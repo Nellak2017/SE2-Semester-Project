@@ -547,7 +547,39 @@ const containerSizePreset = {
 
 // ------
 // --- ATOMS ---
-
+export const outlineButtonPreSets = {
+  variant: {
+    light: css`
+      // TODO: Add Light theme here for the Outline Button
+    `,
+    dark: css`
+      // TODO: Add Dark theme here for the Outline Button
+    `
+  },
+  size: {
+    xs: css`
+    padding: ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.smaller};
+    font-size: ${props => props.theme.fontSizes.extraSmall};
+  `,
+    s: css`
+    padding: ${props => props.theme.spaces.small} ${props => props.theme.spaces.small};
+    font-size: ${props => props.theme.fontSizes.smaller};
+  `,
+    m: css`
+    padding: ${props => props.theme.spaces.medium} ${props => props.theme.spaces.medium};
+    font-size: ${props => props.theme.fontSizes.medium};
+  `,
+    l: css`
+    padding: ${props => props.theme.spaces.large} ${props => props.theme.spaces.large};
+    font-size: ${props => props.theme.fontSizes.large};
+  `,
+    xl: css`
+    padding: ${props => props.theme.spaces.larger} ${props => props.theme.spaces.larger};
+    font-size: ${props => props.theme.fontSizes.larger};
+  `
+  },
+  color: colorPreset
+}
 
 // ------
 // --- Molecules ---
