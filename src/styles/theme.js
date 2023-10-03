@@ -581,6 +581,144 @@ export const outlineButtonPreSets = {
   color: colorPreset
 }
 
+// see also: https://stackoverflow.com/questions/38320878/circle-button-css
+// see also: https://developer.mozilla.org/en-US/docs/Web/CSS/aspect-ratio
+// 691,200 variations
+export const iconButtonPreSets = {
+  variant: {
+    confirmOutline: css`
+      // initially: 
+      
+      // success color
+      color: ${props => props.theme.colors.success};
+      
+      // l size
+      height: ${props => props.theme.fontSizes.large};
+      width: ${props => props.theme.fontSizes.large};
+      padding: 3px;
+      font-size: ${props => props.theme.fontSizes.medium};
+
+      // background transparentSuccess
+      background-color: ${props => props.theme.colors.success}00;
+      &:hover {
+        background-color: ${props => props.theme.colors.successHover}20;
+      }
+      &:active {
+        background-color: ${props => props.theme.colors.successActive}20;
+      }
+      
+      // outlineColor success
+      outline-color: ${props => props.theme.colors.success};
+      
+      // outlineSize xs
+      outline-width: 1px;
+    `,
+    declineOutline: css`
+      // initially: 
+      
+      // danger color
+      color: ${props => props.theme.colors.danger};
+      
+      // l size
+      height: ${props => props.theme.fontSizes.large};
+      width: ${props => props.theme.fontSizes.large};
+      padding: 3px;
+      font-size: ${props => props.theme.fontSizes.medium};
+
+      // background transparentDanger
+      background-color: ${props => props.theme.colors.danger}00;
+      &:hover {
+        background-color: ${props => props.theme.colors.dangerHover}20;
+      }
+      &:active {
+        background-color: ${props => props.theme.colors.dangerActive}20;
+      }
+      
+      // outlineColor danger
+      outline-color: ${props => props.theme.colors.danger};
+      
+      // outlineSize xs
+      outline-width: 1px;
+    `,
+    mediaControllerOutline: css`
+      // initially: 
+
+      // lightNeutral color
+      color: ${props => props.theme.colors.lightNeutralLight};
+
+      // background transparentLightNeutral
+      background-color: ${props => props.theme.colors.lightNeutral}00;
+      &:hover {
+        background-color: ${props => props.theme.colors.lightNeutralHover}20;
+      }
+      &:active {
+        background-color: ${props => props.theme.colors.lightNeutralActive}20;
+      }
+
+      // outlineColor lightNeutralLight
+      outline-color: ${props => props.theme.colors.lightNeutralLight};
+
+      // outlineSize l
+      outline-width: 14px;
+
+      // initially xxl size
+      height: ${props => props.theme.fontSizes.extraLarge};
+      width: ${props => props.theme.fontSizes.extraLarge};
+      padding: 4px;
+      font-size: ${props => props.theme.fontSizes.larger};
+    `,
+    icon: css`
+      // initially: 
+
+      // primary color
+      color: ${props => props.theme.colors.primary};
+
+      // background transparentPrimary
+      background-color: ${props => props.theme.colors.primary}00;
+      &:hover {
+        background-color: ${props => props.theme.colors.primaryHover}20;
+      }
+      &:active {
+        background-color: ${props => props.theme.colors.primaryActive}20;
+      }
+
+      // outlineSize none
+      outline-width: 0;
+
+      // initially xl size
+      height: ${props => props.theme.fontSizes.larger};
+      width: ${props => props.theme.fontSizes.larger};
+      padding: 8px;
+      font-size: ${props => props.theme.fontSizes.large};
+    `
+  },
+  color: allColorsPreset,
+  background: transparentColorPreset,
+  size: iconSizePreset,
+  outlineSize: outlineSizePreset,
+  outlineColor: outlineColorPreset
+}
+
+export const chatInputPresets = {
+  variant: {
+    small: css`
+      & textarea {
+        padding: 0;
+      }
+      & button {
+        height: ${props => props.theme.fontSizes.large};
+        width: ${props => props.theme.fontSizes.large};
+        padding: 4px;
+        font-size: ${props => props.theme.fontSizes.medium};
+      }
+    `,
+    default: css`
+      padding: .5rem ${props => props.theme.fontSizes.smaller};
+    `
+  },
+  color: colorPreset
+}
+
 // ------
 // --- Molecules ---
 

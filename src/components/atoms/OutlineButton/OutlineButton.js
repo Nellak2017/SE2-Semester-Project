@@ -9,8 +9,8 @@ function OutlineButton({ variant = 'dark', onclick, icon = <BiPlus />, text = 'N
 
 	return (
 		<StyledOutlineButton variant={variant} onClick={onclick} maxwidth={maxwidth}>
-			{icon && icon}
-			{text && text}
+			{icon}
+			{text}
 		</StyledOutlineButton>
 	)
 }
