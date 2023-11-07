@@ -722,6 +722,17 @@ export const chatInputPresets = {
 // ------
 // --- Molecules ---
 
+export const threadPresets = {
+  variant: {
+    light: css`
+      
+    `,
+    dark: css`
+    
+    `
+  },
+  color: colorPreset
+}
 
 // ------
 // --- Organisms ---
