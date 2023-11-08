@@ -734,6 +734,18 @@ export const threadPresets = {
   color: colorPreset
 }
 
+export const threadListPresets = {
+  variant: {
+    light: css`
+      
+    `,
+    dark: css`
+    
+    `
+  },
+  color: colorPreset
+}
+
 // ------
 // --- Organisms ---
 

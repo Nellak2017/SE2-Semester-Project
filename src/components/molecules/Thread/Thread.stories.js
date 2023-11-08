@@ -13,7 +13,8 @@ const Template = args => <Thread {...args} />
 export const light = Template.bind({})
 light.args = {
   variant: 'light',
-  idno: 0
+  idno: 0,
+  highlighted: true
 }
 
 export const dark = Template.bind({})

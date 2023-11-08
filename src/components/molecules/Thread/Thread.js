@@ -1,17 +1,20 @@
 import { FiMessageSquare, FiTrash2 } from 'react-icons/fi'
 import { ThreadContainerStyled, IconContainer } from './Thread.elements'
+import { VARIANTS } from '../../utils/constants'
 
 function Thread({
-	variant = 'dark',
+	variant = VARIANTS.dark,
 	color,
 	title = 'Test Title Test Titledddddd',
-	idno = -1,
-	highlighted = true
+	idno = 0,
+	highlighted = false,
+	maxwidth = 244,
+	maxheight = 44
 }) {
 	return (
 		<ThreadContainerStyled
-			$maxwidth={244}
-			$maxheight={44}
+			$maxwidth={maxwidth}
+			$maxheight={maxheight}
 			$variant={variant}
 			$color={color}
 			$highlighted={highlighted}>

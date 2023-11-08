@@ -1,1 +1,1 @@
-export const VARIANTS = ['light', 'dark']
+export const VARIANTS = { light: 'light', dark: 'dark' }
