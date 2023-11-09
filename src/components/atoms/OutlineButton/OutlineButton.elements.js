@@ -13,10 +13,13 @@ export const StyledOutlineButton = styled.button`
 	&:hover {
 		background-color: ${props => props.theme.colors.lightNeutralLight}20;
 	}
+	&:active {
+		background-color: ${props => props.theme.colors.lightNeutralActive};
+	}
 
 	// If maxwidth prop is defined, we use this as the width of the button, otherwise it is normal
-	max-width: ${props => props.maxwidth ? props.maxwidth + 'px' : 'inherit'}; // optional max-width prop
-	width: ${props => props.maxwidth ? '100%' : 'inherit'}; 
+	max-width: ${props => props.$maxwidth ? props.$maxwidth + 'px' : '100%'}; // optional max-width prop
+	width: 100%; 
 
 	// TODO: In the theme.js test the effect of different sizes and fix. I sloppily put it in there
 	// TODO: Factor the below styles out if you need to parameterize based on sizes

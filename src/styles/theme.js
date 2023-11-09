@@ -748,7 +748,17 @@ export const threadListPresets = {
 
 // ------
 // --- Organisms ---
-
+export const sidebarPresets = {
+  variant: {
+    light: css`
+      
+    `,
+    dark: css`
+    
+    `
+  },
+  color: colorPreset
+}
 
 // Pre-set Getter function
 // see also: https://github.com/styled-system/styled-system/issues/1798
