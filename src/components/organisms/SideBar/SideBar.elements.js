@@ -6,13 +6,10 @@ import { getPresetCSS, sidebarPresets } from '../../../styles/theme.js'
 export const SideBarContainer = styled.div`
 	display: flex;
 	flex-direction: column;
-	row-gap: 5px;
-
-	padding: 5px 5px 10px 5px;
+	row-gap: ${props => props.theme.spaces.smaller}; // 4px
+	padding: ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.small} ${props => props.theme.spaces.smaller};
 	height: 98vh;
 	max-width: ${props => props.$maxwidth ? `${props.$maxwidth}px` : '100%'};
-
-	border: 1px solid red;
 
 	.last {
 		margin-top: auto;
@@ -27,5 +24,5 @@ export const SideBarContainer = styled.div`
 
 export const IconContainer = styled.div`
 	display: flex;
-	column-gap: 5px;
+	column-gap: ${props => props.theme.spaces.smaller}; // 4px
 `

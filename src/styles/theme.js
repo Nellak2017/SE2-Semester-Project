@@ -746,6 +746,18 @@ export const threadListPresets = {
   color: colorPreset
 }
 
+export const chatPresets = {
+  user: {
+    user: css`
+      background-color: ${props => props.theme.colors.darkNeutral};
+    `,
+    gpt: css`
+      background-color: ${props => props.theme.colors.lightNeutral};
+    `
+  },
+  color: colorPreset
+}
+
 // ------
 // --- Organisms ---
 export const sidebarPresets = {
