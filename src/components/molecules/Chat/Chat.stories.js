@@ -78,7 +78,7 @@ Notice that the above text goes outside the box, but if styled right it instead 
 export const user = Template.bind({})
 user.args = {
 	user: USERS.user,
-	message: markdownContent,
+	message: "This is user example content with nothing special.",
 	userLogo: <PiPlaceholderDuotone />
 }
 

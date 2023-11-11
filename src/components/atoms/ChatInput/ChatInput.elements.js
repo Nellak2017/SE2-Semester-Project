@@ -12,6 +12,7 @@ export const ChatInputParent = styled.div`
     justify-content: flex-start;
     align-items: flex-end;
     column-gap: .5rem;
+    max-width: 766px;
     width: 100%;
     cursor: text; // This is for accessibility. If user clicks parent div, chatInput child is focused
 

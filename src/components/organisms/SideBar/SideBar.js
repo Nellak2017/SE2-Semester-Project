@@ -12,7 +12,7 @@ import ThreadList from "../../molecules/ThreadList/ThreadList"
 function SideBar({
 	variant = VARIANTS.dark,
 	color,
-	maxwidth = 244,
+	maxwidth = 260,
 	buttonText = "New Chat",
 	threads
 }) {

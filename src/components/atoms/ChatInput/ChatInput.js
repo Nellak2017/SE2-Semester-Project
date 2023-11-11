@@ -13,7 +13,7 @@ const ChatInput = ({
 	buttonType = 'submit',
 	onChange,
 	onBlur,
-	variant,
+	variant = 'default',
 	color,
 	...rest
 }) => {

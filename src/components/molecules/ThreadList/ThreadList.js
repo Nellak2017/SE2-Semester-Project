@@ -6,7 +6,7 @@ import Thread from '../Thread/Thread.js'
 function ThreadList({
 	variant = VARIANTS.dark,
 	color,
-	maxwidth = 244,
+	maxwidth,
 	threads
 }) {
 	return (

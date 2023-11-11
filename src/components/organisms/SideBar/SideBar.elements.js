@@ -8,11 +8,15 @@ export const SideBarContainer = styled.div`
 	flex-direction: column;
 	row-gap: ${props => props.theme.spaces.smaller}; // 4px
 	padding: ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.small} ${props => props.theme.spaces.smaller};
-	height: 98vh;
+	height: 100%;
 	max-width: ${props => props.$maxwidth ? `${props.$maxwidth}px` : '100%'};
+	width: 100%;
+	background-color: ${props => props.theme.colors.darkNeutralDark};
 
 	.last {
 		margin-top: auto;
+		text-align: center;
+		font-size: 16px;
 	}
 
 	${space} 

@@ -6,10 +6,7 @@ export const ChatContainer = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
-	min-height: 84px;
 	padding: ${props => props.theme.spaces.small};
-	border: 1px solid gray;
 
 	* {
 		font-size: ${props => props.theme.fontSizes.small};
@@ -25,9 +22,9 @@ export const ChatContainer = styled.div`
 export const MessageContainer = styled.div`
 	display: flex;
 	column-gap: ${props => props.theme.spaces.medium};
-
 	padding-right: ${props => props.theme.spaces.medium};
-	width: 60%;
+	max-width: 766px;
+	width: 100%;
 	min-height: 84px;
 `
 
@@ -43,6 +40,7 @@ export const Message = styled.pre`
 	width: 100%;
 	white-space: pre-wrap;
   	word-wrap: break-word;
+	padding-top: ${props => props.theme.spaces.smaller};
 `
 
 // Style copied pixel perfectly from ChatGPT

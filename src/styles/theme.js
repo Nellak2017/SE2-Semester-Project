@@ -772,6 +772,32 @@ export const sidebarPresets = {
   color: colorPreset
 }
 
+export const chatListPresets = {
+  variant: {
+    light: css`
+      
+    `,
+    dark: css`
+    
+    `
+  },
+  color: colorPreset
+}
+
+// ------
+// --- Templates ---
+export const llmChatPresets = {
+  variant: {
+    light: css`
+      
+    `,
+    dark: css`
+    
+    `
+  },
+}
+
+
 // Pre-set Getter function
 // see also: https://github.com/styled-system/styled-system/issues/1798
 // see also: https://stackoverflow.com/questions/63663554/approach-to-creating-variants-with-styled-components
