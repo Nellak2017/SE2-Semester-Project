@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { VARIANTS, SX_SLIDER } from "../../utils/constants"
 import {
 	SideBarContainer,
@@ -26,10 +26,12 @@ function SideBar({
 	threads,
 	onTemperatureChange, // Pass to Parent
 	onTypingSpeedChange, // Pass to Parent
+	...props
 }) {
 	const sliderLength = 100 // percent of slider length
 	const [temperaturePosition, setTemperaturePosition] = useState(initialTemperature)
 	const [typingSpeedPosition, setTypingSpeedPosition] = useState(initialTypingSpeed)
+	const [isSidebarOpen, setSidebarOpen] = useState(true)
 
 	const handleTemperatureChange = (_, value) => {
 		setTemperaturePosition(value)
@@ -41,21 +43,30 @@ function SideBar({
 		onTypingSpeedChange && onTypingSpeedChange(value)
 	}
 
+	const handleToggleSidebar = () => setSidebarOpen(!isSidebarOpen)
+
 	return (
-		<SideBarContainer $maxwidth={maxwidth} color={color}>
+		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSidebarOpen} color={color} {...props}>
 			<section>
 				<IconContainer>
 					<OutlineButton
 						variant={variant}
 						text={buttonText}
+						maxheight={44}
 					// add onClick
 					/>
 					<OutlineButton
 						variant={variant}
 						text={null}
 						icon={<BsLayoutSidebar />}
-						maxwidth={34}
-					// add onClick
+						maxwidth={44}
+						maxheight={44}
+						centered={true}
+						onClick={e => {
+							e.stopPropagation()
+							handleToggleSidebar()
+						}}
+						className={!isSidebarOpen ? 'toggle-button':''}
 					/>
 				</IconContainer>
 				<ThreadList

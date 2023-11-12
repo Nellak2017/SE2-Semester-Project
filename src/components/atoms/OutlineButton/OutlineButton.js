@@ -7,18 +7,22 @@ import { BiPlus } from 'react-icons/bi'
 // TODO: Fix the variant validation logic
 function OutlineButton({
 	variant = VARIANTS.dark,
-	onclick,
 	icon = <BiPlus />,
 	text = 'New Chat',
-	maxwidth
+	centered = false, // centers if true
+	maxheight = 44,
+	maxwidth,
+	...props
 }) {
 	//if (!VARIANTS.includes(variant)) variant = 'dark'
-
 	return (
 		<StyledOutlineButton
 			variant={variant}
-			onClick={onclick}
+			onClick={e => {e.stopPropagation()}}
 			$maxwidth={maxwidth}
+			$maxheight={maxheight}
+			$centered={centered}
+			{...props}
 		>
 			{icon}
 			{text}

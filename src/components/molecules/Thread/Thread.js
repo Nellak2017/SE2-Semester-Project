@@ -9,7 +9,8 @@ function Thread({
 	idno = 0,
 	highlighted = false,
 	maxwidth = 244,
-	maxheight = 44
+	maxheight = 44,
+	...props
 }) {
 	return (
 		<ThreadContainerStyled
@@ -17,7 +18,8 @@ function Thread({
 			$maxheight={maxheight}
 			$variant={variant}
 			$color={color}
-			$highlighted={highlighted}>
+			$highlighted={highlighted}
+			{...props}>
 			<IconContainer>
 				<FiMessageSquare id={`thread-message-icon-${idno}`} />
 				<p id={`thread-title-${idno}`}>{title}</p>

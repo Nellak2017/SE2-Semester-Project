@@ -19,11 +19,11 @@ Light.args = {
 	variant: 'light',
 	text: null,
 	icon: <BsLayoutSidebar />,
-	onclick: () => console.log('hello light theme')
+	onClick: () => console.log('hello light theme')
 }
 
 export const Dark = Template.bind({})
 Dark.args = {
 	variant: 'dark',
-	onclick: () => console.log('hello dark theme')
+	onClick: () => console.log('hello dark theme')
 }

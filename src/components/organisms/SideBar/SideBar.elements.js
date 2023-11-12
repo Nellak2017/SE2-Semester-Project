@@ -14,10 +14,15 @@ export const SideBarContainer = styled.div`
 	width: 100%;
 	background-color: ${props => props.theme.colors.darkNeutralDark};
 
+	// styles for hiding or not hiding on button press
+
+	transform: ${props => props.$isOpen ? 'translateX(0)' : 'translateX(-110%)'};
+  	transition: transform 0.3s ease-in-out;
+
 	.last {
 		margin-top: auto;
 		text-align: center;
-		font-size: 16px;
+		font-size: ${props => props.theme.fontSizes.medium}; // 16px
 	}
 
 	& section {
@@ -38,6 +43,14 @@ export const IconContainer = styled.div`
 	display: flex;
 	column-gap: ${props => props.theme.spaces.smaller}; // 4px
 	padding-right: ${props => props.theme.spaces.small}; // 8px
+
+	// styles for hiding or not hiding on button press
+	.toggle-button {
+		position: absolute;
+		top: 0px;
+		left: 110%;
+		z-index: 999; /* Adjust z-index as needed */
+	}
 `
 
 export const SliderContainer = styled.div`

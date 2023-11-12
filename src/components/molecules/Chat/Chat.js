@@ -69,10 +69,11 @@ function Chat({
 	user = USERS.user,
 	userLogo,
 	message,
-	error = false // this is a code smell...
+	error = false, // this is a code smell...
+	...props
 }) {
 	return (
-		<ChatContainer user={user}>
+		<ChatContainer user={user} {...props}>
 			<MessageContainer>
 				<LogoContainer>
 					{userLogo}

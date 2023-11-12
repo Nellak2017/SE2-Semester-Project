@@ -7,10 +7,11 @@ function ThreadList({
 	variant = VARIANTS.dark,
 	color,
 	maxwidth,
-	threads
+	threads,
+	...props
 }) {
 	return (
-		<ThreadListContainer variant={variant} color={color} $maxwidth={maxwidth}>
+		<ThreadListContainer variant={variant} color={color} $maxwidth={maxwidth} {...props}>
 			{threads?.map((info, key) => (
 				<Thread
 					variant={info?.variant}

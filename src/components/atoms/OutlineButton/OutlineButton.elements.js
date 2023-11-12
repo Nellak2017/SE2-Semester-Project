@@ -5,7 +5,7 @@ import { getPresetCSS, outlineButtonPreSets } from '../../../styles/theme.js'
 export const StyledOutlineButton = styled.button`
 	display: flex;
 	align-items: center;
-	justify-content: flex-start;
+	justify-content: ${props => props.$centered ? "center" : "flex-start"};
 	column-gap: ${props => props.theme.spaces.small};
 	background: transparent;
 	outline: 1px solid ${props => props.theme.colors.lightNeutralLight}50; // 50% transparent
@@ -20,6 +20,9 @@ export const StyledOutlineButton = styled.button`
 	// If maxwidth prop is defined, we use this as the width of the button, otherwise it is normal
 	max-width: ${props => props.$maxwidth ? props.$maxwidth + 'px' : '100%'}; // optional max-width prop
 	width: 100%; 
+
+	min-height: ${props => props.$maxheight ? props.$maxheight + 'px' : '100%'};
+	
 
 	// TODO: In the theme.js test the effect of different sizes and fix. I sloppily put it in there
 	// TODO: Factor the below styles out if you need to parameterize based on sizes
