@@ -22,6 +22,7 @@ function ChatList({
 						user={el?.user || USERS?.user}
 						message={el?.text || ""}
 						userLogo={userLogos[el?.user || USERS?.user] || <PiPlaceholderDuotone />}
+						error={el?.error ?? false}
 					/>
 				))}
 			</MessageContainer>

@@ -79,7 +79,8 @@ export const user = Template.bind({})
 user.args = {
 	user: USERS.user,
 	message: "This is user example content with nothing special.",
-	userLogo: <PiPlaceholderDuotone />
+	userLogo: <PiPlaceholderDuotone />,
+	error: true
 }
 
 export const gpt = Template.bind({})

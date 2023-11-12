@@ -53,3 +53,8 @@ export const CodeHeader = styled.div`
 		padding: ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.medium} 0 ${props => props.theme.spaces.medium};
 	}
 `
+
+export const ErrorContainer = styled.div`
+	display: flex;
+	padding-top: ${props => props.theme.spaces.smaller};
+`

@@ -64,6 +64,7 @@ const exampleChatHistory = [
 	{
 		user: 'gpt',
 		text: 'third',
+		error: true, // optional parameter
 		messageId: 2
 	},
 	{

@@ -4,12 +4,14 @@ import {
 	MessageContainer,
 	LogoContainer,
 	Message,
-	CodeHeader
+	CodeHeader,
+	ErrorContainer
 } from './Chat.elements.js'
 import ReactMarkdown from 'react-markdown'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import remarkGfm from "remark-gfm"
+import ErrorMessage from "../../atoms/ErrorMessage/ErrorMessage.js"
 
 // TODO: Research Syntax Highlighting deeper
 //     (1) React Syntax Highlighter - https://github.com/react-syntax-highlighter/react-syntax-highlighter
@@ -66,7 +68,8 @@ const MarkdownComponents = {
 function Chat({
 	user = USERS.user,
 	userLogo,
-	message
+	message,
+	error = false // this is a code smell...
 }) {
 	return (
 		<ChatContainer user={user}>
@@ -74,11 +77,19 @@ function Chat({
 				<LogoContainer>
 					{userLogo}
 				</LogoContainer>
-				<Message>
-					<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
-						{message}
-					</ReactMarkdown>
-				</Message>
+				{!error &&
+					<Message>
+
+						<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
+							{message}
+						</ReactMarkdown>
+					</Message>
+				}
+				<ErrorContainer>
+					{error &&
+						<ErrorMessage />
+					}
+				</ErrorContainer>
 			</MessageContainer>
 		</ChatContainer>
 	)

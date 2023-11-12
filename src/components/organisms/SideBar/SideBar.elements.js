@@ -6,6 +6,7 @@ import { getPresetCSS, sidebarPresets } from '../../../styles/theme.js'
 export const SideBarContainer = styled.div`
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	row-gap: ${props => props.theme.spaces.smaller}; // 4px
 	padding: ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.small} ${props => props.theme.spaces.smaller};
 	height: 100%;
@@ -19,6 +20,13 @@ export const SideBarContainer = styled.div`
 		font-size: 16px;
 	}
 
+	& section {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		row-gap: ${props => props.theme.spaces.smaller};
+	}
+
 	${space} 
     ${layout}
     ${typography}
@@ -29,4 +37,16 @@ export const SideBarContainer = styled.div`
 export const IconContainer = styled.div`
 	display: flex;
 	column-gap: ${props => props.theme.spaces.smaller}; // 4px
+	padding-right: ${props => props.theme.spaces.small}; // 8px
+`
+
+export const SliderContainer = styled.div`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	& div {
+		width: 80%;
+	}
 `
