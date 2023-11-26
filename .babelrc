@@ -8,6 +8,12 @@
 			{
 				"runtime": "automatic"
 			}
+		],
+		[
+			"styled-components",
+			{
+				"ssr": true
+			}
 		]
 	],
 	"ignore": [

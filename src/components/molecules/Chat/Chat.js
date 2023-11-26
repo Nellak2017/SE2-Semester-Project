@@ -80,17 +80,16 @@ function Chat({
 				</LogoContainer>
 				{!error &&
 					<Message>
-
 						<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
 							{message}
 						</ReactMarkdown>
 					</Message>
 				}
-				<ErrorContainer>
-					{error &&
+				{error &&
+					<ErrorContainer>
 						<ErrorMessage />
-					}
-				</ErrorContainer>
+					</ErrorContainer>
+				}
 			</MessageContainer>
 		</ChatContainer>
 	)

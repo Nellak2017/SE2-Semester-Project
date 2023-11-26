@@ -9,7 +9,7 @@ export const ChatContainer = styled.div`
 	padding: ${props => props.theme.spaces.small};
 
 	* {
-		font-size: ${props => props.theme.fontSizes.small};
+		font-size: ${props => props.theme.fontSizes.medium};
 	}
 
 	${space} 
@@ -36,7 +36,7 @@ export const LogoContainer = styled.div`
 
 export const Message = styled.pre`
 	font-size: ${props => props.theme.fontSizes.small};
-	font-weight: 100;
+	font-weight: 300;
 	width: 100%;
 	white-space: pre-wrap;
   	word-wrap: break-word;

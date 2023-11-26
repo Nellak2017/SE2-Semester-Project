@@ -7,8 +7,6 @@ export const ThreadContainerStyled = styled.section`
 	align-items: center;
 
 	border-radius: 5px;
-	padding-left: 10px;
-	padding-right: 10px;
 	background-color: ${props => props.$highlighted === true ? props.theme.colors.lightNeutral : 'transparent'};
 
 	max-width: ${props => props.$maxwidth ? `${props.$maxwidth}px` : '100%'};
@@ -24,10 +22,12 @@ export const ThreadContainerStyled = styled.section`
         box-shadow: ${props => props.theme.elevations.small};
 		background-color: ${props => props.theme.colors.lightNeutralHover};
     }
-    &:active {
+	// This weird :active thing is so that Trashcan :active can be independent from parent
+	// See also: https://stackoverflow.com/questions/33114318/css-prevent-parent-element-getting-active-pseudoclass-when-child-element-is-cl
+	&:active:not(:has(:active)) {
 		cursor: pointer;
 		background-color: ${props => props.theme.colors.lightNeutralActive};
-    }
+	}
     ${space} 
     ${layout}
     ${typography}
@@ -42,6 +42,10 @@ export const IconContainer = styled.div`
 	justify-content: flex-start;
 	column-gap: 10px;
 	width: 100%;
+	height: 100%; // Added in so that Clicking Trash Can is independent from Nav
+	padding-left: 10px; // Added in so that Clicking Trash Can is independent from Nav
+	padding-right: 10px; // Added in so that Clicking Trash Can is independent from Nav
+	border-radius: 5px; // Added in so that Clicking Trash Can is independent from Nav
 
 	p {
 		vertical-align: middle;
@@ -64,6 +68,13 @@ export const IconContainer = styled.div`
 	svg:active {
 		cursor: pointer;
 		color: ${props => props.theme.colors.primaryActive};
+	}
+
+	// This weird :active thing is so that Trashcan :active can be independent from parent
+	// See also: https://stackoverflow.com/questions/33114318/css-prevent-parent-element-getting-active-pseudoclass-when-child-element-is-cl
+	&:active:not(:has(:active)) {
+		cursor: pointer;
+		background-color: ${props => props.theme.colors.lightNeutralActive};
 	}
 
 	.last-icon {

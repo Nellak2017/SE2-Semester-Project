@@ -9,7 +9,8 @@ export const ChatListContainer = styled.section`
 	row-gap: ${props => props.theme.spaces.small};
 	height: 100%;
 	align-items: center;
-	justify-content: flex-end;
+	justify-content: space-between;
+	padding: 0 0 ${props => props.theme.spaces.medium} 0;
 
 	${space} 
     ${layout}
