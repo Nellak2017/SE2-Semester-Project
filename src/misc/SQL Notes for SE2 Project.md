@@ -20,12 +20,6 @@ For the purposes of this documentation, step 1 was skipped over. I do go into fu
    * [Dummy Users](#dummy-users)
    * [Dummy Threads](#dummy-threads)
    * [Dummy Messages](#dummy-messages)
-- [API Reference](#api-reference)
-   * [GET All messages for a given user and thread id](#get-all-messages-for-a-given-user-and-thread-id)
-      + [What you need for GET All messsages](#what-you-need-for-get-all-messsages)
-      + [Code for getMessages](#code-for-getmessages)
-   * [POST Add message](#post-add-message)
-      + [What you need for Add message](#what-you-need-for-add-message)
 - [Setting Up (Assuming our Google Cloud DB is set up w/ dummy data)](#setting-up-assuming-our-google-cloud-db-is-set-up-w-dummy-data)
    * [Service Account](#service-account)
    * [Proxy](#proxy)
@@ -34,6 +28,12 @@ For the purposes of this documentation, step 1 was skipped over. I do go into fu
       + [How to parameterize the queries](#how-to-parameterize-the-queries)
          - [Defining the endpoint, getMessages.js](#defining-the-endpoint-getmessagesjs)
          - [Client using the endpoint](#client-using-the-endpoint)
+- [API Reference](#api-reference)
+   * [GET All messages for a given user and thread id](#get-all-messages-for-a-given-user-and-thread-id)
+      + [What you need for GET All messsages](#what-you-need-for-get-all-messsages)
+      + [Code for getMessages](#code-for-getmessages)
+   * [POST Add message](#post-add-message)
+      + [What you need for Add message](#what-you-need-for-add-message)
 
 # Table of Contents (Obsidian)
 
@@ -45,12 +45,6 @@ For the purposes of this documentation, step 1 was skipped over. I do go into fu
 	- [[#Dummy Users|Dummy Users]]
 	- [[#Dummy Threads|Dummy Threads]]
 	- [[#Dummy Messages|Dummy Messages]]
-- [[#API Reference]]
-	- [[#GET All messages for a given user and thread id|GET All messages for a given user and thread id]]
-		- [[#What you need for GET All messsages|What you need for GET All messsages]]
-      - [[#Code for getMessages|Code for getMessages]
-	- [[#POST Add message|POST Add message]]
-		- [[#What you need for Add message|What you need for Add message]]
 - [[#Setting Up (Assuming our Google Cloud DB is set up w/ dummy data)]]
 	- [[#Service Account|Service Account]]
 	- [[#Proxy|Proxy]]
@@ -58,7 +52,13 @@ For the purposes of this documentation, step 1 was skipped over. I do go into fu
 		- [[#What is an API Endpoint?]]
 		- [[#How to parameterize the queries]]
 			- [[#Defining the endpoint, getMessages.js]]
-			- [[#Client using the endpoint]]]
+			- [[#Client using the endpoint]]
+- [[#API Reference]]
+	- [[#GET All messages for a given user and thread id|GET All messages for a given user and thread id]]
+		- [[#What you need for GET All messsages|What you need for GET All messsages]]
+      - [[#Code for getMessages|Code for getMessages]
+	- [[#POST Add message|POST Add message]]
+		- [[#What you need for Add message|What you need for Add message]]
 
 
 # Database Schema
@@ -175,83 +175,6 @@ INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) VALUES (4, 
 INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) VALUES (4, 2, 'Message2_Thread2_UserB', CURRENT_TIMESTAMP, 0);
 INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) VALUES (4, 2, 'Message3_Thread2_UserB', CURRENT_TIMESTAMP, 1);
 ```
-
-# API Reference
-
-These are all the supported API endpoints for the SE2 application.
-
-## GET All messages for a given user and thread id
-
-```sql
-SELECT Messages.* 
-FROM Messages 
-JOIN Users ON Messages.UserID = Users.UserID 
-JOIN Threads ON Messages.ThreadID = Threads.ThreadID 
-WHERE Users.UserName = ? 
- AND Threads.Name = ?;
-```
-
-### What you need for GET All messsages
-
-- UserName : string
-- Name : string // Name of the thread
-
-### Code for getMessages
-
-__getMessages.js__
-```javascript
-import { connectToDatabase } from "./utils/db"
-
-// Serverless function handler
-export const handler = async (req, res) => {
-    try {
-        // Connect to db
-        const db = await connectToDatabase()
-        
-        // Extract parameters from the request query
-        const { userID, threadID } = req.query
-
-        // Check if both userID and threadID are provided
-        if (!userID || !threadID) {
-            return res.status(400).json({ error: 'Both userID and threadID are required parameters.' })
-        }
-
-        // GET messages operation
-        const query = `
-            SELECT Messages.* 
-            FROM Messages 
-            JOIN Users ON Messages.UserID = Users.UserID 
-            JOIN Threads ON Messages.ThreadID = Threads.ThreadID 
-            WHERE Users.UserName = ? 
-              AND Threads.Name = ?;
-            `
-
-        const result = await db.query(query, [userID, threadID])
-
-        // Send the result as a JSON response
-        res.status(200).json(result[0]) //result.rows
-    } catch (e) {
-        console.error(e)
-        res.status(500).json({ error: 'Internal Server Error' })
-    }
-}
-
-export default handler
-```
-
-## POST Add message
-
-```sql
-INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) VALUES (2, 1, 'Message1_Thread2_UserA', CURRENT_TIMESTAMP, 1);
-```
-
-### What you need for Add message
-
-- ThreadID : number
-- UserID : number
-- Text : string
-- Timestamp : Timestamp
-- SentByUser : 0 | 1 to represent boolean
 
 # Setting Up (Assuming our Google Cloud DB is set up w/ dummy data)
 
@@ -420,3 +343,80 @@ useEffect(() => {
 ```
 
 As you can see in the [[#Defining the endpoint, getMessages.js|endpoint itself]], question marks are used to parameterize positionally based on the _position in the array_ below. I am not sure if you can do named parameterization using this driver, so for now we will stick to positional based paramterization.
+
+# API Reference
+
+These are all the supported API endpoints for the SE2 application.
+
+## GET All messages for a given user and thread id
+
+```sql
+SELECT Messages.* 
+FROM Messages 
+JOIN Users ON Messages.UserID = Users.UserID 
+JOIN Threads ON Messages.ThreadID = Threads.ThreadID 
+WHERE Users.UserName = ? 
+ AND Threads.Name = ?;
+```
+
+### What you need for GET All messsages
+
+- UserName : string
+- Name : string // Name of the thread
+
+### Code for getMessages
+
+__getMessages.js__
+```javascript
+import { connectToDatabase } from "./utils/db"
+
+// Serverless function handler
+export const handler = async (req, res) => {
+    try {
+        // Connect to db
+        const db = await connectToDatabase()
+        
+        // Extract parameters from the request query
+        const { userID, threadID } = req.query
+
+        // Check if both userID and threadID are provided
+        if (!userID || !threadID) {
+            return res.status(400).json({ error: 'Both userID and threadID are required parameters.' })
+        }
+
+        // GET messages operation
+        const query = `
+            SELECT Messages.* 
+            FROM Messages 
+            JOIN Users ON Messages.UserID = Users.UserID 
+            JOIN Threads ON Messages.ThreadID = Threads.ThreadID 
+            WHERE Users.UserName = ? 
+              AND Threads.Name = ?;
+            `
+
+        const result = await db.query(query, [userID, threadID])
+
+        // Send the result as a JSON response
+        res.status(200).json(result[0]) //result.rows
+    } catch (e) {
+        console.error(e)
+        res.status(500).json({ error: 'Internal Server Error' })
+    }
+}
+
+export default handler
+```
+
+## POST Add message
+
+```sql
+INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) VALUES (2, 1, 'Message1_Thread2_UserA', CURRENT_TIMESTAMP, 1);
+```
+
+### What you need for Add message
+
+- ThreadID : number
+- UserID : number
+- Text : string
+- Timestamp : Timestamp
+- SentByUser : 0 | 1 to represent boolean
