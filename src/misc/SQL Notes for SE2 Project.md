@@ -189,18 +189,18 @@ These are all the supported API endpoints for the SE2 application.
 ## GET All messages for a given user and thread id
 
 ```sql
-SELECT Messages.*
-FROM Messages
-JOIN Users ON Messages.UserID = Users.UserID
-JOIN Threads ON Messages.ThreadID = Threads.ThreadID
-WHERE Users.UserName = 'UserA'
-  AND Threads.ThreadID = '1';
+SELECT Messages.* 
+FROM Messages 
+JOIN Users ON Messages.UserID = Users.UserID 
+JOIN Threads ON Messages.ThreadID = Threads.ThreadID 
+WHERE Users.UserName = ? 
+ AND Threads.Name = ?;
 ```
 
 ### What you need for GET All messsages
 
-- UserName
-- ThreadID // later look into doing it with thread name?
+- UserName : string
+- Name : string // Name of the thread
 
 ## POST Add message
 
@@ -210,11 +210,11 @@ INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) VALUES (2, 
 
 ### What you need for Add message
 
-- ThreadID
-- UserID 
-- Text 
-- Timestamp 
-- SentByUser
+- ThreadID : number
+- UserID : number
+- Text : string
+- Timestamp : Timestamp
+- SentByUser : 0 | 1 to represent boolean
 
 # Setting Up (Assuming our Google Cloud DB is set up w/ dummy data)
 
