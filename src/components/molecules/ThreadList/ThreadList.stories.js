@@ -12,14 +12,14 @@ const Template = args => <ThreadList {...args} />
 
 const exampleThreadInfo = [
 	{
-		title: 'Test 1',
+		name: 'Test 1',
 		highlighted: true
 	},
 	{
-		title: 'Test 2'
+		name: 'Test 2'
 	},
 	{
-		title: 'Test 3'
+		name: 'Test 3'
 	}
 ]
 

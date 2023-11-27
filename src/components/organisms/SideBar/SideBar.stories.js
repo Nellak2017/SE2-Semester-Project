@@ -12,14 +12,14 @@ const Template = args => <SideBar {...args} />
 
 const exampleThreadInfo = [
 	{
-		title: 'Test 1',
+		name: 'Test 1',
 		highlighted: true
 	},
 	{
-		title: 'Test 2'
+		name: 'Test 2'
 	},
 	{
-		title: 'Test 3'
+		Name: 'Test 3'
 	}
 ]
 

@@ -18,17 +18,16 @@ const exampleUserLogos = {
 // TODO: Add Lazy Loading
 // TODO: Add real image assets for user and gpt
 // TODO: When the Thread we are highlighted on is fetched, set the temperature and typing speed associated with it
+// TODO: When error, use error component
 export default function Home() {
 
   const [userID, setUserID] = useState(1) // TODO: Stop Hardcoding and use User Information when the User Logs in
   const [messages, setMessages] = useState([])
-  const [threads, setThreads] = useState([]) // unfiltered, use the filterThreads function
-  const [filteredThreads, setFilteredThreads] = useState([]) // filtered copy of threads
-  const [temperature, setTemperature] = useState(50)
-  const [typingSpeed, setTypingSpeed] = useState(50)
+  const [threads, setThreads] = useState([]) // unfiltered, has temperature and typing speed included
+  const [threadIndex, setThreadIndex] = useState(0) // the thread we are highlighting
 
-  const [threadListenerList, setThreadListenerList] = useState([() => console.log('no listeners assigned')])
-  const [trashListenerList, setTrashListenerList] = useState([() => console.log('no listeners assigned')])
+  const [threadListenerList, setThreadListenerList] = useState([() => console.log('no listeners assigned')]) // Event Listeners set at runtime
+  const [trashListenerList, setTrashListenerList] = useState([() => console.log('no listeners assigned')]) // Event Listeners set at runtime
 
   // --- Initial State Loaded in from DB
   useEffect(() => {
@@ -42,7 +41,7 @@ export default function Home() {
 
   // --- Helpers (pure)
   // Function to highlight a specific thread at an index
-  function highlightThread(threadList, index) {
+  function highlightThread(threadList, index = 0) {
     if (!threadList || index < 0 || index > threadList.length) return []
     return threadList.map((e, i) => {
       return i === index ?
@@ -52,33 +51,25 @@ export default function Home() {
   }
 
   // Function to tell the index of the currently highlighted
-  function indexOfCurrentlyHighlighted(threadList) {
-    return threadList?.findIndex(el => el.highlighted === true)
-  }
+  function indexOfCurrentlyHighlighted(threadList) { return threadList?.findIndex(el => el.highlighted === true) }
 
-  // Function to filter the threads to be consumed by the Client
-  function filterThreads(threadList, highlightIndex = 0) {
-    if (threadList.length <= 1 || !threadList) return []
-    return threadList?.map((e, i) => {
-      return {
-        title: e?.Name,
-        highlighted: i === highlightIndex,
-        threadID: e?.ThreadID,
-      }
-    })
+  // Function to update an Object in a list given the index, property name, and property value
+  function updateObjInList(objList, index, propertyName, propertyValue) {
+    if (index < 0 || index === undefined || isNaN(index) || index > objList.length) return objList
+    const updatedList = [...objList]
+    updatedList[index] = { ...updatedList[index], [propertyName]: propertyValue }
+    return updatedList
   }
 
   // --- Helpers (impure)
   // Function to assign the Link Listeners and SET state
   function assignLinkListeners(userID, threads) {
     // Set the List of listener functions for each Link
-    console.log("listeners are being assigned")
-    console.log(threads)
     setThreadListenerList(threads.map((e, i) => {
       return () => {
         getMessages(userID, e?.ThreadID)
-        setFilteredThreads(highlightThread(filterThreads(threads), i))
-        console.log(e)
+        setThreads(highlightThread(threads, i))
+        setThreadIndex(i) // so we know which is highlighted
       }
     }))
   }
@@ -89,9 +80,8 @@ export default function Home() {
     try {
       console.log('Trying to get the threads...')
       const response = await axios.get('/api/getThreads', { params: { userID } })
-      setThreads(response.data)
-      setFilteredThreads(filterThreads(response.data, highlightIndex))
-      return response.data
+      setThreads(highlightThread(response.data, highlightIndex)) // highlight nth thread
+      return highlightThread(response.data, highlightIndex)
     } catch (e) {
       console.error('Error fetching threads:', e)
       toast.error('Error fetching threads. See dev console for more info.')
@@ -136,9 +126,7 @@ export default function Home() {
   }
 
   // --- Handlers
-  const handleOnSubmit = text => {
-    addMessage(text, userID, threads[indexOfCurrentlyHighlighted(threads)]?.threadID, 0)
-  }
+  const handleOnSubmit = text => { addMessage(text, userID, threads[indexOfCurrentlyHighlighted(threads)]?.threadID, 0) }
 
   const handleNewChat = () => {
     /*
@@ -148,30 +136,30 @@ export default function Home() {
     */
   }
 
-  const handleTemperatureChange = temp => { setTemperature(temp) }
-  const handleTypingSpeedChange = speed => { setTypingSpeed(speed) }
+  const handleTemperatureChange = temp => { setThreads(updateObjInList(threads, threadIndex, 'Temperature', temp)) }
+  const handleTypingSpeedChange = speed => { setThreads(updateObjInList(threads, threadIndex, 'TypingSpeed', speed)) }
   const handleTemperatureMouseUp = () => {
-    console.log(temperature)
+    console.log(threads[threadIndex]?.Temperature)
     // Edit the temperature in the API Request
   }
   const handleTypingSpeedMouseUp = () => {
-    console.log(typingSpeed)
-    // Edit the temperature in the API Request
+    console.log(threads[threadIndex]?.TypingSpeed)
+    // Edit the typingspeed in the API Request
   }
 
   return (
     <>
       <button onClick={() => console.log(threadListenerList[0])}>event listeners</button>
-      <button onClick={() => console.log(filteredThreads)}>filtered threads</button>
+      <button onClick={() => console.log(threads)}>threads</button>
       <LLMChat
         variant='dark'
         chatHistory={messages.slice().reverse()}
         userLogos={exampleUserLogos}
-        threads={filteredThreads}
+        threads={threads}
         threadListenerList={threadListenerList}
         trashListenerList={trashListenerList}
         initialTemperature={50} // TODO: Set these to proper values from getting them in API req
-        initialTypingSpeed={50}
+        initialTypingSpeed={50} // TODO: Set these to proper values from getting them in API req
         onSubmitHandler={text => handleOnSubmit(text)}
         onTemperatureChange={temp => handleTemperatureChange(temp)}
         onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}

@@ -110,10 +110,13 @@ CREATE TABLE `Threads` (
 )
 ```
 
-| Field    | Type        | Null | Key | Default | Extra          |
-| ----------|-------------|------|-----|---------|---------------|
-| UserID   | int         | NO   | PRI | NULL    | auto_increment |
-| UserName | varchar(50) | NO   |     | NULL    |                |
+| Field       | Type         | Null | Key | Default | Extra          |
+|-------------|--------------|------|-----|---------|----------------|
+| ThreadID    | int          | NO   | PRI | NULL    | auto_increment |
+| Name        | varchar(100) | NO   | MUL | NULL    |                |
+| Temperature | int          | YES  |     | 50      |                |
+| TypingSpeed | int          | YES  |     | 50      |                |
+| UserID      | int          | NO   | MUL | NULL    |                |
 
 ## Users Table
 

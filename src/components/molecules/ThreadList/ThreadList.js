@@ -7,8 +7,8 @@ function ThreadList({
 	color,
 	maxwidth,
 	threads,
-	threadListenerList = [() => {}], // Pass to Parent
-	trashListenerList = [() => {}],  // Pass to Parent
+	threadListenerList = [() => { }], // Pass to Parent
+	trashListenerList = [() => { }],  // Pass to Parent
 	...props
 }) {
 
@@ -20,22 +20,36 @@ function ThreadList({
 		trashListenerList && trashListenerList[index] && trashListenerList[index]()
 	}
 
+	// TODO: Extract this into seperate file and Unit test
+	// Function to convert object keys to lowercase
+	function convertKeysToLowerCase(obj) {
+		return Object.keys(obj).reduce((acc, currentKey) => {
+			acc[currentKey.toLowerCase()] = obj[currentKey]
+			return acc
+		}, {})
+	}
+
 	return (
 		<ThreadListContainer variant={variant} color={color} $maxwidth={maxwidth} {...props}>
-			{threads?.map((info, key) => (
-				<Thread
-					variant={info?.variant}
-					color={info?.color}
-					title={info?.title}
-					idno={info?.idno || key}
-					highlighted={info?.highlighted}
-					maxwidth={info?.maxwidth}
-					maxheight={info?.maxheight}
-					threadListener={() => handleLinkClick(key)}
-					trashListener={() => handleTrashClick(key)}
-					key={`thread-trash-icon-${key}`}
-				/>
-			))}
+			{threads?.map((info, key) => {
+				const lowercaseInfo = convertKeysToLowerCase(info)
+				// everything is lowercased to ensure consistency
+				return (
+					<Thread
+						variant={lowercaseInfo?.variant}
+						color={lowercaseInfo?.color}
+						name={lowercaseInfo?.name}
+						idno={lowercaseInfo?.threadid || key} 
+						highlighted={lowercaseInfo?.highlighted}
+						maxwidth={lowercaseInfo?.maxwidth}
+						maxheight={lowercaseInfo?.maxheight}
+						threadListener={() => handleLinkClick(key)}
+						trashListener={() => handleTrashClick(key)}
+						key={`thread-trash-icon-${key}`}
+					/>
+				)
+			}
+			)}
 		</ThreadListContainer>
 	)
 }

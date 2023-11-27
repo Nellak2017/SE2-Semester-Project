@@ -7,7 +7,7 @@ import { VARIANTS } from '../../utils/constants'
 function Thread({
 	variant = VARIANTS.dark,
 	color,
-	title = 'Test Title Test Title',
+	name = 'Test name Test name',
 	idno = 0,
 	highlighted = false,
 	maxwidth = 244,
@@ -28,7 +28,7 @@ function Thread({
 			{...props}>
 			<IconContainer>
 				<FiMessageSquare id={`thread-message-icon-${idno}`} />
-				<p id={`thread-title-${idno}`}>{title}</p>
+				<p id={`thread-name-${idno}`}>{name}</p>
 				<FiTrash2
 					id={`thread-trash-icon-${idno}`}
 					className='last-icon'
