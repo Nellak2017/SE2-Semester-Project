@@ -128,7 +128,8 @@ const exampleThreadInfo = [
 const dummyDBThread = [
   {
     title: 'Thread1_UserA',
-    highlighted: true
+    highlighted: true,
+    threadID: 1,
   }
 ]
 
@@ -136,40 +137,99 @@ const dummyDBThread = [
 const stringToBoolean = SentByUser => SentByUser === 'gpt'
 const booleanToString = bool => bool ? 'gpt' : 'user'
 
-// TODO: STOP HARD CODING THE USER AND THREAD SELECTION. THIS IS ONLY FOR TESTING ONLY!!!
+// TODO: Stop Hardcoding and use User Information when the User Logs in
 export default function Home() {
 
+  const [userID, setUserID] = useState(1)
   const [messages, setMessages] = useState([])
+  const [threads, setThreads] = useState([])
+
+  const [threadListenerList, setThreadListenerList] = useState([() => console.log('no listeners assigned')])
+  const [trashListenerList, setTrashListenerList] = useState([() => console.log('no listeners assigned')])
 
   useEffect(() => {
-    (async () => {
+
+    // Function to get all the Threads for the user AND set the state too
+    const getThreads = async (userID, highlightIndex = 0) => {
       try {
-        // Replace 'your-thread-id' with the actual ID of the thread you're interested in
-        const response = await axios.get('/api/getMessages', { // Don't hardcode this. Only use for testing
-          params: { userID: 'UserA', name: '1' },
+        // Don't hardcode this. Only use for testing
+        const response = await axios.get('/api/getThreads', { params: { userID } })
+
+        setThreads(response.data.map((e, i) => {
+          return {
+            title: e?.Name,
+            highlighted: i === highlightIndex,
+            threadID: e?.ThreadID,
+          }
+        }))
+      } catch (e) {
+        console.error('Error fetching threads:', e)
+      }
+    }
+
+    // Function to get Messages for the first thread AND set the state too
+    const getMessages = async (userID, threadID) => {
+      try {
+        // Don't hardcode this. Only use for testing
+        const response = await axios.get('/api/getMessages', {
+          params: { userID, threadID },
         })
 
-        console.log(response.data)
-
-        setMessages(response.data.map(e => {
-          return {
-            'user': booleanToString(e?.SentByUser),
-            'text': e?.Text,
-            'messageId': e?.MessageID
-          }
-        })) // TODO: Change this when you fix the Boolean TODO
-      } catch (error) {
-        console.error('Error fetching messages:', error)
+        setMessages(
+          response.data.map(e => {
+            return {
+              user: booleanToString(e?.SentByUser),
+              text: e?.Text,
+              messageId: e?.MessageID
+            }
+          })
+        ) // TODO: Change this when you fix the Boolean TODO
+      } catch (e) {
+        console.error('Error fetching messages:', e)
       }
-    })()
+    }
+
+    // Function to assign the Link Listeners to the Thread Links by setting the state
+    const assignLinkListeners = userID => {
+
+      // Set the List of listener functions for each Link
+      setThreadListenerList(threads.map((e, i) => {
+        return () => {
+          // Get the messages for a chat and set state for messages
+          getMessages(userID, e?.threadID)
+
+          // Change thread highlight to be the new selected one
+          setThreads(highlightThread(threads, i))
+        }
+      }))
+    }
+
+    // Call the functions in order
+    getThreads(userID, 0)
+    getMessages(userID, threads[0]?.threadID) // possible race condition due to accessing threads before initialization
+    assignLinkListeners(userID)
   }, [])
+
+  // helpers
+
+  // Function to highlight a specific thread at an index
+  function highlightThread(threadList, index) {
+    if (!threadList || index < 0 || index > threadList.length) return []
+    return threadList.map((e, i) => {
+      return i === index ?
+        { ...e, highlighted: true } :
+        { ...e, highlighted: false }
+    })
+  }
 
   return (
     <LLMChat
       variant='dark'
       chatHistory={messages.slice().reverse()}
       userLogos={exampleUserLogos}
-      threads={dummyDBThread}
+      threads={threads}
+      threadListenerList={threadListenerList}
+      trashListenerList={trashListenerList}
     />
   )
 }

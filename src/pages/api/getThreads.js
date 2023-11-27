@@ -7,24 +7,21 @@ export const handler = async (req, res) => {
 		const db = await connectToDatabase()
 
 		// Extract parameters from the request query
-		const { userID, threadID } = req.query
+		const { userID } = req.query
 
 		// Check if both userID and name are provided
-		if (!userID || !threadID) {
-			return res.status(400).json({ error: 'Both userID and threadID are required parameters.' })
+		if (!userID) {
+			return res.status(400).json({ error: 'userID is the required parameter and it is missing.' })
 		}
 
 		// GET messages operation
 		const query = `
-			SELECT Messages.* 
-			FROM Messages 
-			JOIN Users ON Messages.UserID = Users.UserID 
-			JOIN Threads ON Messages.ThreadID = Threads.ThreadID 
-			WHERE Users.UserID = ? 
-			AND Threads.ThreadID = ?;
+			SELECT Threads.*
+			FROM Threads
+			WHERE Threads.UserID = ?;
 			`
 
-		const result = await db.query(query, [userID, threadID])
+		const result = await db.query(query, [userID])
 
 		// Send the result as a JSON response
 		res.status(200).json(result[0]) //result.rows

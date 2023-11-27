@@ -24,6 +24,7 @@ function Thread({
 			$color={color}
 			$highlighted={highlighted}
 			className={'thread-container'}
+			onClick={() => threadListener()}
 			{...props}>
 			<IconContainer>
 				<FiMessageSquare id={`thread-message-icon-${idno}`} />
@@ -31,7 +32,7 @@ function Thread({
 				<FiTrash2
 					id={`thread-trash-icon-${idno}`}
 					className='last-icon'
-					onClick={e => { console.log('trash icon');e.stopPropagation(); trashListener() }}
+					onClick={e => { e.stopPropagation(); trashListener() }}
 				/>
 			</IconContainer>
 		</ThreadContainerStyled>

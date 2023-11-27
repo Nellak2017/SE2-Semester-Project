@@ -26,6 +26,8 @@ function SideBar({
 	threads,
 	onTemperatureChange, // Pass to Parent
 	onTypingSpeedChange, // Pass to Parent
+	threadListenerList = [() => {}],  // Pass to Parent
+	trashListenerList = [() => {}],   // Pass to Parent
 	...props
 }) {
 	const sliderLength = 100 // percent of slider length
@@ -72,7 +74,8 @@ function SideBar({
 				<ThreadList
 					variant={variant}
 					threads={threads}
-				// Listeners should be handled as an implementation detail in ThreadList
+					threadListenerList={threadListenerList}
+					trashListenerList={trashListenerList}
 				/>
 			</section>
 
