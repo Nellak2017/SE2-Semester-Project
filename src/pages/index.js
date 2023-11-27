@@ -26,7 +26,6 @@ export default function Home() {
   const [filteredThreads, setFilteredThreads] = useState([]) // filtered copy of threads
   const [temperature, setTemperature] = useState(50)
   const [typingSpeed, setTypingSpeed] = useState(50)
-  const [highlightIndex, setHighlightIndex] = useState(0)
 
   const [threadListenerList, setThreadListenerList] = useState([() => console.log('no listeners assigned')])
   const [trashListenerList, setTrashListenerList] = useState([() => console.log('no listeners assigned')])
@@ -37,7 +36,7 @@ export default function Home() {
     (async () => {
       const unfilteredThreads = await getThreads(userID, 0) // WARNING: Does side effect and returns value too
       getMessages(userID, unfilteredThreads[0]?.ThreadID) // No Race Condition because threads is awaited above. Always 0 because initial render
-      assignLinkListeners(userID)
+      assignLinkListeners(userID, unfilteredThreads)
     })()
   }, [])
 
@@ -71,16 +70,15 @@ export default function Home() {
 
   // --- Helpers (impure)
   // Function to assign the Link Listeners and SET state
-  function assignLinkListeners(userID) {
+  function assignLinkListeners(userID, threads) {
     // Set the List of listener functions for each Link
     console.log("listeners are being assigned")
-    console.log(filteredThreads)
-    setThreadListenerList(filteredThreads.map((e, i) => {
+    console.log(threads)
+    setThreadListenerList(threads.map((e, i) => {
       return () => {
-        getMessages(userID, e?.threadID)
-        setFilteredThreads(highlightThread(filteredThreads, i))
-        setHighlightIndex(i) // potentially redundant
-        console.log(i)
+        getMessages(userID, e?.ThreadID)
+        setFilteredThreads(highlightThread(filterThreads(threads), i))
+        console.log(e)
       }
     }))
   }
@@ -164,7 +162,7 @@ export default function Home() {
   return (
     <>
       <button onClick={() => console.log(threadListenerList[0])}>event listeners</button>
-
+      <button onClick={() => console.log(filteredThreads)}>filtered threads</button>
       <LLMChat
         variant='dark'
         chatHistory={messages.slice().reverse()}
