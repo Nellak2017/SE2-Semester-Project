@@ -146,12 +146,18 @@ export default function Home() {
       try {
         // Replace 'your-thread-id' with the actual ID of the thread you're interested in
         const response = await axios.get('/api/getMessages', { // Don't hardcode this. Only use for testing
-          params: { userID: 'UserA', threadID: '1' },
+          params: { userID: 'UserA', name: '1' },
         })
 
         console.log(response.data)
-        
-        setMessages(response.data.map(e => { return { 'user': booleanToString(e?.SentByUser), 'text': e?.Text, 'messageId':e?.MessageID } })) // TODO: Change this when you fix the Boolean TODO
+
+        setMessages(response.data.map(e => {
+          return {
+            'user': booleanToString(e?.SentByUser),
+            'text': e?.Text,
+            'messageId': e?.MessageID
+          }
+        })) // TODO: Change this when you fix the Boolean TODO
       } catch (error) {
         console.error('Error fetching messages:', error)
       }
