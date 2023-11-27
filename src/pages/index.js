@@ -68,7 +68,7 @@ export default function Home() {
     setThreadListenerList(threads.map((e, i) => {
       return () => {
         getMessages(userID, e?.ThreadID)
-        setThreads(highlightThread(threads, i))
+        getThreads(userID, i) // so that the temperature and typing speed are updated as expected, we must fetch new threads
         setThreadIndex(i) // so we know which is highlighted
       }
     }))
@@ -125,6 +125,38 @@ export default function Home() {
     }
   }
 
+  // PATCH Temperature - Function to update Temperature for the thread that is currently active AND set the state too
+  async function patchTemperature(userID, threadID, newTemperature, threadIndex) {
+    try {
+      const response = await axios.patch('/api/patchTemperature', {
+        userID: userID,
+        threadID: threadID,
+        newTemperature: newTemperature,
+      })
+      getThreads(userID, threadIndex)
+      console.log(response.data)
+    } catch (e) {
+      console.error('Error updating temperature:', e)
+      toast.error('Error updating temperature. See dev console for more info.')
+    }
+  }
+
+  // PATCH TypingSpeed - Function to update Typing Speed for the thread that is currently active AND set the state too
+  async function patchTypingSpeed(userID, threadID, newTypingSpeed, threadIndex) {
+    try {
+      const response = await axios.patch('/api/patchTypingSpeed', {
+        userID: userID,
+        threadID: threadID,
+        newTypingSpeed: newTypingSpeed,
+      })
+      getThreads(userID, threadIndex)
+      console.log(response.data)
+    } catch (e) {
+      console.error('Error updating typing speed:', e)
+      toast.error('Error updating typing speed. See dev console for more info.')
+    }
+  }
+
   // --- Handlers
   const handleOnSubmit = text => { addMessage(text, userID, threads[indexOfCurrentlyHighlighted(threads)]?.threadID, 0) }
 
@@ -139,18 +171,18 @@ export default function Home() {
   const handleTemperatureChange = temp => { setThreads(updateObjInList(threads, threadIndex, 'Temperature', temp)) }
   const handleTypingSpeedChange = speed => { setThreads(updateObjInList(threads, threadIndex, 'TypingSpeed', speed)) }
   const handleTemperatureMouseUp = () => {
-    console.log(threads[threadIndex]?.Temperature)
-    // Edit the temperature in the API Request
+    const newTemperature = threads[threadIndex]?.Temperature
+    const currentThreadID = threads[threadIndex]?.ThreadID
+    patchTemperature(userID, currentThreadID, newTemperature, threadIndex)
   }
   const handleTypingSpeedMouseUp = () => {
-    console.log(threads[threadIndex]?.TypingSpeed)
-    // Edit the typingspeed in the API Request
+    const newTypingSpeed = threads[threadIndex]?.TypingSpeed
+    const currentThreadID = threads[threadIndex]?.ThreadID
+    patchTypingSpeed(userID, currentThreadID, newTypingSpeed, threadIndex)
   }
 
+  // Conditional Rendering used to ensure that default sliders get proper values
   return (
-    <>
-      <button onClick={() => console.log(threadListenerList[0])}>event listeners</button>
-      <button onClick={() => console.log(threads)}>threads</button>
       <LLMChat
         variant='dark'
         chatHistory={messages.slice().reverse()}
@@ -158,14 +190,13 @@ export default function Home() {
         threads={threads}
         threadListenerList={threadListenerList}
         trashListenerList={trashListenerList}
-        initialTemperature={50} // TODO: Set these to proper values from getting them in API req
-        initialTypingSpeed={50} // TODO: Set these to proper values from getting them in API req
+        initialTemperature={threads[threadIndex]?.Temperature}
+        initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
         onSubmitHandler={text => handleOnSubmit(text)}
         onTemperatureChange={temp => handleTemperatureChange(temp)}
         onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}
         onTemperatureMouseUp={handleTemperatureMouseUp}
         onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
       />
-    </>
   )
 }

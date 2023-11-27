@@ -37,6 +37,13 @@ function SideBar({
 	const [typingSpeedPosition, setTypingSpeedPosition] = useState(initialTypingSpeed)
 	const [isSidebarOpen, setSidebarOpen] = useState(true)
 
+	// This is to let the parent alter the state of the slider lightly, but still allow this component to mostly handle it
+	// Without this, the component won't render intially properly in all cases
+	useEffect(() => {
+		setTemperaturePosition(initialTemperature)
+    	setTypingSpeedPosition(initialTypingSpeed)
+	}, [initialTemperature, initialTypingSpeed])
+
 	const handleTemperatureChange = (_, value) => {
 		setTemperaturePosition(value)
 		onTemperatureChange && onTemperatureChange(value)
@@ -103,6 +110,7 @@ function SideBar({
 							onMouseUp={handleTemperatureMouseUp}
 							onChange={handleTemperatureChange}
 							sx={SX_SLIDER}
+							defaultValue={initialTemperature}
 						/>
 					</div>
 				</SliderContainer>
@@ -119,6 +127,7 @@ function SideBar({
 							onMouseUp={handleTypingSpeedMouseUp}
 							onChange={handleTypingSpeedChange}
 							sx={SX_SLIDER}
+							defaultValue={initialTypingSpeed}
 						/>
 					</div>
 				</SliderContainer>
