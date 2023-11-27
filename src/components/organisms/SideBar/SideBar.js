@@ -20,12 +20,14 @@ function SideBar({
 	buttonText = "New Chat",
 	logoutText = "Log Out",
 	exportText = "Export to Text",
-	initialTemperature = 32,
-	initialTypingSpeed = 32,
+	initialTemperature = 50,
+	initialTypingSpeed = 50,
 	color,
 	threads,
 	onTemperatureChange, // Pass to Parent
 	onTypingSpeedChange, // Pass to Parent
+	onTemperatureMouseUp, // Pass to Parent
+	onTypingSpeedMouseUp, // Pass to Parent
 	threadListenerList = [() => {}],  // Pass to Parent
 	trashListenerList = [() => {}],   // Pass to Parent
 	...props
@@ -43,6 +45,14 @@ function SideBar({
 	const handleTypingSpeedChange = (_, value) => {
 		setTypingSpeedPosition(value)
 		onTypingSpeedChange && onTypingSpeedChange(value)
+	}
+
+	const handleTemperatureMouseUp = () => {
+		onTemperatureMouseUp && onTemperatureMouseUp()
+	}
+
+	const handleTypingSpeedMouseUp = () => {
+		onTypingSpeedMouseUp && onTypingSpeedMouseUp()
 	}
 
 	const handleToggleSidebar = () => setSidebarOpen(!isSidebarOpen)
@@ -90,6 +100,7 @@ function SideBar({
 							min={0}
 							step={1}
 							max={sliderLength}
+							onMouseUp={handleTemperatureMouseUp}
 							onChange={handleTemperatureChange}
 							sx={SX_SLIDER}
 						/>
@@ -105,6 +116,7 @@ function SideBar({
 							min={0}
 							step={1}
 							max={sliderLength}
+							onMouseUp={handleTypingSpeedMouseUp}
 							onChange={handleTypingSpeedChange}
 							sx={SX_SLIDER}
 						/>

@@ -8,7 +8,7 @@ function MyApp({ Component, pageProps }) {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      {/*<ToastContainer position="bottom-left" autoClose={3000} />*/}
+      <ToastContainer position="bottom-left" autoClose={3000} />
       <Component {...pageProps} />
     </ThemeProvider>
   )

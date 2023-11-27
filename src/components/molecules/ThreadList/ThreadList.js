@@ -13,11 +13,11 @@ function ThreadList({
 }) {
 
 	const handleLinkClick = (index) => {
-		threadListenerList && threadListenerList[index]()
+		threadListenerList && threadListenerList[index] && threadListenerList[index]()
 	}
 
 	const handleTrashClick = (index) => {
-		trashListenerList && trashListenerList[index]()
+		trashListenerList && trashListenerList[index] && trashListenerList[index]()
 	}
 
 	return (

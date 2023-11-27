@@ -7,11 +7,13 @@ import {
 } from './ChatList.elements.js'
 import { PiPlaceholderDuotone } from 'react-icons/pi'
 
+// TODO: Flesh out ChatInput so that all props are used
 function ChatList({
 	variant = VARIANTS.dark,
 	color,
 	chatHistory,
-	userLogos
+	userLogos,
+	onSubmitHandler,
 }) {
 	return (
 		<ChatListContainer variant={variant}>
@@ -26,7 +28,10 @@ function ChatList({
 					/>
 				))}
 			</MessageContainer>
-			<ChatInput />
+			<ChatInput 
+				onSubmitHandler={onSubmitHandler}
+
+			/>
 		</ChatListContainer>
 	)
 }

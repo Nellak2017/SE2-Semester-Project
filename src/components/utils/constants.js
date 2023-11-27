@@ -1,5 +1,5 @@
 export const VARIANTS = { light: 'light', dark: 'dark' }
-export const USERS = { user: 'user', gpt: 'gpt' }
+export const USERS = { user: 0, gpt: 1 }
 export const SX_SLIDER = {
 	//color: theme.palette.mode === 'dark' ? '#fff' : 'rgba(0,0,0,0.87)',
 	height: 4,

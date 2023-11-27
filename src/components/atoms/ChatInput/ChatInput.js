@@ -1,5 +1,5 @@
 import { ChatInputParent, ChatInputChild } from './ChatInput.elements'
-import { useRef } from 'react' // used to focus child when parent div pressed (accessibility)
+import { useRef, useState } from 'react' // used to focus child when parent div pressed (accessibility)
 import { IoIosSend } from 'react-icons/io' // testing only
 import IconButton from '../IconButton/IconButton' // testing only
 
@@ -20,10 +20,22 @@ const ChatInput = ({
 	const ref = useRef(null)
 	const handleClick = () => ref.current.focus()
 
+	const [text, setText] = useState('')
+
+	const handleSubmit = text => {
+		text && onSubmitHandler && onSubmitHandler(text)
+		setText('') // Clear after submitting
+	}
+
+	const handleChange = e => {
+		onChange && onChange(e)
+		setText(e.target.value)
+	}
+
 	return (
 		<ChatInputParent variant={variant} color={color} onClick={handleClick}>
-			<ChatInputChild placeholder={placeholder} name={name} onChange={onChange} onBlur={onBlur} ref={ref} {...rest} />
-			<IconButton type={buttonType} onClick={onSubmitHandler} variant='icon' size='xl'><IoIosSend /></IconButton>
+			<ChatInputChild placeholder={placeholder} name={name} onChange={e => handleChange(e)} value={text} onBlur={onBlur} ref={ref} {...rest} />
+			<IconButton type={buttonType} onClick={() => handleSubmit(text)} variant='icon' size='xl'><IoIosSend /></IconButton>
 		</ChatInputParent>
 	)
 }

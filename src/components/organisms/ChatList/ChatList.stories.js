@@ -52,63 +52,63 @@ Notice that the above text goes outside the box, but if styled right it instead 
 
 const exampleChatHistory = [
 	{
-		user: 'gpt',
+		user: 1,
 		text: 'first (oldest)',
 		messageId: 0
 	},
 	{
-		user: 'user',
+		user: 0,
 		text: markdownContent,
 		messageId: 1
 	},
 	{
-		user: 'gpt',
+		user: 1,
 		text: 'third',
 		error: true, // optional parameter
 		messageId: 2
 	},
 	{
-		user: 'user',
+		user: 0,
 		text: 'fourth',
 		messageId: 3
 	},
 	{
-		user: 'gpt',
+		user: 1,
 		text: 'fifth',
 		messageId: 4
 	},
 	{
-		user: 'user',
+		user: 0,
 		text: 'sixth',
 		messageId: 5
 	},
 	{
-		user: 'gpt',
+		user: 1,
 		text: 'seventh',
 		messageId: 6
 	},
 	{
-		user: 'user',
+		user: 0,
 		text: 'eigth',
 		messageId: 7
 	},
 	{
-		user: 'gpt',
+		user: 1,
 		text: 'ninth',
 		messageId: 8
 	},
 	{
-		user: 'user',
+		user: 0,
 		text: 'tenth',
 		messageId: 9
 	},
 	{
-		user: 'gpt',
+		user: 1,
 		text: 'eleventh',
 		messageId: 10
 	},
 	{
-		user: 'user',
+		user: 0,
 		text: 'twelveth (newest)',
 		messageId: 11
 	},

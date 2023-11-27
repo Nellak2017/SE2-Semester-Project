@@ -73,7 +73,7 @@ function Chat({
 	...props
 }) {
 	return (
-		<ChatContainer user={user} {...props}>
+		<ChatContainer user={user === 0 ? 'user' : 'gpt'} {...props}>
 			<MessageContainer>
 				<LogoContainer>
 					{userLogo}
