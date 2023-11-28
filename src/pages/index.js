@@ -1,23 +1,18 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import LLMChat from "../components/templates/LLMChat/LLMChat"
-import {
-  PiPlaceholderDuotone,
-  PiPlaceholderLight
-} from 'react-icons/pi'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import {
+  highlightThread,
+  indexOfCurrentlyHighlighted,
+  updateObjInList,
+  generateRandomSentence
+} from "../utils/helpers"
+import { USER_LOGOS } from "../components/utils/constants"
 
-const exampleUserLogos = {
-  'gpt': <PiPlaceholderLight />,
-  'user': <PiPlaceholderDuotone />
-}
-
-// TODO: Solve the filtered/non filtered threads BULLSHIT
-// TODO: Add Trash Listeners
 // TODO: Add Lazy Loading
 // TODO: Add real image assets for user and gpt
-// TODO: When the Thread we are highlighted on is fetched, set the temperature and typing speed associated with it
 // TODO: When error, use error component
 export default function Home() {
 
@@ -25,6 +20,7 @@ export default function Home() {
   const [messages, setMessages] = useState([])
   const [threads, setThreads] = useState([]) // unfiltered, has temperature and typing speed included
   const [threadIndex, setThreadIndex] = useState(0) // the thread we are highlighting
+  const [isNewChat, setIsNewChat] = useState(false) // if it is a new chat, we need to know so we can dispatch a different Post API request
 
   const [threadListenerList, setThreadListenerList] = useState([() => console.log('no listeners assigned')]) // Event Listeners set at runtime
   const [trashListenerList, setTrashListenerList] = useState([() => console.log('no listeners assigned')]) // Event Listeners set at runtime
@@ -36,30 +32,9 @@ export default function Home() {
       const unfilteredThreads = await getThreads(userID, 0) // WARNING: Does side effect and returns value too
       getMessages(userID, unfilteredThreads[0]?.ThreadID) // No Race Condition because threads is awaited above. Always 0 because initial render
       assignLinkListeners(userID, unfilteredThreads)
+      assignTrashListeners(userID, unfilteredThreads)
     })()
   }, [])
-
-  // --- Helpers (pure)
-  // Function to highlight a specific thread at an index
-  function highlightThread(threadList, index = 0) {
-    if (!threadList || index < 0 || index > threadList.length) return []
-    return threadList.map((e, i) => {
-      return i === index ?
-        { ...e, highlighted: true } :
-        { ...e, highlighted: false }
-    })
-  }
-
-  // Function to tell the index of the currently highlighted
-  function indexOfCurrentlyHighlighted(threadList) { return threadList?.findIndex(el => el.highlighted === true) }
-
-  // Function to update an Object in a list given the index, property name, and property value
-  function updateObjInList(objList, index, propertyName, propertyValue) {
-    if (index < 0 || index === undefined || isNaN(index) || index > objList.length) return objList
-    const updatedList = [...objList]
-    updatedList[index] = { ...updatedList[index], [propertyName]: propertyValue }
-    return updatedList
-  }
 
   // --- Helpers (impure)
   // Function to assign the Link Listeners and SET state
@@ -71,6 +46,14 @@ export default function Home() {
         getThreads(userID, i) // so that the temperature and typing speed are updated as expected, we must fetch new threads
         setThreadIndex(i) // so we know which is highlighted
       }
+    }))
+  }
+
+  // Function to assign the Trash Listeners and SET state
+  function assignTrashListeners(userID, threads) {
+    // Set the List of listener functions for each Trash icon
+    setTrashListenerList(threads.map(e => {
+      return () => { deleteThread(userID, e?.ThreadID) }
     }))
   }
 
@@ -91,6 +74,10 @@ export default function Home() {
   // GET Messages - Function to get Messages AND set the state too
   async function getMessages(userID, threadID) {
     try {
+      if (threads.length <= 0) {
+        console.log('No threads detected')
+        return
+      }
       console.log('Trying to get new messages...')
       const response = await axios.get('/api/getMessages', { params: { userID, threadID } })
       setMessages(
@@ -102,6 +89,9 @@ export default function Home() {
           }
         }))
     } catch (e) {
+      if (threads.length <= 0) {
+        return
+      }
       console.error('Error fetching messages:', e)
       toast.error('Error fetching messages. See dev console for more info.')
     }
@@ -110,15 +100,33 @@ export default function Home() {
   // POST Message - Function to post Messsage for the user and thread that is currently active AND set the state too
   async function addMessage(text, userID, threadID, sentByUser = 0) {
     try {
-      console.log('attempting to post...')
+      console.log('attempting to post message...')
       const response = await axios.post('/api/postMessage', {
         threadID: threadID,
         userID: userID,
         text: text,
         sentByUser: sentByUser
       })
-      getMessages(userID, threadID)
+      getMessages(userID, threadID) // update messages when you add a new one
       console.log(response.data)
+    } catch (e) {
+      console.error('Error adding message:', e)
+      toast.error('Error adding message. See dev console for more info.')
+    }
+  }
+
+  // POST Thread - Function to post generated the new thread AND then addMessage following the creation AND returns ThreadID 
+  async function postThread(userID, threadName, highlightIndex) {
+    try {
+      console.log('attempting to create thread...')
+      const response = await axios.post('/api/postThread', {
+        userID: userID,
+        threadName: threadName,
+      })
+      const newThreadID = response.data.newThreadID
+      getThreads(userID, highlightIndex) // update the display of threads when you make it AND highlight the correct one
+      console.log(response.data)
+      return newThreadID
     } catch (e) {
       console.error('Error adding message:', e)
       toast.error('Error adding message. See dev console for more info.')
@@ -133,7 +141,7 @@ export default function Home() {
         threadID: threadID,
         newTemperature: newTemperature,
       })
-      getThreads(userID, threadIndex)
+      getThreads(userID, threadIndex) // update the display of threads when you update it
       console.log(response.data)
     } catch (e) {
       console.error('Error updating temperature:', e)
@@ -149,7 +157,7 @@ export default function Home() {
         threadID: threadID,
         newTypingSpeed: newTypingSpeed,
       })
-      getThreads(userID, threadIndex)
+      getThreads(userID, threadIndex) // update the display of threads when you update it
       console.log(response.data)
     } catch (e) {
       console.error('Error updating typing speed:', e)
@@ -157,15 +165,54 @@ export default function Home() {
     }
   }
 
+  // DELETE Threads - Function to delete thread and associated messages AND set the state too (resetting it to 0th thread active)
+  async function deleteThread(userID, threadID) {
+    try {
+      console.log('Trying to delete thread...')
+      const response = await axios.delete('/api/deleteThread', {
+        data: {
+          userID: userID,
+          threadID: threadID,
+        },
+      })
+      const unfilteredThreads = await getThreads(userID, 0) // WARNING: Does side effect and returns value too
+      setThreadIndex(0)
+      getMessages(userID, unfilteredThreads[0]?.ThreadID)
+
+      console.log(response.data)
+    } catch (e) {
+      console.error('Error deleting thread: ', e)
+      toast.error('Error deleting thread. See dev console for more info.')
+    }
+  }
+
   // --- Handlers
-  const handleOnSubmit = text => { addMessage(text, userID, threads[indexOfCurrentlyHighlighted(threads)]?.threadID, 0) }
+  const handleOnSubmit = (text, isNewChat = false) => {
+    if (!isNewChat) {
+      addMessage(text, userID, threads[indexOfCurrentlyHighlighted(threads)]?.ThreadID, 0)
+      return
+    }
+    // if it is a New Chat
+    // TODO: LLM Generate Thread Name
+    const fetch = async () => {
+      // Gen thread name, Change highlight index, Post new thread and message, reset isNewChat
+      const generatedThread = generateRandomSentence()
+      const lastFutureThread = threads.length
+      setThreadIndex(lastFutureThread) // uses old last index
+      const newThreadID = await postThread(userID, generatedThread, lastFutureThread) // WARNING: Does side effect and returns ThreadID
+      addMessage(text, userID, newThreadID, 0)
+      setIsNewChat(false)
+    }
+    fetch()
+  }
+
 
   const handleNewChat = () => {
-    /*
-      1. highlight nothing
-      2. display no text
-      3. set isNewChat to true so that the next submit will be to not only add a message as usual, but to generate the name of the thread
-    */
+    console.log("Emptying the Messages, unhighlighting threads, and setting isNewChat...")
+    // highlight nothing, display no messages, and set isNewChat
+    setThreads(highlightThread(threads, -1))
+    setMessages([])
+    setIsNewChat(true)
   }
 
   const handleTemperatureChange = temp => { setThreads(updateObjInList(threads, threadIndex, 'Temperature', temp)) }
@@ -183,20 +230,21 @@ export default function Home() {
 
   // Conditional Rendering used to ensure that default sliders get proper values
   return (
-      <LLMChat
-        variant='dark'
-        chatHistory={messages.slice().reverse()}
-        userLogos={exampleUserLogos}
-        threads={threads}
-        threadListenerList={threadListenerList}
-        trashListenerList={trashListenerList}
-        initialTemperature={threads[threadIndex]?.Temperature}
-        initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
-        onSubmitHandler={text => handleOnSubmit(text)}
-        onTemperatureChange={temp => handleTemperatureChange(temp)}
-        onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}
-        onTemperatureMouseUp={handleTemperatureMouseUp}
-        onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
-      />
+    <LLMChat
+      variant='dark'
+      chatHistory={messages.slice().reverse()}
+      userLogos={USER_LOGOS} // placeholders only
+      threads={threads}
+      threadListenerList={threadListenerList}
+      trashListenerList={trashListenerList}
+      initialTemperature={threads[threadIndex]?.Temperature}
+      initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
+      onNewChatClick={handleNewChat}
+      onSubmitHandler={text => handleOnSubmit(text, isNewChat)}
+      onTemperatureChange={temp => handleTemperatureChange(temp)}
+      onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}
+      onTemperatureMouseUp={handleTemperatureMouseUp}
+      onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
+    />
   )
 }

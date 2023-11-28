@@ -24,6 +24,7 @@ function SideBar({
 	initialTypingSpeed = 50,
 	color,
 	threads,
+	onNewChatClick, // Pass to Parent
 	onTemperatureChange, // Pass to Parent
 	onTypingSpeedChange, // Pass to Parent
 	onTemperatureMouseUp, // Pass to Parent
@@ -43,6 +44,10 @@ function SideBar({
 		setTemperaturePosition(initialTemperature)
     	setTypingSpeedPosition(initialTypingSpeed)
 	}, [initialTemperature, initialTypingSpeed])
+
+	const handleNewChatClick = () => {
+		onNewChatClick && onNewChatClick()
+	}
 
 	const handleTemperatureChange = (_, value) => {
 		setTemperaturePosition(value)
@@ -72,7 +77,7 @@ function SideBar({
 						variant={variant}
 						text={buttonText}
 						maxheight={44}
-					// add onClick
+						onClick={handleNewChatClick}
 					/>
 					<OutlineButton
 						variant={variant}

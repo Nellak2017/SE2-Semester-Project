@@ -13,6 +13,7 @@ function LLMChat({
 	initialTypingSpeed = 50,
 	threadListenerList = [() => {}],  // Pass to Parent
 	trashListenerList = [() => {}],   // Pass to Parent
+	onNewChatClick = () => console.log('New Chat'), // Pass to Parent
 	onTemperatureChange = (a) => console.log(a), // Pass to Parent
 	onTypingSpeedChange = (a) => console.log(a), // Pass to Parent
 	onTemperatureMouseUp = () => console.log('On Mouse Up for Temperature'), // Pass to Parent
@@ -27,6 +28,7 @@ function LLMChat({
 				initialTypingSpeed={initialTypingSpeed}
 				threadListenerList={threadListenerList}
 				trashListenerList={trashListenerList}
+				onNewChatClick={onNewChatClick}
 				onTemperatureChange={onTemperatureChange}
 				onTypingSpeedChange={onTypingSpeedChange}
 				onTemperatureMouseUp={onTemperatureMouseUp}

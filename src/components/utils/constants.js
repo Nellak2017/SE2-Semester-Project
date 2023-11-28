@@ -1,3 +1,7 @@
+import {
+	PiPlaceholderDuotone,
+	PiPlaceholderLight
+} from 'react-icons/pi'
 export const VARIANTS = { light: 'light', dark: 'dark' }
 export const USERS = { user: 0, gpt: 1 }
 export const SX_SLIDER = {
@@ -18,4 +22,8 @@ export const SX_SLIDER = {
 	'& .MuiSlider-rail': {
 		opacity: 0.28,
 	},
+}
+export const USER_LOGOS = {
+	'gpt': <PiPlaceholderLight />,
+	'user': <PiPlaceholderDuotone />
 }
