@@ -87,5 +87,6 @@ export const gpt = Template.bind({})
 gpt.args = {
 	user: USERS.gpt,
 	message: markdownContent,
-	userLogo: <PiPlaceholderLight />
+	userLogo: <PiPlaceholderLight />,
+	typingSpeed: 50
 }

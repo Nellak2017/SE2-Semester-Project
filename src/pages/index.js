@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import axios from "axios"
 import LLMChat from "../components/templates/LLMChat/LLMChat"
 import { toast } from 'react-toastify'
@@ -14,6 +14,7 @@ import { USER_LOGOS } from "../components/utils/constants"
 // TODO: Add Lazy Loading
 // TODO: Add real image assets for user and gpt
 // TODO: When error, use error component
+// TODO: Edge Case bug, (New Chat => Message Post => Delete thread above this => Click on thread you made => Doesn't load messages!! Uses Incorrect ThreadID)
 export default function Home() {
 
   const [userID, setUserID] = useState(1) // TODO: Stop Hardcoding and use User Information when the User Logs in
@@ -25,19 +26,35 @@ export default function Home() {
   const [threadListenerList, setThreadListenerList] = useState([() => console.log('no listeners assigned')]) // Event Listeners set at runtime
   const [trashListenerList, setTrashListenerList] = useState([() => console.log('no listeners assigned')]) // Event Listeners set at runtime
 
+  /*
+  const [step, setStep] = useState(10) // for lazy loading
+  const [prev, setPrev] = useState(0) // for lazy loading
+  const [maxMessages, setMaxMessages] = useState(step) // for lazy loading
+  */
+
+  // Create a ref for initial mount
+  //const initialMount = useRef(true)
+
   // --- Initial State Loaded in from DB
   useEffect(() => {
     // NOTE: fetch is only used because you can't use async/await in useEffect
     (async () => {
       const unfilteredThreads = await getThreads(userID, 0) // WARNING: Does side effect and returns value too
-      if (unfilteredThreads.length <= 0) {
+      if (unfilteredThreads?.length <= 0) {
         console.log('No threads detected. Setting it to be a new chat...')
         setIsNewChat(true)
         return
       }
+
+      // Only fetch messages on the initial mount
+      //if (!initialMount.current) {
       getMessages(userID, unfilteredThreads[0]?.ThreadID) // No Race Condition because threads is awaited above. Always 0 because initial render
       assignLinkListeners(userID, unfilteredThreads)
       assignTrashListeners(userID, unfilteredThreads)
+      //setPrev(step + 1) // should be like 10 on first load. So you can tell if it is the first or not this way!
+      //} else {
+      //  initialMount.current = false
+      //}
     })()
   }, [])
 
@@ -47,9 +64,12 @@ export default function Home() {
     // Set the List of listener functions for each Link
     setThreadListenerList(threads.map((e, i) => {
       return () => {
+        console.log('assignLinkListeners ', e?.ThreadID)
         getMessages(userID, e?.ThreadID)
         getThreads(userID, i) // so that the temperature and typing speed are updated as expected, we must fetch new threads
         setThreadIndex(i) // so we know which is highlighted
+        setIsNewChat(false) // to ensure that a new thread is not made whenever we do (+ New Chat -> Link to another thread -> Message POST)
+        //setPrev(step + 1) // to ensure that you can lazy load when switching threads
       }
     }))
   }
@@ -77,10 +97,12 @@ export default function Home() {
   }
 
   // GET Messages - Function to get Messages AND set the state too
-  async function getMessages(userID, threadID) {
+  async function getMessages(userID, threadID) { // min = 0, max = step
     try {
       console.log('Trying to get new messages...')
-      const response = await axios.get('/api/getMessages', { params: { userID, threadID } })
+
+      const response = await axios.get('/api/getMessages', { params: { userID: userID, threadID: threadID } }) // min, max
+
       setMessages(
         response.data.map(e => {
           return {
@@ -89,6 +111,9 @@ export default function Home() {
             messageId: e?.MessageID
           }
         }))
+
+      // Update the maximum messages
+      //setMaxMessages(prevMax => Math.max(prevMax, response.data.length))
     } catch (e) {
       if (threads.length <= 0) {
         return
@@ -129,7 +154,7 @@ export default function Home() {
         const unfilteredThreads = await getThreads(userID, highlightIndex) // update the display of threads when you make it AND highlight the correct one
         assignLinkListeners(userID, unfilteredThreads)
         assignTrashListeners(userID, unfilteredThreads)
-      } 
+      }
       fetch()
 
       console.log(response.data)
@@ -202,23 +227,34 @@ export default function Home() {
   // --- Handlers
   const handleOnSubmit = (text, isNewChat = false) => {
     if (!isNewChat) {
-      addMessage(text, userID, threads[indexOfCurrentlyHighlighted(threads)]?.ThreadID, 0)
+      const fetch = async () => {
+        // Generator should make up a message
+        const RNGGeneratedMessage = generateRandomSentence({ min: 10, max: 35 })
+        await addMessage(text, userID, threads[indexOfCurrentlyHighlighted(threads)]?.ThreadID, 0) // this is second because the endpoint is sorted in desc order
+        await addMessage(RNGGeneratedMessage, userID, threads[threadIndex]?.ThreadID, 1)
+      }
+      fetch()
+
       return
     }
     // if it is a New Chat
     // TODO: LLM Generate Thread Name
     const fetch = async () => {
       // Gen thread name, Change highlight index, Post new thread and message, reset isNewChat, and assign listeners
-      const generatedThread = generateRandomSentence()
+      const generatedThread = generateRandomSentence({})
       const lastFutureThread = threads.length
       setThreadIndex(lastFutureThread) // uses old last index
       const newThreadID = await postThread(userID, generatedThread, lastFutureThread) // WARNING: Does side effect and returns ThreadID
-      addMessage(text, userID, newThreadID, 0)
+
+      await addMessage(text, userID, newThreadID, 0) // this is second because the endpoint is sorted in desc order
+      // Generator should make up a message
+      const RNGGeneratedMessage = generateRandomSentence({ min: 10, max: 35 })
+      await addMessage(RNGGeneratedMessage, userID, newThreadID, 1)
+
       setIsNewChat(false)
     }
     fetch()
   }
-
 
   const handleNewChat = () => {
     console.log("Emptying the Messages, unhighlighting threads, and setting isNewChat...")
@@ -242,27 +278,47 @@ export default function Home() {
     patchTypingSpeed(userID, currentThreadID, newTypingSpeed, threadIndex)
   }
 
+  const handleLazyLoad = e => {
+    const top = e.target.scrollHeight + e.target.scrollTop <= e.target.clientHeight
+    if (top) {
+      console.log("top")
+      /*
+      // Calculate new range for pagination
+      const min = maxMessages // Use the maximum messages as the starting point
+      const max = min + step
+
+      console.log('min = ', min)
+      console.log('max = ', max)
+
+      console.log('prev', prev)
+
+      if (prev < max) {
+        getMessages(userID, threads[threadIndex]?.ThreadID, false, min, max)
+        setPrev(old => old + step)
+      }
+      */
+    }
+  }
+
   // Conditional Rendering used to ensure that default sliders get proper values
   return (
-    <>
-      <button onClick={() => console.log(threadListenerList)}>Link Listeners</button>
-      <button onClick={() => console.log(trashListenerList)}>Trash Listeners</button>
-      <LLMChat
-        variant='dark'
-        chatHistory={messages.slice().reverse()}
-        userLogos={USER_LOGOS} // placeholders only
-        threads={threads}
-        threadListenerList={threadListenerList}
-        trashListenerList={trashListenerList}
-        initialTemperature={threads[threadIndex]?.Temperature}
-        initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
-        onNewChatClick={handleNewChat}
-        onSubmitHandler={text => handleOnSubmit(text, isNewChat)}
-        onTemperatureChange={temp => handleTemperatureChange(temp)}
-        onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}
-        onTemperatureMouseUp={handleTemperatureMouseUp}
-        onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
-      />
-    </>
+    <LLMChat
+      variant='dark'
+      chatHistory={messages}
+      userLogos={USER_LOGOS} // placeholders only
+      threads={threads}
+      threadListenerList={threadListenerList}
+      trashListenerList={trashListenerList}
+      initialTemperature={threads[threadIndex]?.Temperature}
+      initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
+      onNewChatClick={handleNewChat}
+      onSubmitHandler={text => handleOnSubmit(text, isNewChat)}
+      onTemperatureChange={temp => handleTemperatureChange(temp)}
+      onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}
+      onTemperatureMouseUp={handleTemperatureMouseUp}
+      onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
+      onScrollHandler={e => handleLazyLoad(e)}
+      typingSpeed={threads[threadIndex]?.TypingSpeed}
+    />
   )
 }

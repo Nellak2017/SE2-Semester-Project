@@ -12,6 +12,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import remarkGfm from "remark-gfm"
 import ErrorMessage from "../../atoms/ErrorMessage/ErrorMessage.js"
+import TypingSimulator from "../TypingSimulator/TypingSimulator.js"
 
 // TODO: Research Syntax Highlighting deeper
 //     (1) React Syntax Highlighter - https://github.com/react-syntax-highlighter/react-syntax-highlighter
@@ -62,7 +63,7 @@ const MarkdownComponents = {
 		) : (
 			<code className={className} {...props} />
 		)
-	},
+	}
 }
 
 function Chat({
@@ -70,6 +71,7 @@ function Chat({
 	userLogo,
 	message,
 	error = false, // this is a code smell...
+	typingSpeed,
 	...props
 }) {
 	return (
@@ -78,13 +80,20 @@ function Chat({
 				<LogoContainer>
 					{userLogo}
 				</LogoContainer>
-				{!error &&
+				{!error && !typingSpeed && (
+					// Render normally if no typingSpeed
 					<Message>
 						<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
 							{message}
 						</ReactMarkdown>
 					</Message>
-				}
+				)}
+				{!error && typingSpeed && user === USERS.gpt && (
+					// Render typing simulation if typingSpeed is provided
+					<Message>
+						<TypingSimulator message={message} typingSpeed={typingSpeed} />
+					</Message>
+				)}
 				{error &&
 					<ErrorContainer>
 						<ErrorMessage />

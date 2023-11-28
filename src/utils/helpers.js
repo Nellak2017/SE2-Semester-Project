@@ -30,7 +30,7 @@ const top50EnglishWords = [
 	'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me'
 ]
 
-export function generateRandomSentence(words = top50EnglishWords, min = 2, max = 5) {
+export function generateRandomSentence({words = top50EnglishWords, min = 2, max = 5}) {
 	const sentenceLength = Math.floor(Math.random() * (max - min)) + min // Random length between 2 and 5 words
 	const randomWords = Array.from(
 		{ length: sentenceLength },
