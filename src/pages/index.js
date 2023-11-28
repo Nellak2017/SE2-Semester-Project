@@ -30,6 +30,11 @@ export default function Home() {
     // NOTE: fetch is only used because you can't use async/await in useEffect
     (async () => {
       const unfilteredThreads = await getThreads(userID, 0) // WARNING: Does side effect and returns value too
+      if (unfilteredThreads.length <= 0) {
+        console.log('No threads detected. Setting it to be a new chat...')
+        setIsNewChat(true)
+        return
+      }
       getMessages(userID, unfilteredThreads[0]?.ThreadID) // No Race Condition because threads is awaited above. Always 0 because initial render
       assignLinkListeners(userID, unfilteredThreads)
       assignTrashListeners(userID, unfilteredThreads)
@@ -74,10 +79,6 @@ export default function Home() {
   // GET Messages - Function to get Messages AND set the state too
   async function getMessages(userID, threadID) {
     try {
-      if (threads.length <= 0) {
-        console.log('No threads detected')
-        return
-      }
       console.log('Trying to get new messages...')
       const response = await axios.get('/api/getMessages', { params: { userID, threadID } })
       setMessages(
@@ -124,7 +125,13 @@ export default function Home() {
         threadName: threadName,
       })
       const newThreadID = response.data.newThreadID
-      getThreads(userID, highlightIndex) // update the display of threads when you make it AND highlight the correct one
+      const fetch = async () => {
+        const unfilteredThreads = await getThreads(userID, highlightIndex) // update the display of threads when you make it AND highlight the correct one
+        assignLinkListeners(userID, unfilteredThreads)
+        assignTrashListeners(userID, unfilteredThreads)
+      } 
+      fetch()
+
       console.log(response.data)
       return newThreadID
     } catch (e) {
@@ -177,6 +184,12 @@ export default function Home() {
       })
       const unfilteredThreads = await getThreads(userID, 0) // WARNING: Does side effect and returns value too
       setThreadIndex(0)
+      if (unfilteredThreads.length <= 0) {
+        console.log('No threads detected. Clearing messages and setting it to be a new chat...')
+        setMessages([])
+        setIsNewChat(true)
+        return
+      }
       getMessages(userID, unfilteredThreads[0]?.ThreadID)
 
       console.log(response.data)
@@ -195,7 +208,7 @@ export default function Home() {
     // if it is a New Chat
     // TODO: LLM Generate Thread Name
     const fetch = async () => {
-      // Gen thread name, Change highlight index, Post new thread and message, reset isNewChat
+      // Gen thread name, Change highlight index, Post new thread and message, reset isNewChat, and assign listeners
       const generatedThread = generateRandomSentence()
       const lastFutureThread = threads.length
       setThreadIndex(lastFutureThread) // uses old last index
@@ -209,8 +222,9 @@ export default function Home() {
 
   const handleNewChat = () => {
     console.log("Emptying the Messages, unhighlighting threads, and setting isNewChat...")
-    // highlight nothing, display no messages, and set isNewChat
-    setThreads(highlightThread(threads, -1))
+    // highlight nothing, display no messages, set isNewChat, and assign listeners just in case
+    const newThreads = highlightThread(threads, -1)
+    setThreads(newThreads)
     setMessages([])
     setIsNewChat(true)
   }
@@ -230,21 +244,25 @@ export default function Home() {
 
   // Conditional Rendering used to ensure that default sliders get proper values
   return (
-    <LLMChat
-      variant='dark'
-      chatHistory={messages.slice().reverse()}
-      userLogos={USER_LOGOS} // placeholders only
-      threads={threads}
-      threadListenerList={threadListenerList}
-      trashListenerList={trashListenerList}
-      initialTemperature={threads[threadIndex]?.Temperature}
-      initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
-      onNewChatClick={handleNewChat}
-      onSubmitHandler={text => handleOnSubmit(text, isNewChat)}
-      onTemperatureChange={temp => handleTemperatureChange(temp)}
-      onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}
-      onTemperatureMouseUp={handleTemperatureMouseUp}
-      onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
-    />
+    <>
+      <button onClick={() => console.log(threadListenerList)}>Link Listeners</button>
+      <button onClick={() => console.log(trashListenerList)}>Trash Listeners</button>
+      <LLMChat
+        variant='dark'
+        chatHistory={messages.slice().reverse()}
+        userLogos={USER_LOGOS} // placeholders only
+        threads={threads}
+        threadListenerList={threadListenerList}
+        trashListenerList={trashListenerList}
+        initialTemperature={threads[threadIndex]?.Temperature}
+        initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
+        onNewChatClick={handleNewChat}
+        onSubmitHandler={text => handleOnSubmit(text, isNewChat)}
+        onTemperatureChange={temp => handleTemperatureChange(temp)}
+        onTypingSpeedChange={speed => handleTypingSpeedChange(speed)}
+        onTemperatureMouseUp={handleTemperatureMouseUp}
+        onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
+      />
+    </>
   )
 }
