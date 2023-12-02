@@ -5,7 +5,7 @@ export const handler = async (req, res) => {
     const db = await connectToDatabase()
     const { threadID, newTypingSpeed } = req.body
 
-    if (!newTypingSpeed) return res.status(400).json({ error: 'newTypingSpeed is a required parameter and is missing.' })
+    if (!newTypingSpeed && newTypingSpeed !== 0) return res.status(400).json({ error: 'newTypingSpeed is a required parameter and is missing.' })
 
     const query = `
       UPDATE Threads

@@ -10,9 +10,12 @@ export const handler = async (req, res) => {
 		const { threadID, userID, text, sentByUser } = req.body
 
 		// Check if all required parameters are provided
-		if (!threadID || !userID || !text || sentByUser === undefined) {
+		if ((!threadID && threadID !== 0) ||
+			(!userID && userID !== 0) ||
+			(!text && text !== '') ||
+			sentByUser === undefined) {
 			return res.status(400).json({ error: 'threadID, userID, text, and sentByUser are required parameters.' });
-		  }
+		}
 
 		// POST message operation
 		const query = `

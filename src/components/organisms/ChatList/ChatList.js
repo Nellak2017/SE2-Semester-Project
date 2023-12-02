@@ -16,6 +16,8 @@ function ChatList({
 	onSubmitHandler,
 	onScrollHandler,
 	typingSpeed,
+	parentText, // Pass To Parent so they can clear text on changing threads
+	chatInputOnChange, // Pass To Parent so they can see text
 }) {
 	return (
 		<ChatListContainer variant={variant}>
@@ -33,7 +35,8 @@ function ChatList({
 			</MessageContainer>
 			<ChatInput 
 				onSubmitHandler={onSubmitHandler}
-
+				parentText={parentText}
+				onChange={chatInputOnChange}
 			/>
 		</ChatListContainer>
 	)

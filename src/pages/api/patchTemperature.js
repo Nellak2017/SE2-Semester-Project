@@ -5,7 +5,7 @@ export const handler = async (req, res) => {
 	try {
 		const db = await connectToDatabase()
 		const { threadID , newTemperature } = req.body
-		if (!newTemperature) return res.status(400).json({ error: 'newTemperature is a required parameter and is missing.' })
+		if (!newTemperature && newTemperature !== 0) return res.status(400).json({ error: 'newTemperature is a required parameter and is missing.' })
 
 		// PATCH update temperature operation
 		const query = `

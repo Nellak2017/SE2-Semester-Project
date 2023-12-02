@@ -9,14 +9,8 @@ export const handler = async (req, res) => {
 		// Extract parameters from the request query
 		const { userID, threadID } = req.query
 
-		/*
-		// Convert min and max to numbers
-		const minNumber = parseInt(min, 10)
-		const maxNumber = parseInt(max, 10)
-		*/
-
 		// Check if both userID and name are provided
-		if (!userID || !threadID) {
+		if ((!userID && userID !== 0) || (!threadID && threadID !== 0)) {
 			return res.status(400).json({ error: 'Both userID and threadID are required parameters.' })
 		}
 

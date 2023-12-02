@@ -80,7 +80,7 @@ function Chat({
 				<LogoContainer>
 					{userLogo}
 				</LogoContainer>
-				{!error && !typingSpeed && (
+				{!error && (!typingSpeed && typingSpeed !== 0) && (
 					// Render normally if no typingSpeed
 					<Message>
 						<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
@@ -88,7 +88,7 @@ function Chat({
 						</ReactMarkdown>
 					</Message>
 				)}
-				{!error && typingSpeed && user === USERS.gpt && (
+				{!error && (typingSpeed || typingSpeed === 0) && user === USERS.gpt && (
 					// Render typing simulation if typingSpeed is provided
 					<Message>
 						<TypingSimulator message={message} typingSpeed={typingSpeed} />

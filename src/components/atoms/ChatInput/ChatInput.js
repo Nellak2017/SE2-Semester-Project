@@ -1,5 +1,5 @@
 import { ChatInputParent, ChatInputChild } from './ChatInput.elements'
-import { useRef, useState } from 'react' // used to focus child when parent div pressed (accessibility)
+import { useRef, useState, useEffect } from 'react' // used to focus child when parent div pressed (accessibility)
 import { IoIosSend } from 'react-icons/io' // testing only
 import IconButton from '../IconButton/IconButton' // testing only
 
@@ -15,6 +15,7 @@ const ChatInput = ({
 	onBlur,
 	variant = 'default',
 	color,
+	parentText, // Pass To Parent so they can clear text on changing threads
 	...rest
 }) => {
 	const ref = useRef(null)
@@ -31,6 +32,10 @@ const ChatInput = ({
 		onChange && onChange(e)
 		setText(e.target.value)
 	}
+
+	useEffect(() => {
+		(parentText || parentText === '') && setText(parentText)
+	}, [parentText])
 
 	return (
 		<ChatInputParent variant={variant} color={color} onClick={handleClick}>

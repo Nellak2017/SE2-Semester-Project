@@ -6,7 +6,7 @@ export const handler = async (req, res) => {
     const db = await connectToDatabase()
     const { threadID } = req.body
 
-    if (!threadID) return res.status(400).json({ error: 'threadID is a required parameter and is missing.' })
+    if (!threadID && threadID !== 0) return res.status(400).json({ error: 'threadID is a required parameter and is missing.' })
 
     // Start a transaction
     await db.query('START TRANSACTION')

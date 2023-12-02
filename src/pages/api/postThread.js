@@ -5,7 +5,7 @@ export const handler = async (req, res) => {
 		const db = await connectToDatabase()
 		const { userID, threadName } = req.body
 
-		if (!userID || !threadName) return res.status(400).json({ error: 'Both userID and threadName are required parameters and must not be missing.' })
+		if ((!userID && userID !== 0) || !threadName) return res.status(400).json({ error: 'Both userID and threadName are required parameters and must not be missing.' })
 
 		const query = `
 			INSERT INTO Threads (Name, UserID)

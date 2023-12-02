@@ -10,7 +10,7 @@ export const handler = async (req, res) => {
 		const { userID } = req.query
 
 		// Check if both userID and name are provided
-		if (!userID) {
+		if (!userID && userID !== 0) {
 			return res.status(400).json({ error: 'userID is the required parameter and it is missing.' })
 		}
 

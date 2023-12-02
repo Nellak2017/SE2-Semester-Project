@@ -109,7 +109,7 @@ function SideBar({
 							aria-label="Temperature"
 							size="small"
 							value={temperaturePosition}
-							min={0}
+							min={1}
 							step={1}
 							max={sliderLength}
 							onMouseUp={handleTemperatureMouseUp}
@@ -126,7 +126,7 @@ function SideBar({
 							aria-label="Typing Speed"
 							size="small"
 							value={typingSpeedPosition}
-							min={0}
+							min={1}
 							step={1}
 							max={sliderLength}
 							onMouseUp={handleTypingSpeedMouseUp}

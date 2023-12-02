@@ -19,8 +19,10 @@ function LLMChat({
 	onTemperatureMouseUp = () => console.log('On Mouse Up for Temperature'), // Pass to Parent
 	onTypingSpeedMouseUp = () => console.log('On Mouse Up for Typing Speed'), // Pass to Parent
 	onSubmitHandler = text => console.log(text), // takes text from input as arg
-	onScrollHandler = () => console.log('scrolling'), // Pass to Parent
+	onScrollHandler = () => { }, // Pass to Parent
 	typingSpeed = 50,
+	parentText, // Pass To Parent so they can clear text on changing threads
+	chatInputOnChange, // Pass To Parent so they can see text
 }) {
 	return (
 		<ChatListContainer>
@@ -43,6 +45,8 @@ function LLMChat({
 				onSubmitHandler={onSubmitHandler}
 				onScrollHandler={onScrollHandler}
 				typingSpeed={typingSpeed} // don't use initial one
+				parentText={parentText}
+				chatInputOnChange={chatInputOnChange}
 			/>
 		</ChatListContainer>
 	)
