@@ -34,6 +34,23 @@ For the purposes of this documentation, step 1 was skipped over. I do go into fu
       + [Code for getMessages](#code-for-getmessages)
    * [POST Add message](#post-add-message)
       + [What you need for Add message](#what-you-need-for-add-message)
+      + [Code for postMessage.js](#code-for-postmessagejs)
+   * [GET all threads for a user](#get-all-threads-for-a-user)
+      + [What you need for GET all threads](#what-you-need-for-get-all-threads)
+	  + [Code for getThreads](#code-for-getthreads)
+   * [POST create thread](#post-create-thread)
+      + [What you need for Create thread](#what-you-need-for-create-thread)
+	  + [Code for postThread.js](#code-for-postthreadjs)
+   * [Delete thread](#delete-thread)
+      + [What you need for Delete thread](#what-you-need-for-delete-thread)
+	  + [Code for deleteThread.js](#code-for-deletethreadjs)
+   * [Patch temperature](#patch-temperature)
+      + [What you need for Patch temperature](#what-you-need-for-patch-temperature)
+	  + [Code for Patch temperature](#code-for-patch-temperature)
+   * [Patch typing speed](#patch-typing-speed)
+      + [What you need for Patch typing speed](#what-you-need-for-patch-typing-speed)
+	  + [Code for Patch typing speed](#code-for-patch-typing-speed)
+	
 
 # Table of Contents (Obsidian)
 
