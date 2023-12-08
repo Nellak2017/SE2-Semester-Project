@@ -22,14 +22,15 @@ function ChatList({
 	return (
 		<ChatListContainer variant={variant}>
 			<MessageContainer onScroll={onScrollHandler}>
+				
 				{chatHistory?.map((el, key) => (
 					<Chat
 						key={`text-${el?.messageId}`}
-						user={el?.user || USERS?.user}
-						message={el?.text || ""}
+						user={el?.user || parseInt(el?.author) || USERS?.user}
+						message={el?.text || el?.content || ""} 
 						userLogo={userLogos[el?.user || USERS?.user] || <PiPlaceholderDuotone />}
 						error={el?.error ?? false}
-						typingSpeed={key === 0 && el?.user === USERS?.gpt ? typingSpeed : undefined}
+						typingSpeed={key === 0 && parseInt(el?.author) === USERS?.gpt ? typingSpeed : undefined} // el?.user === USERS?.gpt
 					/>
 				))}
 			</MessageContainer>

@@ -54,7 +54,8 @@ export const IconContainer = styled.div`
 		word-break: break-all;
 		white-space: nowrap;
 		line-height: 1.25rem;
-		height: 1.25rem; 
+		height: 1.25rem;
+		width: 80%; // to fix small trash can issue 
 	}
 
 	svg {

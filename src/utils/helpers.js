@@ -9,7 +9,7 @@ import {
 	patchTypingSpeed,
 	deleteThread
 } from '../utils/api.js'
-
+import { generatePalmMessage } from './palmApi.js'
 
 // ---------------------------------------------------------------
 // --- General Helpers
@@ -59,7 +59,18 @@ export function generateRandomSentence({ words = top50EnglishWords, min = 2, max
 // Generalized listener assignment
 export function assignListeners({ userID, threads, setter, callback }) {
 	// Set the List of listener functions for each Link
-	setter(threads.map((thread, idx) => { return () => callback(userID, thread, idx)}))
+	setter(threads.map((thread, idx) => { return () => callback(userID, thread, idx) }))
+}
+
+
+export function apiRelevantFields(arrayOfObjects) {
+	// Sort the array based on 'messageID'
+	const sortedArray = arrayOfObjects.sort((a, b) => a.messageID - b.messageID).reverse()
+
+	return sortedArray.map(obj => {
+		const { author, content } = obj
+		return { author, content }
+	})
 }
 
 // ---------------------------------------------------------------
@@ -111,8 +122,10 @@ export async function fetchAndUpdateMessages(userID, threadID, setter, getter = 
 	const processed = await requestAndUpdate({
 		args: [userID, threadID],
 		transformer: messages => messages?.map(msg => ({
-			user: msg?.SentByUser,
-			text: msg?.Text,
+			author: String(msg?.SentByUser),
+			content: msg?.Text,
+			//user: msg?.SentByUser,
+			//text: msg?.Text,
 			messageId: msg?.MessageID,
 		})),
 		operation: getter,
@@ -164,7 +177,7 @@ export async function temperatureWrapper(userID, threadID, newTemperature, threa
 }
 
 export async function typingSpeedWrapper(userID, threadID, newTypingSpeed, threadIndex, setter) {
-	
+
 	const response = await operationAndUpdate({
 		operationArgs: [userID, threadID, newTypingSpeed],
 		fetchArgs: [userID, setter, threadIndex, getThreads],
@@ -189,4 +202,40 @@ export async function deleteWrapper(userID, threadID, setter) {
 	})
 
 	return response
+}
+
+export async function generatePalmMessageWrapper(messages, temperature, context = '') {
+	try {
+		console.log(messages)
+		const result = await generatePalmMessage({
+			context: context,
+			messages: messages,
+			temperature: temperature
+		})
+		console.log(result)
+		return result?.data?.candidates[0]?.content ?? "Unspecified Error"
+	} catch (e) {
+		console.error(e)
+		return generateRandomSentence({})
+	}
+}
+
+// ---------------------------------------------------------------
+// --- FILE API Helpers
+
+export function downloadFile(content, fileName, contentType) {
+	const blob = new Blob([content], { type: contentType })
+	const link = document.createElement('a')
+	link.href = URL.createObjectURL(blob)
+	link.download = fileName
+	link.click()
+}
+
+export function formatMessagesForExport(messages) {
+	return messages.reverse().map(message => `${message.author}: ${message.content}`).join('\n') // Warning Messages were stored in reverse order
+}
+
+export function handleExportButtonClick(messages) {
+	const formattedMessages = formatMessagesForExport(messages)
+	downloadFile(formattedMessages, 'exported_messages.txt', 'text/plain')
 }

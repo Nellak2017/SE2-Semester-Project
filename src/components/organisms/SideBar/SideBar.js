@@ -31,6 +31,7 @@ function SideBar({
 	onTypingSpeedMouseUp, // Pass to Parent
 	threadListenerList = [() => {}],  // Pass to Parent
 	trashListenerList = [() => {}],   // Pass to Parent
+	exportHandler, // Pass to Parent
 	...props
 }) {
 	const sliderLength = 100 // percent of slider length
@@ -140,6 +141,7 @@ function SideBar({
 					variant={variant}
 					text={exportText}
 					icon={<BiExport />}
+					onClick={exportHandler}
 				/>
 				<OutlineButton
 					variant={variant}

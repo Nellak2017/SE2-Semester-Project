@@ -2,14 +2,16 @@ import { useEffect, useState } from "react"
 import LLMChat from "../components/templates/LLMChat/LLMChat"
 import 'react-toastify/dist/ReactToastify.css'
 import {
-  highlightThread, indexOfCurrentlyHighlighted, updateObjInList, generateRandomSentence, fetchAndUpdateThreads, fetchAndUpdateMessages,
+  highlightThread, indexOfCurrentlyHighlighted, updateObjInList, fetchAndUpdateThreads, fetchAndUpdateMessages,
   postMessagesWrapper, postThreadWrapper, temperatureWrapper, typingSpeedWrapper, deleteWrapper,
+  apiRelevantFields,
+  handleExportButtonClick
 } from "../utils/helpers"
 import { USER_LOGOS } from "../components/utils/constants"
+import { generatePalmMessageWrapper } from "../utils/helpers.js"
 
 // TODO: Add real image assets for user and gpt
 // TODO: When error, use error component
-// TODO: LLM Generate Thread Name and Messages
 // TODO: Stop Hardcoding and use User Information when the User Logs in
 export default function Home() {
 
@@ -26,19 +28,31 @@ export default function Home() {
   useEffect(() => { initialize() }, [])
 
   // --- Handlers
+  // User "0" = user, User "1" = gpt
   const handleOnSubmit = async (text, isNewChat = false) => {
+    const rawTemperature = threads[threadIndex]?.Temperature
+    const processedTemperature = !rawTemperature && rawTemperature !== 0 ? .5 : rawTemperature / 100
+
     if (!isNewChat) {
       const threadIDUser = threads[indexOfCurrentlyHighlighted(threads)]?.ThreadID
       const threadIDGPT = threads[threadIndex]?.ThreadID
       await postMessagesWrapper(text, userID, threadIDUser, 0, setMessages) // post User's first because the endpoint is sorted in desc order
-      await postMessagesWrapper(generateRandomSentence({ min: 10, max: 35 }), userID, threadIDGPT, 1, setMessages) // post GPT's second
+
+      if (!rawTemperature) console.warn("Temperature seems invalid, may lead to unexpected results. Temperature = ", rawTemperature)
+
+      const LLMResponse = await generatePalmMessageWrapper([...apiRelevantFields(messages), { author: '0', content: text }], processedTemperature)
+      await postMessagesWrapper(LLMResponse, userID, threadIDGPT, 1, setMessages) // post GPT's second
       return
     }
     const highlightIndex = threads?.length ?? 0
-    const data = await postThreadSimply(generateRandomSentence({}), userID, highlightIndex)
+
+    const LLM_GENERATED_THREAD = await generatePalmMessageWrapper([{ author: '0', content: text + " Respond in 5 words or less with an unformatted chat title." }], processedTemperature, 'chat_title')
+    const data = await postThreadSimply(LLM_GENERATED_THREAD, userID, highlightIndex)
     const newThreadID = data[0] // data[0] = threadID
     await postMessagesWrapper(text, userID, newThreadID, 0, setMessages) // post User's first because the endpoint is sorted in desc order: ;
-    await postMessagesWrapper(generateRandomSentence({ min: 10, max: 35 }), userID, newThreadID, 1, setMessages) // post GPT's second
+
+    const LLMResponse = await generatePalmMessageWrapper([...apiRelevantFields(messages), { author: '0', content: text }], .5)
+    await postMessagesWrapper(LLMResponse, userID, newThreadID, 1, setMessages) // post GPT's second
     setIsNewChat(false)
     setThreadIndex(highlightIndex) // uses old last index
   }
@@ -50,7 +64,7 @@ export default function Home() {
   const handleTypingSpeedMouseUp = async () => { await typingSpeedWrapper(userID, threads[threadIndex]?.ThreadID, threads[threadIndex]?.TypingSpeed, threadIndex, setThreads) }
 
   // --- Helpers
-  function noThreadsDetected(t) { if (t !== null && t !== undefined && t?.length <= 0) { setThreadIndex(0); setMessages([]); setIsNewChat(true); } return t?.length <= 0 }
+  function noThreadsDetected(t) { if (t?.length > 0) { return false; } setThreadIndex(0); setMessages([]); setIsNewChat(true); return true }
 
   function assignAllListeners(userID, t) {
     setThreadListenerList(t?.map((e, i) => {
@@ -106,6 +120,7 @@ export default function Home() {
       typingSpeed={threads[threadIndex]?.TypingSpeed}
       parentText={userInput}
       chatInputOnChange={inputArea => setUserInput(inputArea.target.value)}
+      exportHandler={() => handleExportButtonClick(messages)}
     />
   )
 }

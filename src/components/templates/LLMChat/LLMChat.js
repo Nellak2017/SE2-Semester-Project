@@ -23,6 +23,7 @@ function LLMChat({
 	typingSpeed = 50,
 	parentText, // Pass To Parent so they can clear text on changing threads
 	chatInputOnChange, // Pass To Parent so they can see text
+	exportHandler, // Pass To Parent
 }) {
 	return (
 		<ChatListContainer>
@@ -37,6 +38,7 @@ function LLMChat({
 				onTypingSpeedChange={onTypingSpeedChange}
 				onTemperatureMouseUp={onTemperatureMouseUp}
 				onTypingSpeedMouseUp={onTypingSpeedMouseUp}
+				exportHandler={exportHandler}
 			/>
 			<ChatList 
 				variant={variant}
