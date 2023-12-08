@@ -1,5 +1,15 @@
 // Contains many pure functions used through out the application
 import { toast } from 'react-toastify'
+import {
+	getThreads,
+	getMessages,
+	addMessage,
+	postThread,
+	patchTemperature,
+	patchTypingSpeed,
+	deleteThread
+} from '../utils/api.js'
+
 
 // ---------------------------------------------------------------
 // --- General Helpers
@@ -46,21 +56,19 @@ export function generateRandomSentence({ words = top50EnglishWords, min = 2, max
 	return sentence.charAt(0).toUpperCase() + sentence.slice(1).trim() + '.'
 }
 
-// Generalized listener assignment (UNTESTED)
+// Generalized listener assignment
 export function assignListeners({ userID, threads, setter, callback }) {
 	// Set the List of listener functions for each Link
-	setter(threads.map((thread, idx) => {
-		return () => callback(userID, thread, idx)
-	}))
+	setter(threads.map((thread, idx) => { return () => callback(userID, thread, idx)}))
 }
 
 // ---------------------------------------------------------------
 // --- API Helpers (API request and SET state using return values)
 
 // Generalized API helper
-export async function requestAndUpdate({ args, transformer = res => res, getter, setter, type, errorMessage = "Error fetching and updating" }) {
+export async function requestAndUpdate({ args, transformer = res => res, operation, setter, type, errorMessage = "Error fetching and updating" }) {
 	try {
-		const response = await getter(...args)
+		const response = await operation(...args)
 		const processed = transformer(response)
 		setter(processed)
 		return processed
@@ -70,23 +78,36 @@ export async function requestAndUpdate({ args, transformer = res => res, getter,
 	}
 }
 
+// Generalized Operation then Fetch/Update
+export async function operationAndUpdate({ operationArgs, fetchArgs, operation, fetch, type = 'message', errorMessage = 'Error adding', setter = (_) => { } }) {
+	const response = await requestAndUpdate({
+		args: [...operationArgs],
+		operation,
+		setter,
+		type,
+		errorMessage
+	})
+	const updated = await fetch(...fetchArgs)
+	return [response, updated]
+}
+
 // ---------------------------------------------------------------
 // --- Wrappers (To make calling the generalized functions more convienient)
 
-export async function fetchAndUpdateThreads(userID, getter, setter, highlightIndex = 0) {
+export async function fetchAndUpdateThreads(userID, setter, highlightIndex = 0, getter = getThreads) {
 	const processed = await requestAndUpdate({
 		args: [userID],
 		transformer: response => {
 			return highlightThread(response, highlightIndex)
 		},
-		getter,
+		operation: getter,
 		setter,
 		type: 'threads'
 	})
 	return processed
 }
 
-export async function fetchAndUpdateMessages(userID, threadID, getter, setter) {
+export async function fetchAndUpdateMessages(userID, threadID, setter, getter = getMessages) {
 	const processed = await requestAndUpdate({
 		args: [userID, threadID],
 		transformer: messages => messages?.map(msg => ({
@@ -94,86 +115,78 @@ export async function fetchAndUpdateMessages(userID, threadID, getter, setter) {
 			text: msg?.Text,
 			messageId: msg?.MessageID,
 		})),
-		getter,
+		operation: getter,
 		setter,
 		type: 'messages'
 	})
 	return processed
 }
 
-export async function postAndUpdateMessage(text, userID, threadID,
-	getters = { 'post': () => { }, 'get': () => { } }, setters = { 'post': () => { }, 'get': () => { } }, sentByUser = 0) {
+export async function postMessagesWrapper(text, userID, threadID, sentByUser, setter) {
 
-	const processed = await requestAndUpdate({
-		args: [text, userID, threadID, sentByUser],
-		getter: getters['post'],
-		setter: setters['post'],
+	const response = await operationAndUpdate({
+		operationArgs: [text, userID, threadID, sentByUser],
+		fetchArgs: [userID, threadID, setter, getMessages],
+		operation: addMessage,
+		fetch: fetchAndUpdateMessages,
 		type: 'message',
-		errorMessage: 'Error adding'
+		errorMessage: 'Error Adding',
 	})
-
-	const unfilteredMessages = await fetchAndUpdateMessages(userID, threadID, getters['get'], setters['get']) // update messages when you add a new one
-	return [processed, unfilteredMessages]
+	return response
 }
 
-export async function postAndUpdateThread(threadName, userID, highlightIndex,
-	getters = { 'post': () => { }, 'get': () => { } }, setters = { 'post': () => { }, 'get': () => { } }) {
+export async function postThreadWrapper(threadName, userID, highlightIndex, setter) {
 
-	const newThreadID = await requestAndUpdate({
-		args: [userID, threadName],
-		getter: getters['post'],
-		setter: setters['post'],
+	const response = await operationAndUpdate({
+		operationArgs: [userID, threadName],
+		fetchArgs: [userID, setter, highlightIndex, getThreads],
+		operation: postThread,
+		fetch: fetchAndUpdateThreads,
 		type: 'thread',
-		errorMessage: 'Error adding'
+		errorMessage: 'Error Adding',
 	})
 
-	const unfilteredThreads = await fetchAndUpdateThreads(userID, getters['get'], setters['get'], highlightIndex)
-
-	return [newThreadID, unfilteredThreads]
+	return response
 }
 
-export async function patchTemperatureAndUpdateThreads(userID, threadID, newTemperature, threadIndex,
-	getters = { 'patch': () => { }, 'get': () => { } }, setters = { 'patch': () => { }, 'get': () => { } }) {
-	const processed = await requestAndUpdate({
-		args: [userID, threadID, newTemperature],
-		getter: getters['patch'],
-		setter: setters['patch'],
+export async function temperatureWrapper(userID, threadID, newTemperature, threadIndex, setter) {
+
+	const response = await operationAndUpdate({
+		operationArgs: [userID, threadID, newTemperature],
+		fetchArgs: [userID, setter, threadIndex, getThreads],
+		operation: patchTemperature,
+		fetch: fetchAndUpdateThreads,
 		type: 'temperature',
-		errorMessage: 'Error updating'
+		errorMessage: 'Error updating',
 	})
 
-	const unfilteredThreads = await fetchAndUpdateThreads(userID, getters['get'], setters['get'], threadIndex)
-
-	return [processed, unfilteredThreads]
+	return response
 }
 
-export async function patchTypingSpeedAndUpdateThreads(userID, threadID, newTemperature, threadIndex,
-	getters = { 'patch': () => { }, 'get': () => { } }, setters = { 'patch': () => { }, 'get': () => { } }) {
-	const processed = await requestAndUpdate({
-		args: [userID, threadID, newTemperature],
-		getter: getters['patch'],
-		setter: setters['patch'],
+export async function typingSpeedWrapper(userID, threadID, newTypingSpeed, threadIndex, setter) {
+	
+	const response = await operationAndUpdate({
+		operationArgs: [userID, threadID, newTypingSpeed],
+		fetchArgs: [userID, setter, threadIndex, getThreads],
+		operation: patchTypingSpeed,
+		fetch: fetchAndUpdateThreads,
 		type: 'typing speed',
-		errorMessage: 'Error updating'
+		errorMessage: 'Error updating',
 	})
 
-	const unfilteredThreads = await fetchAndUpdateThreads(userID, getters['get'], setters['get'], threadIndex)
-
-	return [processed, unfilteredThreads]
+	return response
 }
 
-export async function deleteAndUpdateThreads(userID, threadID,
-	getters = { 'delete': () => { }, 'get': () => { } }, setters = { 'delete': () => { }, 'get': () => { } }) {
+export async function deleteWrapper(userID, threadID, setter) {
 
-	const processed = await requestAndUpdate({
-		args: [userID, threadID],
-		getter: getters['delete'],
-		setter: setters['delete'],
+	const response = await operationAndUpdate({
+		operationArgs: [userID, threadID],
+		fetchArgs: [userID, setter, 0, getThreads],
+		operation: deleteThread,
+		fetch: fetchAndUpdateThreads,
 		type: 'thread',
-		errorMessage: 'Error deleting'
+		errorMessage: 'Error deleting',
 	})
 
-	const unfilteredThreads = await fetchAndUpdateThreads(userID, getters['get'], setters['get'], 0)
-
-	return [processed, unfilteredThreads]
+	return response
 }
