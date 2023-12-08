@@ -2,10 +2,10 @@ import axios from 'axios'
 import dotenv from 'dotenv'
 
 // Load environment variables from the .env file
-dotenv.config() // {path: '../../../../.env.local'}
+dotenv.config()
 
 const MODEL_NAME = "models/chat-bison-001"
-const API_KEY = "AIzaSyB5I4AkOR6NjDfDS3NLdr7yfj81hCLMBXg" // I am past the point of giving a fucking shit. Environment variable won't work 
+const API_KEY = "AIzaSyB5I4AkOR6NjDfDS3NLdr7yfj81hCLMBXg" // Environment variable won't work for some reason. 
 const headers = { 'Content-Type': 'application/json' }
 const apiURL = `https://generativelanguage.googleapis.com/v1beta3/models/chat-bison-001:generateMessage` // ?key=${API_KEY}
 
