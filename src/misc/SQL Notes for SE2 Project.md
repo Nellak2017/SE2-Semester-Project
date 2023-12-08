@@ -440,3 +440,269 @@ INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) VALUES (2, 
 - Text : string
 - Timestamp : Timestamp
 - SentByUser : 0 | 1 to represent boolean
+
+### Code for postMessage.js
+__postMessage.js__
+```javascript
+import { connectToDatabase } from "./utils/db"
+
+// Serverless function handler
+export const handler = async (req, res) => {
+	try {
+		// Connect to db
+		const db = await connectToDatabase()
+
+		// Extract parameters from the request query
+		const { threadID, userID, text, sentByUser } = req.body
+
+		// Check if all required parameters are provided
+		if ((!threadID && threadID !== 0) ||
+			(!userID && userID !== 0) ||
+			(!text && text !== '') ||
+			sentByUser === undefined) {
+			return res.status(400).json({ error: 'threadID, userID, text, and sentByUser are required parameters.' });
+		}
+
+		// POST message operation
+		const query = `
+			INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) 
+			VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?);
+    	`
+
+		await db.query(query, [threadID, userID, text, sentByUser])
+
+		// Send a success response
+		res.status(200).json({ success: true })
+	} catch (e) {
+		console.error(e)
+		res.status(500).json({ error: 'Internal Server Error' })
+	}
+}
+
+export default handler
+```
+
+## GET all threads for a user
+
+```sql
+SELECT Threads.*
+FROM Threads
+WHERE Threads.UserID = ?;
+```
+
+### What you need for GET all threads
+
+- UserID : number
+
+### Code for getThreads
+
+__getThreads.js__
+```javascript
+import { connectToDatabase } from "./utils/db"
+
+// Serverless function handler
+export const handler = async (req, res) => {
+	try {
+		// Connect to db
+		const db = await connectToDatabase()
+
+		// Extract parameters from the request query
+		const { userID } = req.query
+
+		// Check if both userID and name are provided
+		if (!userID && userID !== 0) {
+			return res.status(400).json({ error: 'userID is the required parameter and it is missing.' })
+		}
+
+		// GET messages operation
+		const query = `
+			SELECT Threads.*
+			FROM Threads
+			WHERE Threads.UserID = ?;
+			`
+
+		const result = await db.query(query, [userID])
+
+		// Send the result as a JSON response
+		res.status(200).json(result[0]) //result.rows
+	} catch (e) {
+		console.error(e)
+		res.status(500).json({ error: 'Internal Server Error' })
+	}
+}
+
+export default handler
+```
+
+## POST Create thread
+
+```sql
+INSERT INTO Threads (Name, UserID)
+VALUES (?, ?);
+```
+
+### What you need for Create thread
+- Name: string // Name of the thread
+- ThreadID: number
+
+### Code for postThread.js
+__postThread.js__
+```javascript
+import { connectToDatabase } from "./utils/db"
+
+export const handler = async (req, res) => {
+	try {
+		const db = await connectToDatabase()
+		const { userID, threadName } = req.body
+
+		if ((!userID && userID !== 0) || !threadName) return res.status(400).json({ error: 'Both userID and threadName are required parameters and must not be missing.' })
+
+		const query = `
+			INSERT INTO Threads (Name, UserID)
+			VALUES (?, ?);
+    	`
+		const result = await db.query(query, [threadName, userID])
+		const newThreadID = result[0].insertId
+		res.status(200).json({ message: 'Thread created successfully.', newThreadID: newThreadID})
+	} catch (e) {
+		console.error(e)
+		res.status(500).json({ error: 'Internal Server Error', details: e.message })
+	}
+}
+
+export default handler
+```
+
+## Delete thread
+
+```sql
+START TRANSACTION;
+DELETE FROM Messages WHERE ThreadID = ?, [threadID];
+DELETE FROM Threads WHERE ThreadID = ?, [threadID];
+COMMIT;
+```
+
+### What you need for Delete thread
+
+- ThreadID : number
+
+## Code for deleteThread.js
+__deleteThread.js__
+```javascript
+import { connectToDatabase } from "./utils/db"
+
+// Serverless function handler
+export const handler = async (req, res) => {
+  try {
+    const db = await connectToDatabase()
+    const { threadID } = req.body
+
+    if (!threadID && threadID !== 0) return res.status(400).json({ error: 'threadID is a required parameter and is missing.' })
+
+    // Start a transaction
+    await db.query('START TRANSACTION')
+    try {
+      await db.query('DELETE FROM Messages WHERE ThreadID = ?', [threadID])
+      await db.query('DELETE FROM Threads WHERE ThreadID = ?', [threadID])
+      await db.query('COMMIT')
+      res.status(200).json({ message: 'Thread and associated messages deleted successfully.' })
+    } catch (error) {
+      // Rollback the transaction in case of an error
+      await db.query('ROLLBACK')
+      throw error
+    }
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: 'Internal Server Error', details: e.message })
+  }
+}
+
+export default handler
+```
+
+## Patch temperature
+
+```sql
+UPDATE Threads
+SET Temperature = ?
+WHERE ThreadID = ?;
+```
+
+### What you need for Patch temperature
+
+- Temperature : number // between 1 and 100
+- ThreadID : number
+
+### Code for Patch temperature
+
+__patchTemperature.js__
+```javascript
+import { connectToDatabase } from "./utils/db"
+
+// Serverless function handler
+export const handler = async (req, res) => {
+	try {
+		const db = await connectToDatabase()
+		const { threadID , newTemperature } = req.body
+		if (!newTemperature && newTemperature !== 0) return res.status(400).json({ error: 'newTemperature is a required parameter and is missing.' })
+
+		// PATCH update temperature operation
+		const query = `
+			UPDATE Threads
+			SET Temperature = ?
+			WHERE ThreadID = ?;
+    	`
+		await db.query(query, [newTemperature, threadID])
+
+		res.status(200).json({ message: 'Temperature updated successfully.' })
+	} catch (e) {
+		console.error(e)
+		res.status(500).json({ error: 'Internal Server Error', details: e.message })
+	}
+}
+
+export default handler
+```
+
+## Patch typing speed
+
+```sql
+UPDATE Threads
+SET TypingSpeed = ?
+WHERE ThreadID = ?;
+```
+
+### What you need for Patch typing speed
+
+- TypingSpeed : number // between 1 and 100
+- ThreadID : number
+
+### Code for Patch typing speed
+
+__patchTypingSpeed.js__
+```javascript
+import { connectToDatabase } from "./utils/db"
+
+export const handler = async (req, res) => {
+  try {
+    const db = await connectToDatabase()
+    const { threadID, newTypingSpeed } = req.body
+
+    if (!newTypingSpeed && newTypingSpeed !== 0) return res.status(400).json({ error: 'newTypingSpeed is a required parameter and is missing.' })
+
+    const query = `
+      UPDATE Threads
+      SET TypingSpeed = ?
+      WHERE ThreadID = ?;
+    `
+    await db.query(query, [newTypingSpeed, threadID])
+
+    res.status(200).json({ message: 'Typing speed updated successfully.' })
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: 'Internal Server Error', details: e.message})
+  }
+}
+
+export default handler
+```
