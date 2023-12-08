@@ -16,7 +16,7 @@ import {
 
 // Function to highlight a specific thread at an index. If index is negative, it makes everything false
 export function highlightThread(threadList, index = 0) {
-	if (!threadList || index > threadList.length) return []
+	if (!threadList || index > threadList?.length) return []
 	if (index < 0) return threadList.map(e => ({ ...e, highlighted: false }))
 	return threadList.map((e, i) => {
 		return i === index ?
@@ -30,7 +30,7 @@ export function indexOfCurrentlyHighlighted(threadList) { return threadList?.fin
 
 // Function to update an Object in a list given the index, property name, and property value
 export function updateObjInList(objList, index, propertyName, propertyValue) {
-	if (index < 0 || index === undefined || isNaN(index) || index > objList.length) return objList
+	if (index < 0 || index === undefined || isNaN(index) || index > objList?.length) return objList
 	const updatedList = [...objList]
 	updatedList[index] = { ...updatedList[index], [propertyName]: propertyValue }
 	return updatedList
@@ -48,7 +48,7 @@ export function generateRandomSentence({ words = top50EnglishWords, min = 2, max
 	const sentenceLength = Math.floor(Math.random() * (max - min)) + min // Random length between 2 and 5 words
 	const randomWords = Array.from(
 		{ length: sentenceLength },
-		() => { return words[Math.floor(Math.random() * words.length)] }
+		() => { return words[Math.floor(Math.random() * words?.length)] }
 	)
 	const sentence = randomWords.join(' ')
 

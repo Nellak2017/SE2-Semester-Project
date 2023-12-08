@@ -194,10 +194,27 @@ Once you have a service account, you will need to generate a __credentials file_
 If your absolute path has spaces in it, you will have to run a command prompt program to find the short name of it.
 
 ```bash
-for %I in ("C:\path\to\your\file.txt") do @echo %~nxI
+for %I in ("C:\path\to\your\file.json") do @echo %~nxI
 ```
 
 This short name will be later used in the environment variable for the Proxy server.
+
+If the above program does not work for you, then a work-around that I found that definitely works is to create a __shortNamePath.cmd__ file in a known folder such as Desktop, then use that to get the shortName of the file.
+
+__shortNamePath.cmd__
+```cmd
+@ECHO OFF
+echo %~s1
+```
+
+Be sure to save the file with that name and _.cmd_ and save as __all files__. To use this cmd program open up command prompt at that folder where the program is saved and do this:
+
+__Usage__
+```cmd
+shortNamePath "C:\path\to\your\file.json"
+```
+
+This will return the short file name to be used.
 
 ## Proxy
 

@@ -13,7 +13,7 @@ import { USER_LOGOS } from "../components/utils/constants"
 // TODO: Stop Hardcoding and use User Information when the User Logs in
 export default function Home() {
 
-  const [userID, setUserID] = useState(1) 
+  const [userID, setUserID] = useState(1)
   const [messages, setMessages] = useState([])
   const [threads, setThreads] = useState([]) // unfiltered, has temperature and typing speed included
   const [threadIndex, setThreadIndex] = useState(0) // the thread we are highlighting
@@ -34,7 +34,7 @@ export default function Home() {
       await postMessagesWrapper(generateRandomSentence({ min: 10, max: 35 }), userID, threadIDGPT, 1, setMessages) // post GPT's second
       return
     }
-    const highlightIndex = threads.length
+    const highlightIndex = threads?.length ?? 0
     const data = await postThreadSimply(generateRandomSentence({}), userID, highlightIndex)
     const newThreadID = data[0] // data[0] = threadID
     await postMessagesWrapper(text, userID, newThreadID, 0, setMessages) // post User's first because the endpoint is sorted in desc order: ;
@@ -50,7 +50,7 @@ export default function Home() {
   const handleTypingSpeedMouseUp = async () => { await typingSpeedWrapper(userID, threads[threadIndex]?.ThreadID, threads[threadIndex]?.TypingSpeed, threadIndex, setThreads) }
 
   // --- Helpers
-  function noThreadsDetected(t) { if (t.length <= 0) { setThreadIndex(0); setMessages([]); setIsNewChat(true); } return t.length <= 0 }
+  function noThreadsDetected(t) { if (t !== null && t !== undefined && t?.length <= 0) { setThreadIndex(0); setMessages([]); setIsNewChat(true); } return t?.length <= 0 }
 
   function assignAllListeners(userID, t) {
     setThreadListenerList(t?.map((e, i) => {
@@ -62,9 +62,7 @@ export default function Home() {
         await fetchAndUpdateThreads(userID, setThreads, i) // so that the temperature and typing speed are updated as expected, we must fetch new threads
       }
     }))
-    setTrashListenerList(t.map(e => {
-      return async () => { await deleteThreadSimply(userID, e?.ThreadID) }
-    }))
+    setTrashListenerList(t.map(e => { return async () => { await deleteThreadSimply(userID, e?.ThreadID) } }))
   }
 
   async function postThreadSimply(threadName, userID, highlightIndex, setter = setThreads) {

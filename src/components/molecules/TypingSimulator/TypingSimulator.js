@@ -63,7 +63,7 @@ const TypingSimulator = ({ message, typingSpeed }) => {
 		// To ensure this runs only once, I use a ref
 		if (initialMount.current) {
 			let currentIndex = 0
-			const totalChars = message.length
+			const totalChars = message?.length
 			const typeCharacters = async () => {
 				while (currentIndex < totalChars) {
 					// Use a Promise to introduce an asynchronous delay
