@@ -30,7 +30,7 @@ describe('Parameterized Test Cases', () => {
 		[[{ id: 1 }, { id: 2 }, { id: 3 }], 1, 'name', 'Updated', [{ id: 1 }, { id: 2, name: 'Updated' }, { id: 3 }]],
 		[[{ id: 1 }, { id: 2 }, { id: 3 }], 0, 'name', 'Updated', [{ id: 1, name: 'Updated' }, { id: 2 }, { id: 3 }]],
 	])('updateObjInList should update an object in a list', (objList, index, propertyName, propertyValue, expected) => {
-		const updatedList = updateObjInList(objList, index, propertyName, propertyValue)
+		const updatedList = updateObjInList({ objList, index, propertyName, propertyValue })
 		expect(updatedList).toEqual(expected)
 	})
 

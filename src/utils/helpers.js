@@ -1,4 +1,8 @@
+/* eslint-disable max-lines */
 // Contains many pure functions used through out the application
+// See also: https://medium.com/@jemimaosoro/ecmascript-2023-mastering-tosorted-toreversed-tospliced-and-with-array-methods-61030c57a677
+import 'core-js/features/array/to-reversed' // https://github.com/vercel/next.js/issues/58242
+import 'core-js/features/array/to-sorted' // https://github.com/vercel/next.js/issues/58242
 import { toast } from 'react-toastify'
 import {
 	getThreads,
@@ -10,27 +14,19 @@ import {
 	deleteThread
 } from '../utils/api.js'
 import { generatePalmMessage } from './palmApi.js'
+import { tryCatchAsync, handle, ok, err, getValue } from './result.js'
 
 // ---------------------------------------------------------------
 // --- General Helpers
 
 // Function to highlight a specific thread at an index. If index is negative, it makes everything false
-export function highlightThread(threadList, index = 0) {
-	if (!threadList || index > threadList?.length) return []
-	if (index < 0) return threadList.map(e => ({ ...e, highlighted: false }))
-	return threadList.map((e, i) => {
-		return i === index ?
-			{ ...e, highlighted: true } :
-			{ ...e, highlighted: false }
-	})
-}
+export const highlightThread = (threadList, index = 0) => threadList.map((e, i) => ({ ...e, highlighted: i === index }))
 
 // Function to tell the index of the currently highlighted
-export function indexOfCurrentlyHighlighted(threadList) { return threadList?.findIndex(el => el.highlighted === true) }
+export const indexOfCurrentlyHighlighted = threadList => threadList?.findIndex(el => el.highlighted === true)
 
 // Function to update an Object in a list given the index, property name, and property value
-export function updateObjInList(objList, index, propertyName, propertyValue) {
-	if (index < 0 || index === undefined || isNaN(index) || index > objList?.length) return objList
+export const updateObjInList = ({ objList, index, propertyName, propertyValue }) => {
 	const updatedList = [...objList]
 	updatedList[index] = { ...updatedList[index], [propertyName]: propertyValue }
 	return updatedList
@@ -44,54 +40,55 @@ const top50EnglishWords = [
 	'up', 'out', 'if', 'about', 'who', 'get', 'which', 'go', 'me'
 ]
 
-export function generateRandomSentence({ words = top50EnglishWords, min = 2, max = 5 }) {
-	const sentenceLength = Math.floor(Math.random() * (max - min)) + min // Random length between 2 and 5 words
-	const randomWords = Array.from(
-		{ length: sentenceLength },
+export const generateRandomSentence = ({ words = top50EnglishWords, min = 2, max = 5 }) => {
+	const sentence = Array.from(
+		{ length: Math.floor(Math.random() * (max - min)) + min }, // Random length between 2 and 5 words
 		() => { return words[Math.floor(Math.random() * words?.length)] }
-	)
-	const sentence = randomWords.join(' ')
+	).join(' ')
 
 	// Capitalize the first letter and add a period at the end
 	return sentence.charAt(0).toUpperCase() + sentence.slice(1).trim() + '.'
 }
 
 // Generalized listener assignment
-export function assignListeners({ userID, threads, setter, callback }) {
-	// Set the List of listener functions for each Link
-	setter(threads.map((thread, idx) => { return () => callback(userID, thread, idx) }))
-}
+export const assignListeners = ({ userID, threads, setter, callback }) => {
+	setter(threads.map((thread, idx) => () => callback(userID, thread, idx)))
+} // Set the List of listener functions for each Link
 
 
-export function apiRelevantFields(arrayOfObjects) {
-	// Sort the array based on 'messageID'
-	const sortedArray = arrayOfObjects.sort((a, b) => a.messageID - b.messageID).reverse()
-
-	return sortedArray.map(obj => {
-		const { author, content } = obj
-		return { author, content }
-	})
-}
+export const apiRelevantFields = arrayOfObjects => arrayOfObjects
+	.toSorted((a, b) => a.messageID - b.messageID) // Sort the array based on 'messageID'
+	.toReversed()
+	.map(obj => ({ author: obj?.author, content: obj?.content }))
 
 // ---------------------------------------------------------------
 // --- API Helpers (API request and SET state using return values)
 
 // Generalized API helper
-export async function requestAndUpdate({ args, transformer = res => res, operation, setter, type, errorMessage = "Error fetching and updating" }) {
-	try {
-		const response = await operation(...args)
-		const processed = transformer(response)
-		setter(processed)
-		return processed
-	} catch (e) {
-		console.error(`${errorMessage} ${type}: `, e)
-		toast.error(`${errorMessage} ${type}, see dev console for more details.`)
-	}
+
+// input => <Result>
+export const requestAndUpdate = async ({ args, transformer = res => res, operation, setter, type, errorMessage = "Error fetching and updating" }) => {
+	const result = await tryCatchAsync(() => operation(...args), `${errorMessage} ${type}: `)
+	return handle(
+		result,
+		res => {
+			const processed = transformer(res)
+			setter(processed)
+			return ok(processed)
+		},
+		error => {
+			console.error(error)
+			toast.error(`${errorMessage} ${type}, see dev console for more details.`)
+			return err(error)
+		}
+	) // if result ok then res function, if result not ok then err function
 }
 
 // Generalized Operation then Fetch/Update
-export async function operationAndUpdate({ operationArgs, fetchArgs, operation, fetch, type = 'message', errorMessage = 'Error adding', setter = (_) => { } }) {
-	const response = await requestAndUpdate({
+// TODO: Look closer into the return type for this and the rest of the operationAndUpdate users
+// input => [result value, updated]
+export const operationAndUpdate = async ({ operationArgs, fetchArgs, operation, fetch, type = 'message', errorMessage = 'Error adding', setter = (_) => { } }) => {
+	const result = await requestAndUpdate({
 		args: [...operationArgs],
 		operation,
 		setter,
@@ -99,27 +96,25 @@ export async function operationAndUpdate({ operationArgs, fetchArgs, operation, 
 		errorMessage
 	})
 	const updated = await fetch(...fetchArgs)
-	return [response, updated]
+	return [getValue(result), updated]
 }
 
 // ---------------------------------------------------------------
 // --- Wrappers (To make calling the generalized functions more convienient)
 
-export async function fetchAndUpdateThreads(userID, setter, highlightIndex = 0, getter = getThreads) {
-	const processed = await requestAndUpdate({
+export const fetchAndUpdateThreads = async ({ userID, setter, highlightIndex = 0, getter = getThreads }) => {
+	const result = await requestAndUpdate({
 		args: [userID],
-		transformer: response => {
-			return highlightThread(response, highlightIndex)
-		},
+		transformer: response => highlightThread(response, highlightIndex),
 		operation: getter,
 		setter,
 		type: 'threads'
 	})
-	return processed
+	return getValue(result)
 }
 
-export async function fetchAndUpdateMessages(userID, threadID, setter, getter = getMessages) {
-	const processed = await requestAndUpdate({
+export const fetchAndUpdateMessages = async ({ userID, threadID, setter, getter = getMessages }) => {
+	const result = await requestAndUpdate({
 		args: [userID, threadID],
 		transformer: messages => messages?.map(msg => ({
 			author: String(msg?.SentByUser),
@@ -132,11 +127,10 @@ export async function fetchAndUpdateMessages(userID, threadID, setter, getter = 
 		setter,
 		type: 'messages'
 	})
-	return processed
+	return getValue(result)
 }
 
-export async function postMessagesWrapper(text, userID, threadID, sentByUser, setter) {
-
+export const postMessagesWrapper = async ({ text, userID, threadID, sentByUser, setter }) => {
 	const response = await operationAndUpdate({
 		operationArgs: [text, userID, threadID, sentByUser],
 		fetchArgs: [userID, threadID, setter, getMessages],
@@ -148,8 +142,7 @@ export async function postMessagesWrapper(text, userID, threadID, sentByUser, se
 	return response
 }
 
-export async function postThreadWrapper(threadName, userID, highlightIndex, setter) {
-
+export const postThreadWrapper = async ({ threadName, userID, highlightIndex, setter }) => {
 	const response = await operationAndUpdate({
 		operationArgs: [userID, threadName],
 		fetchArgs: [userID, setter, highlightIndex, getThreads],
@@ -158,12 +151,10 @@ export async function postThreadWrapper(threadName, userID, highlightIndex, sett
 		type: 'thread',
 		errorMessage: 'Error Adding',
 	})
-
 	return response
 }
 
-export async function temperatureWrapper(userID, threadID, newTemperature, threadIndex, setter) {
-
+export const temperatureWrapper = async ({ userID, threadID, newTemperature, threadIndex, setter }) => {
 	const response = await operationAndUpdate({
 		operationArgs: [userID, threadID, newTemperature],
 		fetchArgs: [userID, setter, threadIndex, getThreads],
@@ -172,12 +163,10 @@ export async function temperatureWrapper(userID, threadID, newTemperature, threa
 		type: 'temperature',
 		errorMessage: 'Error updating',
 	})
-
 	return response
 }
 
-export async function typingSpeedWrapper(userID, threadID, newTypingSpeed, threadIndex, setter) {
-
+export const typingSpeedWrapper = async ({ userID, threadID, newTypingSpeed, threadIndex, setter }) => {
 	const response = await operationAndUpdate({
 		operationArgs: [userID, threadID, newTypingSpeed],
 		fetchArgs: [userID, setter, threadIndex, getThreads],
@@ -186,12 +175,10 @@ export async function typingSpeedWrapper(userID, threadID, newTypingSpeed, threa
 		type: 'typing speed',
 		errorMessage: 'Error updating',
 	})
-
 	return response
 }
 
-export async function deleteWrapper(userID, threadID, setter) {
-
+export const deleteWrapper = async (userID, threadID, setter) => {
 	const response = await operationAndUpdate({
 		operationArgs: [userID, threadID],
 		fetchArgs: [userID, setter, 0, getThreads],
@@ -200,30 +187,29 @@ export async function deleteWrapper(userID, threadID, setter) {
 		type: 'thread',
 		errorMessage: 'Error deleting',
 	})
-
 	return response
 }
 
-export async function generatePalmMessageWrapper(messages, temperature, context = '') {
-	try {
-		console.log(messages)
-		const result = await generatePalmMessage({
-			context: context,
-			messages: messages,
-			temperature: temperature
-		})
-		console.log(result)
-		return result?.data?.candidates[0]?.content ?? "Unspecified Error"
-	} catch (e) {
-		console.error(e)
-		return generateRandomSentence({})
-	}
+export const generatePalmMessageWrapper = async (messages, temperature, context = '') => {
+	const result = await generatePalmMessage({
+		context: context,
+		messages: messages,
+		temperature: temperature
+	})
+	return handle(
+		result,
+		res => res?.data?.candidates[0]?.content ?? "Unspecified Error",
+		err => {
+			console.error(err)
+			return generateRandomSentence({})
+		}
+	)
 }
 
 // ---------------------------------------------------------------
 // --- FILE API Helpers
 
-export function downloadFile(content, fileName, contentType) {
+export const downloadFile = (content, fileName, contentType) => {
 	const blob = new Blob([content], { type: contentType })
 	const link = document.createElement('a')
 	link.href = URL.createObjectURL(blob)
@@ -231,11 +217,8 @@ export function downloadFile(content, fileName, contentType) {
 	link.click()
 }
 
-export function formatMessagesForExport(messages) {
-	return messages.reverse().map(message => `${message.author}: ${message.content}`).join('\n') // Warning Messages were stored in reverse order
-}
+export const formatMessagesForExport = messages => messages
+	.toReversed()
+	.map(message => `${message.author}: ${message.content}`).join('\n') // Warning Messages were stored in reverse order: ;
 
-export function handleExportButtonClick(messages) {
-	const formattedMessages = formatMessagesForExport(messages)
-	downloadFile(formattedMessages, 'exported_messages.txt', 'text/plain')
-}
+export const handleExportButtonClick = messages => downloadFile(formatMessagesForExport(messages), 'exported_messages.txt', 'text/plain')
