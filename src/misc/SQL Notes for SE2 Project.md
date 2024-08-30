@@ -245,7 +245,7 @@ Once you have the proxy going, you will have to set up your __connectToDatabase_
 
 _dependencies_
 ```node
-npm install mysql
+npm install mysql2
 npm install dotenv
 ```
 
