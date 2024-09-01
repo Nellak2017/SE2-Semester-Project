@@ -15,7 +15,7 @@ import { USER_LOGOS } from "../components/utils/constants"
 // TODO: Stop Hardcoding and use User Information when the User Logs in
 export default function Home() {
 
-  const [userID, setUserID] = useState(1)
+  const [userID] = useState(1)
   const [messages, setMessages] = useState([])
   const [threads, setThreads] = useState([]) // unfiltered, has temperature and typing speed included
   const [threadIndex, setThreadIndex] = useState(0) // the thread we are highlighting
@@ -47,7 +47,7 @@ export default function Home() {
     const highlightIndex = threads?.length ?? 0
 
     const LLM_GENERATED_THREAD = await generatePalmMessageWrapper([{ author: '0', content: text + " Respond in 5 words or less with an unformatted chat title." }], processedTemperature, 'chat_title')
-    const data = await postThreadSimply(LLM_GENERATED_THREAD, userID, highlightIndex)
+    const data = await postThreadSimply({ threadName: LLM_GENERATED_THREAD, userID, highlightIndex })
     const newThreadID = data[0] // data[0] = threadID
     await postMessagesWrapper({ text, userID, threadID: newThreadID, sentByUser: 0, setter: setMessages }) // post User's first because the endpoint is sorted in desc order: ;
 
@@ -76,16 +76,16 @@ export default function Home() {
         await fetchAndUpdateThreads({ userID, setter: setThreads, highlightIndex: i }) // so that the temperature and typing speed are updated as expected, we must fetch new threads
       }
     }))
-    setTrashListenerList(t.map(e => { return async () => { await deleteThreadSimply(userID, e?.ThreadID) } }))
+    setTrashListenerList(t.map(e => { return async () => { await deleteThreadSimply({ userID, threadID: e?.ThreadID }) } }))
   }
 
-  async function postThreadSimply(threadName, userID, highlightIndex, setter = setThreads) {
+  async function postThreadSimply({ threadName, userID, highlightIndex, setter = setThreads }) {
     const data = await postThreadWrapper({ threadName, userID, highlightIndex, setter })
     assignAllListeners(userID, data[1]) // data[1] = unfiltered threads
     return data
   }
 
-  async function deleteThreadSimply(userID, threadID, setter = setThreads) {
+  async function deleteThreadSimply({ userID, threadID, setter = setThreads }) {
     const data = await deleteWrapper(userID, threadID, setter)
     const unfilteredThreads = data[1]
     if (noThreadsDetected(unfilteredThreads)) return

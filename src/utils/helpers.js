@@ -67,8 +67,10 @@ export const apiRelevantFields = arrayOfObjects => arrayOfObjects
 // Generalized API helper
 
 // input => <Result>
+// operation : input => <Result>
 export const requestAndUpdate = async ({ args, transformer = res => res, operation, setter, type, errorMessage = "Error fetching and updating" }) => {
 	const result = await tryCatchAsync(() => operation(...args), `${errorMessage} ${type}: `)
+	console.log(result)
 	return handle(
 		result,
 		res => {
