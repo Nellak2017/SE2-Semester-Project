@@ -119,16 +119,20 @@ const exampleUserLogos = {
 	'user': <PiPlaceholderDuotone />
 }
 
-export const light = Template.bind({})
-light.args = {
-	variant: 'light',
-	chatHistory: exampleChatHistory.slice().reverse(),
-	userLogos: exampleUserLogos
+export const Light = Template.bind({})
+Light.args = {
+	state: {
+		variant: 'light',
+		chatHistory: exampleChatHistory.slice().reverse(),
+		userLogos: exampleUserLogos
+	}
 }
 
-export const dark = Template.bind({})
-dark.args = {
-	variant: 'dark',
-	chatHistory: exampleChatHistory.slice().reverse(),
-	userLogos: exampleUserLogos
+export const Dark = Template.bind({})
+Dark.args = {
+	state: {
+		variant: 'dark',
+		chatHistory: exampleChatHistory.slice().reverse(),
+		userLogos: exampleUserLogos
+	}
 }

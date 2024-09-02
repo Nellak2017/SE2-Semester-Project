@@ -11,12 +11,16 @@ export default {
 
 const Template = args => <ChatInput {...args} />
 
-export const defaultInput = Template.bind({})
-defaultInput.args = {
-  variant: 'default'
+export const DefaultInput = Template.bind({})
+DefaultInput.args = {
+  state: {
+    variant: 'default'
+  }
 }
 
-export const smallInput = Template.bind({})
-smallInput.args = {
-  variant: 'small'
+export const SmallInput = Template.bind({})
+SmallInput.args = {
+  state: {
+    variant: 'small'
+  }
 }

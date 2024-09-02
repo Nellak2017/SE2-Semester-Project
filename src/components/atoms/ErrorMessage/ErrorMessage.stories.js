@@ -10,7 +10,7 @@ export default {
 
 const Template = args => <ErrorMessage {...args} />
 
-export const defaultComponent = Template.bind({})
-defaultComponent.args = {
+export const DefaultComponent = Template.bind({})
+DefaultComponent.args = {
   
 }

@@ -1,17 +1,18 @@
 import { ThreadListContainer } from './ThreadList.elements'
 import Thread from '../Thread/Thread.js'
+import { VARIANTS } from '../../utils/constants.js'
 
 function ThreadList({
-	state = {
-		variant,
-		maxwidth,
-		threads,
-		threadListenerList,
-		trashListenerList,
-	},
+	state,
 	...props
 }) {
-	const { variant, maxwidth, threads, threadListenerList, trashListenerList } = state || {}
+	const {
+		variant = VARIANTS.dark,
+		maxwidth = 260,
+		threads = [],
+		threadListenerList = [() => { }],
+		trashListenerList = [() => { }]
+	} = state || {}
 
 	const handleLinkClick = index => threadListenerList && threadListenerList[index] && threadListenerList[index]()
 	const handleTrashClick = index => trashListenerList && trashListenerList[index] && trashListenerList[index]()

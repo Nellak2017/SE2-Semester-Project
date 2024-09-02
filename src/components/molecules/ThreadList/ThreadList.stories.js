@@ -23,14 +23,18 @@ const exampleThreadInfo = [
 	}
 ]
 
-export const light = Template.bind({})
-light.args = {
-  variant: 'light',
-  threads: exampleThreadInfo
+export const Light = Template.bind({})
+Light.args = {
+	state: {
+		variant: 'light',
+		threads: exampleThreadInfo
+	}
 }
 
-export const dark = Template.bind({})
-dark.args = {
-  variant: 'dark',
-  threads: exampleThreadInfo
+export const Dark = Template.bind({})
+Dark.args = {
+	state: {
+		variant: 'dark',
+		threads: exampleThreadInfo
+	}
 }

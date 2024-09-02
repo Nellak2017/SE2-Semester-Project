@@ -1,11 +1,11 @@
 import SideBar from './SideBar'
 
 export default {
-  title: 'Organisms/SideBar',
-  component: SideBar,
-  argTypes: {
-    variant: { control: 'text' },
-  }
+	title: 'Organisms/SideBar',
+	component: SideBar,
+	argTypes: {
+		variant: { control: 'text' },
+	}
 }
 
 const Template = args => <SideBar {...args} />
@@ -23,14 +23,34 @@ const exampleThreadInfo = [
 	}
 ]
 
-export const light = Template.bind({})
-light.args = {
-  variant: 'light',
-  threads: exampleThreadInfo
+export const Light = Template.bind({})
+Light.args = {
+	state: {
+		variant: 'light',
+		threads: exampleThreadInfo,
+		// initialTemperature: 50,
+		// initialTypingSpeed: 50,
+		// threadListenerList: [() => { }],
+		// trashListenerList: [() => { }],
+		// maxwidth: 260,
+		// buttonText: "New Chat",
+		// logoutText: "Log Out",
+		// exportText: "Export to Text",
+	},
 }
 
-export const dark = Template.bind({})
-dark.args = {
-  variant: 'dark',
-  threads: exampleThreadInfo
+export const Dark = Template.bind({})
+Dark.args = {
+	state: {
+		variant: 'dark',
+		threads: exampleThreadInfo,
+		initialTemperature: 50,
+		initialTypingSpeed: 50,
+		threadListenerList: [() => { }],
+		trashListenerList: [() => { }],
+		maxwidth: 260,
+		buttonText: "New Chat",
+		logoutText: "Log Out",
+		exportText: "Export to Text",
+	},
 }

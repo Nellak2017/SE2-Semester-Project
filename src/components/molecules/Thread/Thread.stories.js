@@ -10,15 +10,19 @@ export default {
 
 const Template = args => <Thread {...args} />
 
-export const light = Template.bind({})
-light.args = {
-  variant: 'light',
-  idno: 0,
-  highlighted: true
+export const Light = Template.bind({})
+Light.args = {
+  state: {
+    variant: 'light',
+    idno: 0,
+    highlighted: true
+  }
 }
 
-export const dark = Template.bind({})
-dark.args = {
-  variant: 'dark',
-  idno: 0
+export const Dark = Template.bind({})
+Dark.args = {
+  state: {
+    variant: 'dark',
+    idno: 0
+  }
 }

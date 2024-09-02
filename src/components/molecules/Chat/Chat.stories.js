@@ -75,18 +75,22 @@ Notice that the above text goes outside the box, but if styled right it instead 
 | Cell 3   | Cell 4   |
 `
 
-export const user = Template.bind({})
-user.args = {
-	user: USERS.user,
-	message: "This is user example content with nothing special.",
-	userLogo: <PiPlaceholderDuotone />,
-	error: true
+export const User = Template.bind({})
+User.args = {
+	state: {
+		user: USERS.user,
+		message: "This is user example content with nothing special.",
+		userLogo: <PiPlaceholderDuotone />,
+		error: true
+	}
 }
 
-export const gpt = Template.bind({})
-gpt.args = {
-	user: USERS.gpt,
-	message: markdownContent,
-	userLogo: <PiPlaceholderLight />,
-	typingSpeed: 50
+export const Gpt = Template.bind({})
+Gpt.args = {
+	state: {
+		user: USERS.gpt,
+		message: markdownContent,
+		userLogo: <PiPlaceholderLight />,
+		typingSpeed: 50
+	}
 }

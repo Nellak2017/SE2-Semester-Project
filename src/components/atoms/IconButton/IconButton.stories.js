@@ -1,10 +1,10 @@
-import IconButton from './IconButton'
+import {IconButton as IconButton2} from './IconButton'
 import { AiOutlineCheck, AiOutlineClose } from 'react-icons/ai'
 import { IoIosSend, IoIosPlay } from 'react-icons/io'
 
 export default {
   title: 'Atoms/Buttons/IconButton',
-  component: IconButton,
+  component: IconButton2,
   argTypes: {
     variant: { control: 'text' },
     size: { control: 'text' },
@@ -15,28 +15,28 @@ export default {
   }
 }
 
-const Template = args => <IconButton {...args} />
+const Template = args => <IconButton2 {...args} />
 
-export const iconButton = Template.bind({})
-iconButton.args = {
+export const IconButton = Template.bind({})
+IconButton.args = {
   children: <IoIosSend />,
   variant: 'icon'
 }
 
-export const declineButton = Template.bind({})
-declineButton.args = {
+export const DeclineButton = Template.bind({})
+DeclineButton.args = {
   children: <AiOutlineClose />,
   variant: 'declineOutline'
 }
 
-export const confirmButton = Template.bind({})
-confirmButton.args = {
+export const ConfirmButton = Template.bind({})
+ConfirmButton.args = {
   children: <AiOutlineCheck />,
   variant: 'confirmOutline'
 }
 
-export const mediaControllerButton = Template.bind({})
-mediaControllerButton.args = {
+export const MediaControllerButton = Template.bind({})
+MediaControllerButton.args = {
   children: <IoIosPlay />,
   variant: 'mediaControllerOutline'
 }

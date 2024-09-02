@@ -13,6 +13,9 @@ import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import remarkGfm from "remark-gfm"
 import ErrorMessage from "../../atoms/ErrorMessage/ErrorMessage.js"
 import TypingSimulator from "../TypingSimulator/TypingSimulator.js"
+import {
+	PiPlaceholderDuotone,
+} from 'react-icons/pi'
 
 // TODO: Research Syntax Highlighting deeper
 //     (1) React Syntax Highlighter - https://github.com/react-syntax-highlighter/react-syntax-highlighter
@@ -67,16 +70,16 @@ const MarkdownComponents = {
 }
 
 function Chat({
-	state = {
-		user: USERS.user,
-		userLogo,
-		message,
-		error: false, // this is a code smell...
-		typingSpeed,
-	},
+	state,
 	...props
 }) {
-	const { user, userLogo, message, error, typingSpeed } = state || {}
+	const {
+		user = USERS.user,
+		userLogo = <PiPlaceholderDuotone />,
+		message = '',
+		error = false, // this is a code smell...
+		typingSpeed = 0,
+	} = state || {}
 	return (
 		<ChatContainer user={user === 0 ? 'user' : 'gpt'} {...props}>
 			<MessageContainer>

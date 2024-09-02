@@ -4,22 +4,19 @@ import { VARIANTS } from '../../utils/constants'
 
 // TODO: change user: 'gpt'|'user' to use boolean instead
 function Thread({
-	state = {
-		variant: VARIANTS.dark,
-		name: 'Test name Test name',
-		idno: 0,
-		highlighted: false,
-		maxwidth: 244,
-		maxheight: 44,
-	},
-	services = {
-		threadListener: () => { }, // Listener for clicking on the Thread itself, almost like a link
-		trashListener: () => { }, // Listener for clicking on the Trash icon.
-	},
+	state,
+	services,
 	...props
 }) {
-	const { variant, name, idno, highlighted, maxwidth, maxheight } = state || {}
-	const { threadListener, trashListener } = services || {}
+	const {
+		variant = VARIANTS.dark,
+		name = 'Test name Test name',
+		idno = 0,
+		highlighted = false,
+		maxwidth = 244,
+		maxheight = 44,
+	} = state || {}
+	const { threadListener = () => { }, trashListener = () => { } } = services || {}
 	return (
 		<ThreadContainerStyled
 			$maxwidth={maxwidth}

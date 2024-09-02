@@ -9,22 +9,12 @@ import { PiPlaceholderDuotone } from 'react-icons/pi'
 
 // TODO: Flesh out ChatInput so that all props are used
 function ChatList({
-	state = {
-		variant: VARIANTS.dark,
-		chatHistory: [],
-		userLogos,
-		typingSpeed,
-		parentText,
-	},
-	services = {
-		onSubmitHandler,
-		onScrollHandler,
-		chatInputOnChange,
-	},
+	state,
+	services,
 }) {
-	const { variant, chatHistory, userLogos, typingSpeed, parentText } = state || {}
-	const { onSubmitHandler, onScrollHandler, chatInputOnChange } = services || {}
-	
+	const { variant = VARIANTS.dark, chatHistory = [], userLogos = [], typingSpeed = 0, parentText = ''} = state || {}
+	const { onSubmitHandler = () => {}, onScrollHandler = () => {}, chatInputOnChange = () => {} } = services || {}
+
 	const chatInputState = {
 		variant: 'default',
 		placeholder: 'Write a Message...',

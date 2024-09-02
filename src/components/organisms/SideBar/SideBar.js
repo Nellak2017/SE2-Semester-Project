@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useState, useEffect } from "react"
 import { VARIANTS, SX_SLIDER } from "../../utils/constants"
 import {
@@ -14,35 +15,31 @@ import Slider from '@mui/material/Slider'
 
 // TODO: Add Event listeners
 // TODO: Potentially add temperature sliders OR other thing like link to settings page
+
 function SideBar({
-	state = {
-		variant: VARIANTS.dark,
-		threads: [],
-		initialTemperature: 50,
-		initialTypingSpeed: 50,
-		threadListenerList: [() => { }],
-		trashListenerList: [() => { }],
-		maxwidth: 260,
-		buttonText: "New Chat",
-		logoutText: "Log Out",
-		exportText: "Export to Text",
-	},
-	services = {
-		onNewChatClick,
-		onTemperatureChange,
-		onTypingSpeedChange,
-		onTemperatureMouseUp,
-		onTypingSpeedMouseUp,
-		exportHandler
-	},
+	state,
+	services,
 	...props
 }) {
-	const { variant, threads, initialTemperature, initialTypingSpeed,
-		threadListenerList, trashListenerList,
-		maxwidth, buttonText, logoutText, exportText
+	const {
+		variant = VARIANTS.dark,
+		threads = [],
+		initialTemperature = 50,
+		initialTypingSpeed = 50,
+		threadListenerList = [() => { }],
+		trashListenerList = [() => { }],
+		maxwidth = 260,
+		buttonText = "New Chat",
+		logoutText = "Log Out",
+		exportText = "Export to Text",
 	} = state || {}
-	const { onNewChatClick, onTemperatureChange, onTypingSpeedChange,
-		onTemperatureMouseUp, onTypingSpeedMouseUp, exportHandler
+	const {
+		onNewChatClick = () => { },
+		onTemperatureChange = () => { },
+		onTypingSpeedChange = () => { },
+		onTemperatureMouseUp = () => { },
+		onTypingSpeedMouseUp = () => { },
+		exportHandler = () => { }
 	} = services || {}
 
 	const sliderLength = 100 // percent of slider length
@@ -99,15 +96,15 @@ function SideBar({
 						services={{ onClick: handleNewChatClick }}
 					/>
 					<OutlineButton
-						state={{ 
-							variant, 
-							text: '', 
+						state={{
+							variant,
+							text: '',
 							icon: <BsLayoutSidebar />,
 							maxwidth: 44,
 							maxheight: 44,
 							centered: true,
 						}}
-						services={{onClick: e => {e.stopPropagation(); handleToggleSidebar()}}}
+						services={{ onClick: e => { e.stopPropagation(); handleToggleSidebar() } }}
 						className={!isSidebarOpen ? 'toggle-button' : ''}
 					/>
 				</IconContainer>

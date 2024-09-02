@@ -7,22 +7,22 @@ import IconButton from '../IconButton/IconButton' // testing only
 // I.E. This is still just a Stateless Functional React Component, that has composibility
 // NOTE: Small variant overrides the Button Size to make it fit!!
 const ChatInput = ({
-	state = {
-		variant: 'default',
-		placeholder: 'Write a Message...',
-		name,
-		buttonType: 'submit',
-		parentText, // Pass To Parent so they can clear text on changing threads
-	},
-	services = {
-		onSubmitHandler,
-		onChange,
-		onBlur,
-	},
+	state,
+	services,
 	...rest
 }) => {
-	const { variant, placeholder, name, buttonType, parentText } = state || {}
-	const { onSubmitHandler, onChange, onBlur } = services || {}
+	const {
+		variant = 'default',
+		placeholder = 'Write a Message...',
+		name = '',
+		buttonType = 'submit',
+		parentText = '', // Pass To Parent so they can clear text on changing threads
+	} = state || {}
+	const {
+		onSubmitHandler = () => { },
+		onChange = () => { },
+		onBlur = () => { },
+	} = services || {}
 
 	const ref = useRef(null)
 	const handleClick = () => ref.current.focus()

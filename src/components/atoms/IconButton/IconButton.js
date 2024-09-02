@@ -1,6 +1,6 @@
 import { IconButtonStyled } from './IconButton.elements'
 
-function IconButton({ children, ...rest }) {
+export function IconButton({ children, ...rest }) {
 	return (
 		<IconButtonStyled {...rest}>
 			{children}
