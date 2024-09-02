@@ -24,6 +24,9 @@ export const SX_SLIDER = {
 	},
 }
 export const USER_LOGOS = {
+	'user': <PiPlaceholderDuotone />,
+	0: <PiPlaceholderDuotone />,
 	'gpt': <PiPlaceholderLight />,
-	'user': <PiPlaceholderDuotone />
+	1: <PiPlaceholderLight />,
 }
+export const SLIDER_LENGTH = 100

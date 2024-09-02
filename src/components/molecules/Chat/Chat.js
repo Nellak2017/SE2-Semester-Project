@@ -76,7 +76,7 @@ function Chat({
 	const {
 		user = USERS.user,
 		userLogo = <PiPlaceholderDuotone />,
-		message = '',
+		text = '',
 		error = false, // this is a code smell...
 		typingSpeed = 0,
 	} = state || {}
@@ -90,14 +90,14 @@ function Chat({
 					// Render normally if no typingSpeed
 					<Message>
 						<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
-							{message}
+							{text}
 						</ReactMarkdown>
 					</Message>
 				)}
 				{!error && (typingSpeed || typingSpeed === 0) && user === USERS.gpt && (
 					// Render typing simulation if typingSpeed is provided
 					<Message>
-						<TypingSimulator message={message} typingSpeed={typingSpeed} />
+						<TypingSimulator message={text} typingSpeed={typingSpeed} />
 					</Message>
 				)}
 				{error &&

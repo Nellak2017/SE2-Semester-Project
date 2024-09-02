@@ -5,6 +5,8 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Head from 'next/head'
 import isPropValid from '@emotion/is-prop-valid' // automatic unknown prop filtering
+import { Provider } from 'react-redux'
+import store from '../redux/store.js'
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -15,7 +17,9 @@ function MyApp({ Component, pageProps }) {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <ToastContainer position="bottom-left" autoClose={3000} />
-        <Component {...pageProps} />
+        <Provider store={store}>
+          <Component {...pageProps} />
+        </Provider>
       </ThemeProvider>
     </StyleSheetManager>
   )

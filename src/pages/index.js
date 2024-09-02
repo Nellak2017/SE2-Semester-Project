@@ -9,7 +9,10 @@ import {
   handleExportButtonClick,
   generatePalmMessageWrapper
 } from "../utils/helpers"
-import { USER_LOGOS } from "../components/utils/constants"
+import { USER_LOGOS, VARIANTS } from "../components/utils/constants"
+import { createLLMPageServices } from '../components/services/LLMChatPage/LLMChatServices.js'
+import store from '../redux/store.js'
+import { useSelector } from 'react-redux'
 
 // TODO: Add real image assets for user and gpt
 // TODO: When error, use error component
@@ -104,35 +107,34 @@ export default function Home() {
   // ----- State / Service pattern construction area
 
   const LLMChatState = {
-    variant: 'dark',
-    chatHistory: messages,
-    userLogos: USER_LOGOS, // placeholders only
-    threads: threads,
-    initialTemperature: threads[threadIndex]?.Temperature,
-    initialTypingSpeed: threads[threadIndex]?.TypingSpeed,
-    threadListenerList: threadListenerList,
-    trashListenerList: trashListenerList,
-    typingSpeed: threads[threadIndex]?.TypingSpeed,
-    parentText: userInput,
-  }
-
-  const LLMChatServices = {
-    onNewChatClick: handleNewChat,
-    onSubmitHandler: text => handleOnSubmit(text, isNewChat),
-    onTemperatureChange: temp => handleTemperatureChange(temp),
-    onTypingSpeedChange: speed => { handleTypingSpeedChange(speed) },
-    onTemperatureMouseUp: handleTemperatureMouseUp,
-    onTypingSpeedMouseUp: handleTypingSpeedMouseUp,
-    // onScrollHandler
-    chatInputOnChange: inputArea => setUserInput(inputArea.target.value),
-    exportHandler: () => handleExportButtonClick(messages),
+    sideBarState: {
+      variant: useSelector(state => state.LLMChatPage.variant),
+      threads: useSelector(state => state.LLMChatPage.sideBar.threads), 
+      temperature: useSelector(state => state.LLMChatPage.sideBar.temperature),
+      typingSpeed: useSelector(state => state.LLMChatPage.typingSpeed),
+      threadIndex: useSelector(state => state.LLMChatPage.threadIndex),
+      userID: useSelector(state => state.LLMChatPage.userId),
+      isSideBarOpen: useSelector(state => state.LLMChatPage.sideBar.isSideBarOpen),
+      maxwidth: 260, 
+      buttonText: "New Chat", 
+      logoutText: "Log Out", 
+      exportText: "Export to Text",
+    },
+    chatListState: {
+      variant: useSelector(state => state.LLMChatPage.variant),
+      chatHistory: useSelector(state => state.LLMChatPage.chatHistory),
+      userLogos: USER_LOGOS, 
+      typingSpeed: useSelector(state => state.LLMChatPage.typingSpeed),
+      userInput: useSelector(state => state.LLMChatPage.chatList.userInput),
+      isNewChat: useSelector(state => state.LLMChatPage.chatList.isNewChat),
+    },
   }
 
   // -----
   return (
     <LLMChat
       state={LLMChatState}
-      services={LLMChatServices}
+      services={createLLMPageServices(store)}
     />
   )
 }

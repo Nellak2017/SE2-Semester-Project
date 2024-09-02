@@ -26,27 +26,27 @@ function ThreadList({
 
 	return (
 		<ThreadListContainer variant={variant} $maxwidth={maxwidth} {...props}>
-			{threads?.map((info, key) => {
+			{threads?.map((info, i) => {
 				const lowercaseInfo = convertKeysToLowerCase(info)
 				// everything is lowercased to ensure consistency
-				const { variant, name, threadid, highlighted, maxwidth, maxheight } = lowercaseInfo
+				const { name, threadid, highlighted } = lowercaseInfo
 				const threadState = {
 					variant,
-					name,
-					idno: threadid || key,
-					highlighted,
 					maxwidth,
-					maxheight,
+					maxheight: 44,
+					name,
+					idno: threadid || i,
+					highlighted,
 				}
 				const threadServices = {
-					threadListener: () => handleLinkClick(key),
-					trashListener: () => handleTrashClick(key),
+					threadListener: () => handleLinkClick(i),
+					trashListener: () => handleTrashClick(i),
 				}
 				return (
 					<Thread
 						state={threadState}
 						services={threadServices}
-						key={`thread-trash-icon-${key}`}
+						key={`thread-trash-icon-${i}`}
 					/>
 				)
 			}

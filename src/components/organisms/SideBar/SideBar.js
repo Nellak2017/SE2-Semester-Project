@@ -1,6 +1,4 @@
 /* eslint-disable max-lines-per-function */
-import { useState, useEffect } from "react"
-import { VARIANTS, SX_SLIDER } from "../../utils/constants"
 import {
 	SideBarContainer,
 	IconContainer,
@@ -12,6 +10,8 @@ import { MdLogout } from 'react-icons/md'
 import OutlineButton from "../../atoms/OutlineButton/OutlineButton.js"
 import ThreadList from "../../molecules/ThreadList/ThreadList"
 import Slider from '@mui/material/Slider'
+import { handleExportButtonClick } from "../../../utils/helpers.js"
+import { VARIANTS, SX_SLIDER, SLIDER_LENGTH } from '../../utils/constants.js'
 
 // TODO: Add Event listeners
 // TODO: Potentially add temperature sliders OR other thing like link to settings page
@@ -24,60 +24,32 @@ function SideBar({
 	const {
 		variant = VARIANTS.dark,
 		threads = [],
-		initialTemperature = 50,
-		initialTypingSpeed = 50,
-		threadListenerList = [() => { }],
-		trashListenerList = [() => { }],
+		temperature = 50,
+		typingSpeed = 50,
+		threadIndex = 0,
+		userId = 0,
+		isSidebarOpen = true,
+		threadListenerList = [() => { }], // TODO: Remove
+		trashListenerList = [() => { }], // TODO: Remove
 		maxwidth = 260,
 		buttonText = "New Chat",
 		logoutText = "Log Out",
 		exportText = "Export to Text",
 	} = state || {}
 	const {
-		onNewChatClick = () => { },
-		onTemperatureChange = () => { },
-		onTypingSpeedChange = () => { },
-		onTemperatureMouseUp = () => { },
-		onTypingSpeedMouseUp = () => { },
-		exportHandler = () => { }
+		sideBarOpen = () => { },
+		newChat = () => { }, // TODO: In the thunk do this: highlightThread(threads, -1); setThreadIndex(0); setMessages([]); setIsNewChat(true);
+		temperatureChange = () => { },
+		temperatureUpdate = () => { },
+		typingSpeedChange = () => { },
+		typingSpeedUpdate = () => { },
+		setThreadIndex = () => { },
+		deleteThread = () => { },
+		exportHandler = messages => handleExportButtonClick(messages)
 	} = services || {}
-
-	const sliderLength = 100 // percent of slider length
-	const [temperaturePosition, setTemperaturePosition] = useState(initialTemperature)
-	const [typingSpeedPosition, setTypingSpeedPosition] = useState(initialTypingSpeed)
-	const [isSidebarOpen, setSidebarOpen] = useState(true)
-
-	// This is to let the parent alter the state of the slider lightly, but still allow this component to mostly handle it
-	// Without this, the component won't render intially properly in all cases
-	useEffect(() => {
-		setTemperaturePosition(initialTemperature)
-		setTypingSpeedPosition(initialTypingSpeed)
-	}, [initialTemperature, initialTypingSpeed])
-
 	const handleNewChatClick = () => {
-		onNewChatClick && onNewChatClick()
+		newChat && newChat()
 	}
-
-	const handleTemperatureChange = (_, value) => {
-		setTemperaturePosition(value)
-		onTemperatureChange && onTemperatureChange(value)
-	}
-
-	const handleTypingSpeedChange = (_, value) => {
-		setTypingSpeedPosition(value)
-		onTypingSpeedChange && onTypingSpeedChange(value)
-	}
-
-	const handleTemperatureMouseUp = () => {
-		onTemperatureMouseUp && onTemperatureMouseUp()
-	}
-
-	const handleTypingSpeedMouseUp = () => {
-		onTypingSpeedMouseUp && onTypingSpeedMouseUp()
-	}
-
-	const handleToggleSidebar = () => setSidebarOpen(!isSidebarOpen)
-
 
 	const threadListState = {
 		variant,
@@ -104,7 +76,7 @@ function SideBar({
 							maxheight: 44,
 							centered: true,
 						}}
-						services={{ onClick: e => { e.stopPropagation(); handleToggleSidebar() } }}
+						services={{ onClick: e => { e.stopPropagation(); sideBarOpen() } }}
 						className={!isSidebarOpen ? 'toggle-button' : ''}
 					/>
 				</IconContainer>
@@ -120,14 +92,14 @@ function SideBar({
 						<Slider
 							aria-label="Temperature"
 							size="small"
-							value={temperaturePosition}
+							value={temperature}
 							min={1}
 							step={1}
-							max={sliderLength}
-							onMouseUp={handleTemperatureMouseUp}
-							onChange={handleTemperatureChange}
+							max={SLIDER_LENGTH}
+							onMouseUp={() => temperatureUpdate({ userId, temperature })}
+							onChange={(_, temperature) => temperatureChange(temperature)}
 							sx={SX_SLIDER}
-							defaultValue={initialTemperature}
+							defaultValue={temperature}
 						/>
 					</div>
 				</SliderContainer>
@@ -137,20 +109,21 @@ function SideBar({
 						<Slider
 							aria-label="Typing Speed"
 							size="small"
-							value={typingSpeedPosition}
+							value={typingSpeed}
 							min={1}
 							step={1}
-							max={sliderLength}
-							onMouseUp={handleTypingSpeedMouseUp}
-							onChange={handleTypingSpeedChange}
+							max={SLIDER_LENGTH}
+							onMouseUp={() => typingSpeedUpdate({ userId, typingSpeed })}
+							onChange={(_, typingSpeed) => typingSpeedChange(typingSpeed)}
 							sx={SX_SLIDER}
-							defaultValue={initialTypingSpeed}
+							defaultValue={typingSpeed}
 						/>
 					</div>
 				</SliderContainer>
 				<OutlineButton
 					state={{ variant, icon: <BiExport />, text: exportText, centered: false, maxheight: 44 }}
 					services={{ onClick: exportHandler }}
+				// TODO: We need to use messages local variable with exportHandler for it to work
 				/>
 				<OutlineButton
 					state={{ variant, icon: <MdLogout />, text: logoutText, centered: false, maxheight: 44 }}
