@@ -3,22 +3,27 @@ import { VARIANTS } from '../../utils/constants.js'
 import { StyledOutlineButton } from './OutlineButton.elements.js'
 import { BiPlus } from 'react-icons/bi'
 
-// TODO: Pass the value of onclick to the parent component
-// TODO: Fix the variant validation logic
 function OutlineButton({
-	variant = VARIANTS.dark,
-	icon = <BiPlus />,
-	text = 'New Chat',
-	centered = false, // centers if true
-	maxheight = 44,
-	maxwidth,
+	state = {
+		variant: VARIANTS.dark,
+		icon: <BiPlus />,
+		text: 'New Chat',
+		centered: false, // centers if true
+		maxheight: 44,
+		maxwidth,
+	},
+	services = {
+		onClick: () => console.log('no service defined for this button'),
+	},
 	...props
 }) {
-	//if (!VARIANTS.includes(variant)) variant = 'dark'
+	const { variant, icon, text, centered, maxheight, maxwidth } = state || {}
+	const { onClick } = services || {}
 	return (
 		<StyledOutlineButton
 			variant={variant}
-			onClick={e => {e.stopPropagation()}}
+			//onClick={e => { e.stopPropagation() }}
+			onClick={onClick}
 			$maxwidth={maxwidth}
 			$maxheight={maxheight}
 			$centered={centered}

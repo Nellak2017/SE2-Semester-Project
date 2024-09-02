@@ -7,17 +7,23 @@ import IconButton from '../IconButton/IconButton' // testing only
 // I.E. This is still just a Stateless Functional React Component, that has composibility
 // NOTE: Small variant overrides the Button Size to make it fit!!
 const ChatInput = ({
-	placeholder = 'Write a Message...',
-	name,
-	onSubmitHandler,
-	buttonType = 'submit',
-	onChange,
-	onBlur,
-	variant = 'default',
-	color,
-	parentText, // Pass To Parent so they can clear text on changing threads
+	state = {
+		variant: 'default',
+		placeholder: 'Write a Message...',
+		name,
+		buttonType: 'submit',
+		parentText, // Pass To Parent so they can clear text on changing threads
+	},
+	services = {
+		onSubmitHandler,
+		onChange,
+		onBlur,
+	},
 	...rest
 }) => {
+	const { variant, placeholder, name, buttonType, parentText } = state || {}
+	const { onSubmitHandler, onChange, onBlur } = services || {}
+
 	const ref = useRef(null)
 	const handleClick = () => ref.current.focus()
 
@@ -38,9 +44,9 @@ const ChatInput = ({
 	}, [parentText])
 
 	return (
-		<ChatInputParent variant={variant} color={color} onClick={handleClick}>
+		<ChatInputParent variant={variant} onClick={handleClick}>
 			<ChatInputChild placeholder={placeholder} name={name} onChange={e => handleChange(e)} value={text} onBlur={onBlur} ref={ref} {...rest} />
-			<IconButton type={buttonType} onClick={() => handleSubmit(text)} variant='icon' size='xl'><IoIosSend /></IconButton>
+			<IconButton variant='icon' type={buttonType} onClick={() => handleSubmit(text)} size='xl'><IoIosSend /></IconButton>
 		</ChatInputParent>
 	)
 }

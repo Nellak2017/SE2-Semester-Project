@@ -67,13 +67,16 @@ const MarkdownComponents = {
 }
 
 function Chat({
-	user = USERS.user,
-	userLogo,
-	message,
-	error = false, // this is a code smell...
-	typingSpeed,
+	state = {
+		user: USERS.user,
+		userLogo,
+		message,
+		error: false, // this is a code smell...
+		typingSpeed,
+	},
 	...props
 }) {
+	const { user, userLogo, message, error, typingSpeed } = state || {}
 	return (
 		<ChatContainer user={user === 0 ? 'user' : 'gpt'} {...props}>
 			<MessageContainer>

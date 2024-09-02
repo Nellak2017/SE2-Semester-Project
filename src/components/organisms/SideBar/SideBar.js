@@ -15,25 +15,36 @@ import Slider from '@mui/material/Slider'
 // TODO: Add Event listeners
 // TODO: Potentially add temperature sliders OR other thing like link to settings page
 function SideBar({
-	variant = VARIANTS.dark,
-	maxwidth = 260,
-	buttonText = "New Chat",
-	logoutText = "Log Out",
-	exportText = "Export to Text",
-	initialTemperature = 50,
-	initialTypingSpeed = 50,
-	color,
-	threads,
-	onNewChatClick, // Pass to Parent
-	onTemperatureChange, // Pass to Parent
-	onTypingSpeedChange, // Pass to Parent
-	onTemperatureMouseUp, // Pass to Parent
-	onTypingSpeedMouseUp, // Pass to Parent
-	threadListenerList = [() => {}],  // Pass to Parent
-	trashListenerList = [() => {}],   // Pass to Parent
-	exportHandler, // Pass to Parent
+	state = {
+		variant: VARIANTS.dark,
+		threads: [],
+		initialTemperature: 50,
+		initialTypingSpeed: 50,
+		threadListenerList: [() => { }],
+		trashListenerList: [() => { }],
+		maxwidth: 260,
+		buttonText: "New Chat",
+		logoutText: "Log Out",
+		exportText: "Export to Text",
+	},
+	services = {
+		onNewChatClick,
+		onTemperatureChange,
+		onTypingSpeedChange,
+		onTemperatureMouseUp,
+		onTypingSpeedMouseUp,
+		exportHandler
+	},
 	...props
 }) {
+	const { variant, threads, initialTemperature, initialTypingSpeed,
+		threadListenerList, trashListenerList,
+		maxwidth, buttonText, logoutText, exportText
+	} = state || {}
+	const { onNewChatClick, onTemperatureChange, onTypingSpeedChange,
+		onTemperatureMouseUp, onTypingSpeedMouseUp, exportHandler
+	} = services || {}
+
 	const sliderLength = 100 // percent of slider length
 	const [temperaturePosition, setTemperaturePosition] = useState(initialTemperature)
 	const [typingSpeedPosition, setTypingSpeedPosition] = useState(initialTypingSpeed)
@@ -43,7 +54,7 @@ function SideBar({
 	// Without this, the component won't render intially properly in all cases
 	useEffect(() => {
 		setTemperaturePosition(initialTemperature)
-    	setTypingSpeedPosition(initialTypingSpeed)
+		setTypingSpeedPosition(initialTypingSpeed)
 	}, [initialTemperature, initialTypingSpeed])
 
 	const handleNewChatClick = () => {
@@ -70,35 +81,38 @@ function SideBar({
 
 	const handleToggleSidebar = () => setSidebarOpen(!isSidebarOpen)
 
+
+	const threadListState = {
+		variant,
+		maxwidth,
+		threads,
+		threadListenerList,
+		trashListenerList,
+	}
+
 	return (
-		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSidebarOpen} color={color} {...props}>
+		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSidebarOpen} {...props}>
 			<section>
 				<IconContainer>
 					<OutlineButton
-						variant={variant}
-						text={buttonText}
-						maxheight={44}
-						onClick={handleNewChatClick}
+						state={{ variant, text: buttonText, centered: false, maxheight: 44 }}
+						services={{ onClick: handleNewChatClick }}
 					/>
 					<OutlineButton
-						variant={variant}
-						text={null}
-						icon={<BsLayoutSidebar />}
-						maxwidth={44}
-						maxheight={44}
-						centered={true}
-						onClick={e => {
-							e.stopPropagation()
-							handleToggleSidebar()
+						state={{ 
+							variant, 
+							text: '', 
+							icon: <BsLayoutSidebar />,
+							maxwidth: 44,
+							maxheight: 44,
+							centered: true,
 						}}
-						className={!isSidebarOpen ? 'toggle-button':''}
+						services={{onClick: e => {e.stopPropagation(); handleToggleSidebar()}}}
+						className={!isSidebarOpen ? 'toggle-button' : ''}
 					/>
 				</IconContainer>
 				<ThreadList
-					variant={variant}
-					threads={threads}
-					threadListenerList={threadListenerList}
-					trashListenerList={trashListenerList}
+					state={threadListState}
 				/>
 			</section>
 
@@ -138,15 +152,12 @@ function SideBar({
 					</div>
 				</SliderContainer>
 				<OutlineButton
-					variant={variant}
-					text={exportText}
-					icon={<BiExport />}
-					onClick={exportHandler}
+					state={{ variant, icon: <BiExport />, text: exportText, centered: false, maxheight: 44 }}
+					services={{ onClick: exportHandler }}
 				/>
 				<OutlineButton
-					variant={variant}
-					text={logoutText}
-					icon={<MdLogout />}
+					state={{ variant, icon: <MdLogout />, text: logoutText, centered: false, maxheight: 44 }}
+				// services : TODO: Add logout feature
 				/>
 			</section>
 		</SideBarContainer>

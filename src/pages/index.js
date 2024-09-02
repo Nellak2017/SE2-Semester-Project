@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 import { useEffect, useState } from "react"
 import LLMChat from "../components/templates/LLMChat/LLMChat"
 import 'react-toastify/dist/ReactToastify.css'
@@ -14,7 +15,6 @@ import { USER_LOGOS } from "../components/utils/constants"
 // TODO: When error, use error component
 // TODO: Stop Hardcoding and use User Information when the User Logs in
 export default function Home() {
-
   const [userID] = useState(1)
   const [messages, setMessages] = useState([])
   const [threads, setThreads] = useState([]) // unfiltered, has temperature and typing speed included
@@ -101,26 +101,38 @@ export default function Home() {
     assignAllListeners(userID, unfilteredThreads)
   }
 
+  // ----- State / Service pattern construction area
+
+  const LLMChatState = {
+    variant: 'dark',
+    chatHistory: messages,
+    userLogos: USER_LOGOS, // placeholders only
+    threads: threads,
+    initialTemperature: threads[threadIndex]?.Temperature,
+    initialTypingSpeed: threads[threadIndex]?.TypingSpeed,
+    threadListenerList: threadListenerList,
+    trashListenerList: trashListenerList,
+    typingSpeed: threads[threadIndex]?.TypingSpeed,
+    parentText: userInput,
+  }
+
+  const LLMChatServices = {
+    onNewChatClick: handleNewChat,
+    onSubmitHandler: text => handleOnSubmit(text, isNewChat),
+    onTemperatureChange: temp => handleTemperatureChange(temp),
+    onTypingSpeedChange: speed => { handleTypingSpeedChange(speed) },
+    onTemperatureMouseUp: handleTemperatureMouseUp,
+    onTypingSpeedMouseUp: handleTypingSpeedMouseUp,
+    // onScrollHandler
+    chatInputOnChange: inputArea => setUserInput(inputArea.target.value),
+    exportHandler: () => handleExportButtonClick(messages),
+  }
+
+  // -----
   return (
     <LLMChat
-      variant='dark'
-      chatHistory={messages}
-      userLogos={USER_LOGOS} // placeholders only
-      threads={threads}
-      threadListenerList={threadListenerList}
-      trashListenerList={trashListenerList}
-      initialTemperature={threads[threadIndex]?.Temperature}
-      initialTypingSpeed={threads[threadIndex]?.TypingSpeed}
-      onNewChatClick={handleNewChat}
-      onSubmitHandler={text => handleOnSubmit(text, isNewChat)}
-      onTemperatureChange={temp => handleTemperatureChange(temp)}
-      onTypingSpeedChange={speed => { handleTypingSpeedChange(speed) }}
-      onTemperatureMouseUp={handleTemperatureMouseUp}
-      onTypingSpeedMouseUp={handleTypingSpeedMouseUp}
-      typingSpeed={threads[threadIndex]?.TypingSpeed}
-      parentText={userInput}
-      chatInputOnChange={inputArea => setUserInput(inputArea.target.value)}
-      exportHandler={() => handleExportButtonClick(messages)}
+      state={LLMChatState}
+      services={LLMChatServices}
     />
   )
 }

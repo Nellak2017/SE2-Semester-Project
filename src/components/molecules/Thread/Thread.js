@@ -3,25 +3,28 @@ import { ThreadContainerStyled, IconContainer } from './Thread.elements'
 import { VARIANTS } from '../../utils/constants'
 
 // TODO: change user: 'gpt'|'user' to use boolean instead
-
 function Thread({
-	variant = VARIANTS.dark,
-	color,
-	name = 'Test name Test name',
-	idno = 0,
-	highlighted = false,
-	maxwidth = 244,
-	maxheight = 44,
-	threadListener = () => { }, // Listener for clicking on the Thread itself, almost like a link
-	trashListener = () => { }, // Listener for clicking on the Trash icon.
+	state = {
+		variant: VARIANTS.dark,
+		name: 'Test name Test name',
+		idno: 0,
+		highlighted: false,
+		maxwidth: 244,
+		maxheight: 44,
+	},
+	services = {
+		threadListener: () => { }, // Listener for clicking on the Thread itself, almost like a link
+		trashListener: () => { }, // Listener for clicking on the Trash icon.
+	},
 	...props
 }) {
+	const { variant, name, idno, highlighted, maxwidth, maxheight } = state || {}
+	const { threadListener, trashListener } = services || {}
 	return (
 		<ThreadContainerStyled
 			$maxwidth={maxwidth}
 			$maxheight={maxheight}
 			$variant={variant}
-			$color={color}
 			$highlighted={highlighted}
 			className={'thread-container'}
 			onClick={() => threadListener()}

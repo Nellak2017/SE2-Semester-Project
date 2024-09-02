@@ -9,35 +9,56 @@ import { PiPlaceholderDuotone } from 'react-icons/pi'
 
 // TODO: Flesh out ChatInput so that all props are used
 function ChatList({
-	variant = VARIANTS.dark,
-	color,
-	chatHistory,
-	userLogos,
-	onSubmitHandler,
-	onScrollHandler,
-	typingSpeed,
-	parentText, // Pass To Parent so they can clear text on changing threads
-	chatInputOnChange, // Pass To Parent so they can see text
+	state = {
+		variant: VARIANTS.dark,
+		chatHistory: [],
+		userLogos,
+		typingSpeed,
+		parentText,
+	},
+	services = {
+		onSubmitHandler,
+		onScrollHandler,
+		chatInputOnChange,
+	},
 }) {
+	const { variant, chatHistory, userLogos, typingSpeed, parentText } = state || {}
+	const { onSubmitHandler, onScrollHandler, chatInputOnChange } = services || {}
+	
+	const chatInputState = {
+		variant: 'default',
+		placeholder: 'Write a Message...',
+		name: undefined, // Not sure what? TODO: Figure out name
+		buttonType: 'submit',
+		parentText,
+	}
+	const chatInputServices = {
+		onSubmitHandler,
+		onChange: chatInputOnChange,
+		// onBlur not defined
+	}
+
 	return (
 		<ChatListContainer variant={variant}>
 			<MessageContainer onScroll={onScrollHandler}>
-				
-				{chatHistory?.map((el, key) => (
-					<Chat
-						key={`text-${el?.messageId}`}
-						user={el?.user || parseInt(el?.author) || USERS?.user}
-						message={el?.text || el?.content || ""} 
-						userLogo={userLogos[el?.user || USERS?.user] || <PiPlaceholderDuotone />}
-						error={el?.error ?? false}
-						typingSpeed={key === 0 && parseInt(el?.author) === USERS?.gpt ? typingSpeed : undefined} // el?.user === USERS?.gpt
-					/>
-				))}
+				{chatHistory?.map((el, key) => {
+					const { user, author, text, content, error } = el || {}
+					return (
+						<Chat
+							state={{
+								user: user || parseInt(author) || USERS?.user,
+								message: text || content || "",
+								userLogo: userLogos[user || USERS?.user] || <PiPlaceholderDuotone />,
+								error: error ?? false,
+								typingSpeed: key === 0 && parseInt(author) === USERS?.gpt ? typingSpeed : undefined, // el?.user === USERS?.gpt
+							}}
+							key={`text-${el?.messageId}`}
+						/>)
+				})}
 			</MessageContainer>
-			<ChatInput 
-				onSubmitHandler={onSubmitHandler}
-				parentText={parentText}
-				onChange={chatInputOnChange}
+			<ChatInput
+				state={chatInputState}
+				services={chatInputServices}
 			/>
 		</ChatListContainer>
 	)
