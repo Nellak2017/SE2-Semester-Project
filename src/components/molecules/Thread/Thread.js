@@ -3,11 +3,7 @@ import { ThreadContainerStyled, IconContainer } from './Thread.elements'
 import { VARIANTS } from '../../utils/constants'
 
 // TODO: change user: 'gpt'|'user' to use boolean instead
-function Thread({
-	state,
-	services,
-	...props
-}) {
+export default function Thread({ state, services, ...props }) {
 	const {
 		variant = VARIANTS.dark,
 		name = 'Test name Test name',
@@ -38,5 +34,3 @@ function Thread({
 		</ThreadContainerStyled>
 	)
 }
-
-export default Thread

@@ -1,13 +1,8 @@
-import React from 'react'
 import { VARIANTS } from '../../utils/constants.js'
 import { StyledOutlineButton } from './OutlineButton.elements.js'
 import { BiPlus } from 'react-icons/bi'
 
-function OutlineButton({
-	state,
-	services,
-	...props
-}) {
+export default function OutlineButton({ state, services, ...props }) {
 	const {
 		variant = VARIANTS.dark,
 		icon = <BiPlus />,
@@ -32,5 +27,3 @@ function OutlineButton({
 		</StyledOutlineButton>
 	)
 }
-
-export default OutlineButton

@@ -61,6 +61,11 @@ export const apiRelevantFields = arrayOfObjects => arrayOfObjects
 	.toReversed()
 	.map(obj => ({ author: obj?.author, content: obj?.content }))
 
+// Function to convert object keys to lowercase
+export const convertKeysToLowerCase = obj => Object.keys(obj).reduce((acc, currentKey) => {
+	acc[currentKey.toLowerCase()] = obj[currentKey]
+	return acc
+}, {})
 // ---------------------------------------------------------------
 // --- API Helpers (API request and SET state using return values)
 

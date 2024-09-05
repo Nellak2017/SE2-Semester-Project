@@ -13,59 +13,37 @@ import Slider from '@mui/material/Slider'
 import { handleExportButtonClick } from "../../../utils/helpers.js"
 import { VARIANTS, SX_SLIDER, SLIDER_LENGTH } from '../../utils/constants.js'
 
-// TODO: Add Event listeners
 // TODO: Potentially add temperature sliders OR other thing like link to settings page
-
-function SideBar({
-	state,
-	services,
-	...props
-}) {
+export default function SideBar({ state, services, ...props }) {
 	const {
 		variant = VARIANTS.dark,
-		threads = [],
 		temperature = 50,
 		typingSpeed = 50,
-		threadIndex = 0,
 		userId = 0,
-		isSidebarOpen = true,
-		threadListenerList = [() => { }], // TODO: Remove
-		trashListenerList = [() => { }], // TODO: Remove
+		isSideBarOpen = true,
 		maxwidth = 260,
 		buttonText = "New Chat",
 		logoutText = "Log Out",
 		exportText = "Export to Text",
+		threadListState,
 	} = state || {}
 	const {
 		sideBarOpen = () => { },
-		newChat = () => { }, // TODO: In the thunk do this: highlightThread(threads, -1); setThreadIndex(0); setMessages([]); setIsNewChat(true);
+		newChat = () => { },
 		temperatureChange = () => { },
 		temperatureUpdate = () => { },
 		typingSpeedChange = () => { },
 		typingSpeedUpdate = () => { },
-		setThreadIndex = () => { },
-		deleteThread = () => { },
-		exportHandler = messages => handleExportButtonClick(messages)
+		exportHandler = messages => handleExportButtonClick(messages),
+		threadListServices,
 	} = services || {}
-	const handleNewChatClick = () => {
-		newChat && newChat()
-	}
-
-	const threadListState = {
-		variant,
-		maxwidth,
-		threads,
-		threadListenerList,
-		trashListenerList,
-	}
-
 	return (
-		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSidebarOpen} {...props}>
+		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSideBarOpen} {...props}>
 			<section>
 				<IconContainer>
 					<OutlineButton
 						state={{ variant, text: buttonText, centered: false, maxheight: 44 }}
-						services={{ onClick: handleNewChatClick }}
+						services={{ onClick: () => newChat({ userId }) }}
 					/>
 					<OutlineButton
 						state={{
@@ -77,11 +55,12 @@ function SideBar({
 							centered: true,
 						}}
 						services={{ onClick: e => { e.stopPropagation(); sideBarOpen() } }}
-						className={!isSidebarOpen ? 'toggle-button' : ''}
+						className={!isSideBarOpen ? 'toggle-button' : ''}
 					/>
 				</IconContainer>
 				<ThreadList
 					state={threadListState}
+					services={threadListServices}
 				/>
 			</section>
 
@@ -133,5 +112,3 @@ function SideBar({
 		</SideBarContainer>
 	)
 }
-
-export default SideBar

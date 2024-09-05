@@ -19,7 +19,7 @@ const exampleThreadInfo = [
 		name: 'Test 2'
 	},
 	{
-		Name: 'Test 3'
+		name: 'Test 3'
 	}
 ]
 

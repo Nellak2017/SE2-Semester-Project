@@ -79,9 +79,9 @@ export const User = Template.bind({})
 User.args = {
 	state: {
 		user: USERS.user,
-		message: "This is user example content with nothing special.",
+		text: "This is user example content with nothing special.",
 		userLogo: <PiPlaceholderDuotone />,
-		error: true
+		//error: true
 	}
 }
 
@@ -89,7 +89,7 @@ export const Gpt = Template.bind({})
 Gpt.args = {
 	state: {
 		user: USERS.gpt,
-		message: markdownContent,
+		text: markdownContent,
 		userLogo: <PiPlaceholderLight />,
 		typingSpeed: 50
 	}

@@ -1,54 +1,44 @@
 import { ChatInputParent, ChatInputChild } from './ChatInput.elements'
-import { useRef, useState, useEffect } from 'react' // used to focus child when parent div pressed (accessibility)
-import { IoIosSend } from 'react-icons/io' // testing only
-import IconButton from '../IconButton/IconButton' // testing only
+import { useRef } from 'react' // used to focus child when parent div pressed (accessibility)
+import { IoIosSend } from 'react-icons/io'
+import IconButton from '../IconButton/IconButton' 
+import { VARIANTS } from '../../utils/constants'
 
-// ChatInput is defined here as just a div wrapping a textarea with No Internal State.
-// I.E. This is still just a Stateless Functional React Component, that has composibility
-// NOTE: Small variant overrides the Button Size to make it fit!!
-const ChatInput = ({
-	state,
-	services,
-	...rest
-}) => {
+export default function ChatInput({ state, services, ...rest }){
 	const {
-		variant = 'default',
+		variant = VARIANTS.dark,
 		placeholder = 'Write a Message...',
 		name = '',
 		buttonType = 'submit',
-		parentText = '', // Pass To Parent so they can clear text on changing threads
+		userID = 0,
+		userInput = '',
+		isNewChat = false,
+		threads = [],
+		threadIndex = 0,
+		chatHistory = [],
 	} = state || {}
 	const {
-		onSubmitHandler = () => { },
-		onChange = () => { },
+		userInputSubmit = () => { },
+		userInputChange = () => { },
 		onBlur = () => { },
 	} = services || {}
 
 	const ref = useRef(null)
 	const handleClick = () => ref.current.focus()
 
-	const [text, setText] = useState('')
-
-	const handleSubmit = text => {
-		text && onSubmitHandler && onSubmitHandler(text)
-		setText('') // Clear after submitting
+	const submitArgs = {
+		userID, 
+		userInput, 
+		isNewChat, 
+		threadId: threads?.[threadIndex]?.threadid || 0, 
+		messageId: chatHistory?.[chatHistory?.length - 1]?.messageId + 1 || 0,
+		nextThreadIndex: threads?.length || 0
 	}
-
-	const handleChange = e => {
-		onChange && onChange(e)
-		setText(e.target.value)
-	}
-
-	useEffect(() => {
-		(parentText || parentText === '') && setText(parentText)
-	}, [parentText])
 
 	return (
 		<ChatInputParent variant={variant} onClick={handleClick}>
-			<ChatInputChild placeholder={placeholder} name={name} onChange={e => handleChange(e)} value={text} onBlur={onBlur} ref={ref} {...rest} />
-			<IconButton variant='icon' type={buttonType} onClick={() => handleSubmit(text)} size='xl'><IoIosSend /></IconButton>
+			<ChatInputChild placeholder={placeholder} name={name} onChange={e => userInputChange(e.target.value)} value={userInput} onBlur={onBlur} ref={ref} {...rest} />
+			<IconButton variant='icon' type={buttonType} onClick={() => userInputSubmit(submitArgs)} size='xl'><IoIosSend /></IconButton>
 		</ChatInputParent>
 	)
 }
-
-export default ChatInput

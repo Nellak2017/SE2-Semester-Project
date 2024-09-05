@@ -1,58 +1,45 @@
 import { ThreadListContainer } from './ThreadList.elements'
 import Thread from '../Thread/Thread.js'
 import { VARIANTS } from '../../utils/constants.js'
+import { convertKeysToLowerCase } from '../../../utils/helpers.js'
 
-function ThreadList({
-	state,
-	...props
-}) {
+export default function ThreadList({ state, services, ...props }) {
 	const {
 		variant = VARIANTS.dark,
+		userId = 0,
 		maxwidth = 260,
 		threads = [],
-		threadListenerList = [() => { }],
-		trashListenerList = [() => { }]
 	} = state || {}
-
-	const handleLinkClick = index => threadListenerList && threadListenerList[index] && threadListenerList[index]()
-	const handleTrashClick = index => trashListenerList && trashListenerList[index] && trashListenerList[index]()
-
-	// TODO: Extract this into seperate file and Unit test
-	// Function to convert object keys to lowercase
-	const convertKeysToLowerCase = obj => Object.keys(obj).reduce((acc, currentKey) => {
-		acc[currentKey.toLowerCase()] = obj[currentKey]
-		return acc
-	}, {})
+	const {
+		deleteThread = () => { },
+		openExistingThread = () => { }
+	} = services || {}
 
 	return (
 		<ThreadListContainer variant={variant} $maxwidth={maxwidth} {...props}>
-			{threads?.map((info, i) => {
-				const lowercaseInfo = convertKeysToLowerCase(info)
+			{threads?.map((info, index) => {
 				// everything is lowercased to ensure consistency
-				const { name, threadid, highlighted } = lowercaseInfo
+				const { name, threadid, highlighted } = convertKeysToLowerCase(info)
 				const threadState = {
 					variant,
 					maxwidth,
 					maxheight: 44,
 					name,
-					idno: threadid || i,
+					idno: threadid || index,
 					highlighted,
 				}
 				const threadServices = {
-					threadListener: () => handleLinkClick(i),
-					trashListener: () => handleTrashClick(i),
+					threadListener: () => openExistingThread({ userId, index, threadid }),
+					trashListener: () => deleteThread({ userId, index, threadid }),
 				}
 				return (
 					<Thread
 						state={threadState}
 						services={threadServices}
-						key={`thread-trash-icon-${i}`}
+						key={`thread-trash-icon-${index}`}
 					/>
 				)
-			}
-			)}
+			})}
 		</ThreadListContainer>
 	)
 }
-
-export default ThreadList

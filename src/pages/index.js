@@ -2,135 +2,61 @@
 import { useEffect, useState } from "react"
 import LLMChat from "../components/templates/LLMChat/LLMChat"
 import 'react-toastify/dist/ReactToastify.css'
-import {
-  highlightThread, indexOfCurrentlyHighlighted, updateObjInList, fetchAndUpdateThreads, fetchAndUpdateMessages,
-  postMessagesWrapper, postThreadWrapper, temperatureWrapper, typingSpeedWrapper, deleteWrapper,
-  apiRelevantFields,
-  handleExportButtonClick,
-  generatePalmMessageWrapper
-} from "../utils/helpers"
-import { USER_LOGOS, VARIANTS } from "../components/utils/constants"
+import { USER_LOGOS } from "../components/utils/constants"
 import { createLLMPageServices } from '../components/services/LLMChatPage/LLMChatServices.js'
 import store from '../redux/store.js'
 import { useSelector } from 'react-redux'
+import { initialize } from '../redux/thunks/LLMChatPageThunks.js'
 
 // TODO: Add real image assets for user and gpt
 // TODO: When error, use error component
 // TODO: Stop Hardcoding and use User Information when the User Logs in
 export default function Home() {
-  const [userID] = useState(1)
-  const [messages, setMessages] = useState([])
-  const [threads, setThreads] = useState([]) // unfiltered, has temperature and typing speed included
-  const [threadIndex, setThreadIndex] = useState(0) // the thread we are highlighting
-  const [isNewChat, setIsNewChat] = useState(false) // if it is a new chat, we need to know so we can dispatch a different Post API request
-  const [threadListenerList, setThreadListenerList] = useState([]) // Event Listeners set at runtime
-  const [trashListenerList, setTrashListenerList] = useState([])
-  const [userInput, setUserInput] = useState('') // this gives us the ability to reset the typing area whenever we swap threads
+  const [userId] = useState(1)
 
-  // --- Initial State Loaded in from DB
-  useEffect(() => { initialize() }, [])
+  // --- Initial State Loaded in from DB. Update userId, fetch threads, fetch messages for 0th thread
+  useEffect(() => { store.dispatch(initialize({ userId })) }, [])
 
-  // --- Handlers
-  // User "0" = user, User "1" = gpt
-  const handleOnSubmit = async (text, isNewChat = false) => {
-    const rawTemperature = threads[threadIndex]?.Temperature
-    const processedTemperature = !rawTemperature && rawTemperature !== 0 ? .5 : rawTemperature / 100
-
-    if (!isNewChat) {
-      const threadIDUser = threads[indexOfCurrentlyHighlighted(threads)]?.ThreadID
-      const threadIDGPT = threads[threadIndex]?.ThreadID
-      await postMessagesWrapper({ text, userID, threadID: threadIDUser, sentByUser: 0, setter: setMessages }) // post User's first because the endpoint is sorted in desc order: ;
-
-      if (!rawTemperature) console.warn("Temperature seems invalid, may lead to unexpected results. Temperature = ", rawTemperature)
-
-      const LLMResponse = await generatePalmMessageWrapper([...apiRelevantFields(messages), { author: '0', content: text }], processedTemperature)
-      await postMessagesWrapper({ text: LLMResponse, userID, threadID: threadIDGPT, sentByUser: 1, setter: setMessages }) // post GPT's second
-      return
-    }
-    const highlightIndex = threads?.length ?? 0
-
-    const LLM_GENERATED_THREAD = await generatePalmMessageWrapper([{ author: '0', content: text + " Respond in 5 words or less with an unformatted chat title." }], processedTemperature, 'chat_title')
-    const data = await postThreadSimply({ threadName: LLM_GENERATED_THREAD, userID, highlightIndex })
-    const newThreadID = data[0] // data[0] = threadID
-    await postMessagesWrapper({ text, userID, threadID: newThreadID, sentByUser: 0, setter: setMessages }) // post User's first because the endpoint is sorted in desc order: ;
-
-    const LLMResponse = await generatePalmMessageWrapper([...apiRelevantFields(messages), { author: '0', content: text }], .5)
-    await postMessagesWrapper({ text: LLMResponse, userID, threadID: newThreadID, sentByUser: 1, setter: setMessages }) // post GPT's second
-    setIsNewChat(false)
-    setThreadIndex(highlightIndex) // uses old last index
-  }
-
-  const handleNewChat = () => { setThreads(highlightThread(threads, -1)); if (noThreadsDetected([])) return }
-  const handleTemperatureChange = temp => { setThreads(updateObjInList({ objList: threads, index: threadIndex, propertyName: 'Temperature', propertyValue: temp })) }
-  const handleTypingSpeedChange = speed => { setThreads(updateObjInList({ objList: threads, index: threadIndex, propertyName: 'TypingSpeed', propertyValue: speed })) }
-  const handleTemperatureMouseUp = async () => { await temperatureWrapper({ userID, threadID: threads[threadIndex]?.ThreadID, newTemperature: threads[threadIndex]?.Temperature, threadIndex, setter: setThreads }) }
-  const handleTypingSpeedMouseUp = async () => { await typingSpeedWrapper({ userID, threadID: threads[threadIndex]?.ThreadID, newTypingSpeed: threads[threadIndex]?.TypingSpeed, threadIndex, setter: setThreads }) }
-
-  // --- Helpers
-  function noThreadsDetected(t) { if (t?.length > 0) { return false; } setThreadIndex(0); setMessages([]); setIsNewChat(true); return true }
-
-  function assignAllListeners(userID, t) {
-    setThreadListenerList(t?.map((e, i) => {
-      return async () => {
-        setThreadIndex(i) // so we know which is highlighted
-        setIsNewChat(false) // to ensure that a new thread is not made whenever we do (+ New Chat -> Link to another thread -> Message POST)
-        setUserInput('') // clear input if clicking other thread
-        await fetchAndUpdateMessages({ userID, threadID: e?.ThreadID, setter: setMessages })
-        await fetchAndUpdateThreads({ userID, setter: setThreads, highlightIndex: i }) // so that the temperature and typing speed are updated as expected, we must fetch new threads
-      }
-    }))
-    setTrashListenerList(t.map(e => { return async () => { await deleteThreadSimply({ userID, threadID: e?.ThreadID }) } }))
-  }
-
-  async function postThreadSimply({ threadName, userID, highlightIndex, setter = setThreads }) {
-    const data = await postThreadWrapper({ threadName, userID, highlightIndex, setter })
-    assignAllListeners(userID, data[1]) // data[1] = unfiltered threads
-    return data
-  }
-
-  async function deleteThreadSimply({ userID, threadID, setter = setThreads }) {
-    const data = await deleteWrapper(userID, threadID, setter)
-    const unfilteredThreads = data[1]
-    if (noThreadsDetected(unfilteredThreads)) return
-    assignAllListeners(userID, data[1]) // data[1] = unfiltered threads
-    await fetchAndUpdateMessages({ userID, threadID: unfilteredThreads[0]?.ThreadID, setter: setMessages })
-    return data
-  }
-
-  async function initialize() {
-    const unfilteredThreads = await fetchAndUpdateThreads({ userID, setter: setThreads, highlightIndex: threadIndex })
-    if (noThreadsDetected(unfilteredThreads)) return
-    await fetchAndUpdateMessages({ userID, threadID: unfilteredThreads[0]?.ThreadID, setter: setMessages })
-    assignAllListeners(userID, unfilteredThreads)
-  }
-
-  // ----- State / Service pattern construction area
-
+  // ----- State aggregation for this page
   const LLMChatState = {
     sideBarState: {
       variant: useSelector(state => state.LLMChatPage.variant),
-      threads: useSelector(state => state.LLMChatPage.sideBar.threads), 
       temperature: useSelector(state => state.LLMChatPage.sideBar.temperature),
       typingSpeed: useSelector(state => state.LLMChatPage.typingSpeed),
-      threadIndex: useSelector(state => state.LLMChatPage.threadIndex),
       userID: useSelector(state => state.LLMChatPage.userId),
       isSideBarOpen: useSelector(state => state.LLMChatPage.sideBar.isSideBarOpen),
-      maxwidth: 260, 
-      buttonText: "New Chat", 
-      logoutText: "Log Out", 
+      maxwidth: 260,
+      buttonText: "New Chat",
+      logoutText: "Log Out",
       exportText: "Export to Text",
+      threadListState: {
+        variant: useSelector(state => state.LLMChatPage.variant),
+        userId: useSelector(state => state.LLMChatPage.userId),
+        maxwidth: 260,
+        threads: useSelector(state => state.LLMChatPage.sideBar.threads),
+      },
     },
     chatListState: {
       variant: useSelector(state => state.LLMChatPage.variant),
       chatHistory: useSelector(state => state.LLMChatPage.chatHistory),
-      userLogos: USER_LOGOS, 
+      userLogos: USER_LOGOS,
       typingSpeed: useSelector(state => state.LLMChatPage.typingSpeed),
-      userInput: useSelector(state => state.LLMChatPage.chatList.userInput),
-      isNewChat: useSelector(state => state.LLMChatPage.chatList.isNewChat),
+      chatInputState: {
+        variant: useSelector(state => state.LLMChatPage.variant),
+        placeholder: 'Write a Message...',
+        name: '',
+        buttonType: 'submit',
+        userID: useSelector(state => state.LLMChatPage.userId),
+        userInput: useSelector(state => state.LLMChatPage.chatList.userInput),
+        isNewChat: useSelector(state => state.LLMChatPage.chatList.isNewChat),
+        threads: useSelector(state => state.LLMChatPage.sideBar.threads),
+        threadIndex: useSelector(state => state.LLMChatPage.threadIndex),
+        chatHistory: useSelector(state => state.LLMChatPage.chatHistory),
+        // threadId and messageId are derived from threads and chatHistory
+      },
     },
   }
 
-  // -----
   return (
     <LLMChat
       state={LLMChatState}

@@ -1,7 +1,4 @@
-import {
-	PiPlaceholderDuotone,
-	PiPlaceholderLight
-} from 'react-icons/pi'
+import { FaRegUserCircle, FaInstalod } from "react-icons/fa"
 export const VARIANTS = { light: 'light', dark: 'dark' }
 export const USERS = { user: 0, gpt: 1 }
 export const SX_SLIDER = {
@@ -24,9 +21,9 @@ export const SX_SLIDER = {
 	},
 }
 export const USER_LOGOS = {
-	'user': <PiPlaceholderDuotone />,
-	0: <PiPlaceholderDuotone />,
-	'gpt': <PiPlaceholderLight />,
-	1: <PiPlaceholderLight />,
+	'user': <FaRegUserCircle />,
+	0: <FaRegUserCircle />,
+	'gpt': <FaInstalod />,
+	1: <FaInstalod />,
 }
 export const SLIDER_LENGTH = 100
