@@ -41,14 +41,14 @@ const typeCharacters = async () => {
 \`\`\`
 `
 
-export const light = Template.bind({})
-light.args = {
+export const Light = Template.bind({})
+Light.args = {
   message: 'light',
   typingSpeed: .5
 }
 
-export const dark = Template.bind({})
-dark.args = {
+export const Dark = Template.bind({})
+Dark.args = {
   message: longParagraph,
   typingSpeed: 100
 }

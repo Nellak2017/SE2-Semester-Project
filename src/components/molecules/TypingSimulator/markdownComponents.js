@@ -2,7 +2,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import {
 	CodeHeader,
-} from './Chat.elements.js'
+} from '../Chat/Chat.elements.js'
 
 // TODO: Research Syntax Highlighting deeper
 //     (1) React Syntax Highlighter - https://github.com/react-syntax-highlighter/react-syntax-highlighter

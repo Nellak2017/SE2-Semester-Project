@@ -1,21 +1,18 @@
-/* eslint-disable max-lines-per-function */
-import { useEffect, useState } from "react"
-import LLMChat from "../components/templates/LLMChat/LLMChat"
+import { useEffect, useState } from 'react'
+import LLMChat from '../components/templates/LLMChat/LLMChat'
 import 'react-toastify/dist/ReactToastify.css'
-import { USER_LOGOS } from "../components/utils/constants"
+import { USER_LOGOS } from '../components/utils/constants'
 import { createLLMPageServices } from '../components/services/LLMChatPage/LLMChatServices.js'
 import store from '../redux/store.js'
 import { useSelector } from 'react-redux'
 import { initialize } from '../redux/thunks/LLMChatPageThunks.js'
 
-// TODO: Add real image assets for user and gpt
 // TODO: When error, use error component
-// TODO: Stop Hardcoding and use User Information when the User Logs in
 export default function Home() {
   const [userId] = useState(1)
 
   // --- Initial State Loaded in from DB. Update userId, fetch threads, fetch messages for 0th thread
-  useEffect(() => { store.dispatch(initialize({ userId })) }, [])
+  useEffect(() => { store.dispatch(initialize({ userId })) }, [userId])
 
   // ----- State aggregation for this page
   const LLMChatState = {

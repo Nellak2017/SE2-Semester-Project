@@ -16,6 +16,7 @@ import {
 import {
 	dialogueWorkflow,
 	titleWorkflow,
+	initializeWorkflow,
 } from '../../utils/workflows.js'
 
 // TODO: Do these need try/catch?
@@ -34,11 +35,9 @@ export const initialize = ({ userId }) => dispatch => {
 	console.log('Implement initialize')
 	// 0. initial userIdUpdate
 	dispatch(initialUserIdUpdate({ userId }))
-	// 1. fetch threads
-	// if no threads when fetching, early return
-	// 2. update threads
-	// 3. fetch messages for 0th thread's threadId
-	// 4. update messages
+	// 1. initializeWorkflow({ userId, threadIndex }) => <Result> of { ok: { threads, messages } | '' , error: string | ''}
+	const result = initializeWorkflow()
+	// 2. update threads and messages OR display an error when handling the result
 }
 
 export const newChat = ({ userId, threadid }) => dispatch => {

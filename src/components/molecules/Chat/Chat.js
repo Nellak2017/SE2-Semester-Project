@@ -10,10 +10,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from "remark-gfm"
 import ErrorMessage from "../../atoms/ErrorMessage/ErrorMessage.js"
 import TypingSimulator from "../TypingSimulator/TypingSimulator.js"
-import {
-	PiPlaceholderDuotone,
-} from 'react-icons/pi'
-import { MarkdownComponents } from './markdownComponents.js'
+import { PiPlaceholderDuotone } from 'react-icons/pi'
+import { MarkdownComponents } from '../TypingSimulator/markdownComponents.js'
 
 export default function Chat({ state, ...props }) {
 	const {

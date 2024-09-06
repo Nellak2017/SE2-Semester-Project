@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { css } from 'styled-components'
 
 // Add variants or size or kind pre-sets, then when you need to alter hover, get that css in the hover
@@ -805,7 +806,7 @@ export const getPresetCSS = (preSets, preSetProp) => (props) => {
 }
 
 // body and defaultFontColor are redundant and only there for understandability
-export default {
+const theme = {
   colors: {
     primaryLight: '#f1ecfd',
     primaryLightHover: '#e2d9fc',
@@ -876,3 +877,4 @@ export default {
   elevations,
   insets
 }
+export default theme
