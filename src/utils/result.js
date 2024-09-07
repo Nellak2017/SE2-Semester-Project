@@ -22,20 +22,30 @@ export const handle = (result, successFn, falureFn) => isOk(result) ? successFn(
 // --- Helper Result type functions
 
 // sync fn => <Result>
-export const tryCatchSync = (fn, errorMessagePrefix = '') => {
+export const tryCatchSync = (fn, errFn = e => e) => {
 	try {
 		return ok(fn())
 	} catch (e) {
-		return err(`${errorMessagePrefix}${e}`)
+		return err(errFn(e))
 	}
 }
 
 // async fn => <Result>
-export const tryCatchAsync = async (fn, errorMessagePrefix = '') => {
+export const tryCatchAsync = async (fn, errFn = e => e) => {
 	try {
 		const result = await fn()
 		return ok(result)
 	} catch (e) {
-		return err(`${errorMessagePrefix}${e}`)
+		return err(errFn(e))
+	}
+}
+
+// async fn => plain
+export const tryCatchAsyncPlain = async (okFn, errFn = e => e) => {
+	try {
+		const result = await okFn()
+		return result
+	} catch (e) {
+		return errFn(e)
 	}
 }

@@ -29,6 +29,5 @@ export async function generatePalmMessage({
 		},
 	}
 	return tryCatchAsync(
-		async () => axios.post(`${apiURL}?key=${API_KEY}`, requestData, headers),
-		`Error generating Palm message: `)
+		async () => axios.post(`${apiURL}?key=${API_KEY}`, requestData, headers))
 }

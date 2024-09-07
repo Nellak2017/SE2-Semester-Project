@@ -19,11 +19,7 @@ import {
 	initializeWorkflow,
 } from '../../utils/workflows.js'
 
-// TODO: Do these need try/catch?
 // TODO: Add API calls and other required actions to these thunks
-
-// Initial fetch of data
-// TODO: Create
 
 // initial userId update
 export const initialUserIdUpdate = ({ userId }) => dispatch => {
@@ -31,8 +27,7 @@ export const initialUserIdUpdate = ({ userId }) => dispatch => {
 }
 
 // initialize LLMChatPage
-export const initialize = ({ userId }) => dispatch => {
-	console.log('Implement initialize')
+export const initialize = ({ userId }) => async (dispatch) => {
 	// 0. initial userIdUpdate
 	dispatch(initialUserIdUpdate({ userId }))
 	// 1. initializeWorkflow({ userId, threadIndex }) => <Result> of { ok: { threads, messages } | '' , error: string | ''}
