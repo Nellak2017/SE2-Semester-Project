@@ -7,9 +7,31 @@ import store from '../redux/store.js'
 import { useSelector } from 'react-redux'
 import { initialize } from '../redux/thunks/LLMChatPageThunks.js'
 
+import { generatePalmMessage } from '../utils/palmApi.js' // TODO: Remove
+
 // TODO: When error, use error component
 export default function Home() {
   const [userId] = useState(1)
+
+  // --- TODO Remove. this is for testing only
+  useEffect(() => {
+    const getter = async () => {
+      const res = await generatePalmMessage({
+        contents: [
+          {
+            "role": "user",
+            "parts": [
+              {
+                "text": "Hello! Tell me about Gemini."
+              }
+            ]
+          },
+        ],
+      })
+      console.log(res)
+    }
+    getter()
+  }, [])
 
   // --- Initial State Loaded in from DB. Update userId, fetch threads, fetch messages for 0th thread
   useEffect(() => { store.dispatch(initialize({ userId })) }, [userId])
@@ -55,9 +77,30 @@ export default function Home() {
   }
 
   return (
-    <LLMChat
-      state={LLMChatState}
-      services={createLLMPageServices(store)}
-    />
+    <>
+      <button onClick={() => {
+        const getter = async () => {
+          const res = await generatePalmMessage({
+            contents: [
+              {
+                "role": "user",
+                "parts": [
+                  {
+                    "text": "Hello! Tell me about Gemini."
+                  }
+                ]
+              },
+            ],
+          })
+          console.log(res.ok.data.candidates[0].content) // {parts: [{text: string}], role: 'model' }
+          console.log(res.ok.data.candidates[0].content.parts[0].text)
+        }
+        getter()
+      }}>See LLM Thing</button>
+      <LLMChat
+        state={LLMChatState}
+        services={createLLMPageServices(store)}
+      />
+    </>
   )
 }
