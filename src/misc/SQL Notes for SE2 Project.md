@@ -234,7 +234,7 @@ To set up the environment variable and start the proxy server, using the most up
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS="C:/...short name for absolute path"
-./cloud-sql-proxy.x64.exe --credentials-file="$GOOGLE_APPLICATION_CREDENTIALS" extended-ward-405700:us-central1:one
+./cloud-sql-proxy.x64.exe --credentials-file="$GOOGLE_APPLICATION_CREDENTIALS" llm-chatbot-app:us-central1:chatbot-database-instance
 ```
 
 Take note that the specific __./cloud-sql-proxy__ may be different depending on the file name. Mine was for Windows 64 bit, so mine was this: __./cloud-sql-proxy.x64.exe__. Also, the syntax is not constant, so in the future it may be different. See the most up to date syntax for this following the official Google Docs.

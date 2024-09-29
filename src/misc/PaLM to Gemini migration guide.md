@@ -10,6 +10,10 @@ Before making any API requests, you must obtain a valid API Key from [AIstudio](
     + [POST Request Contents](#post-request-contents)
       - [Example using Curl](#example-using-curl)
     + [How to use this with Axios](#how-to-use-this-with-axios)
+    + [New Messages Schema](#new-messages-schema)
+      - [Old Messages Schema from PaLM API](#old-messages-schema-from-palm-api)
+      - [New Messages Schema from Gemini API](#new-messages-schema-from-gemini-api)
+      - [Commands to update existing database in-place (without backing up table)](#commands-to-update-existing-database-in-place--without-backing-up-table-)
   * [POST Request URL](#post-request-url)
     + [Old URL in PaLM](#old-url-in-palm)
     + [New URL in Gemini](#new-url-in-gemini)
@@ -103,6 +107,90 @@ export async function generatePalmMessage({
 	return result
 }
 ```
+
+### New Messages Schema
+
+We must migrate the SQL Messages schema and update the existing table data to fit the new API.
+_Note: User = 0 is 'user' and User = 1 is 'model'_
+
+#### Old Messages Schema from PaLM API
+
+```sql
+CREATE TABLE `Messages` (
+  `MessageID` int NOT NULL AUTO_INCREMENT,
+  `ThreadID` int DEFAULT NULL,
+  `Text` text,
+  `Timestamp` timestamp NULL DEFAULT NULL,
+  `SentByUser` tinyint(1) DEFAULT NULL,
+  `UserID` int DEFAULT NULL,
+  PRIMARY KEY (`MessageID`),
+  KEY `ThreadID` (`ThreadID`),
+  KEY `UserID` (`UserID`),
+  CONSTRAINT `Messages_ibfk_1` FOREIGN KEY (`ThreadID`) REFERENCES `Threads` (`ThreadID`),
+  CONSTRAINT `Messages_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`)
+)
+```
+
+| Field      | Type       | Null | Key | Default | Extra          |
+|------------|------------|------|-----|---------|----------------|
+| MessageID  | int        | NO   | PRI | NULL    | auto_increment |
+| ThreadID   | int        | YES  | MUL | NULL    |                |
+| Text       | text       | YES  |     | NULL    |                |
+| Timestamp  | timestamp  | YES  |     | NULL    |                |
+| SentByUser | tinyint(1) | YES  |     | NULL    |                |
+| UserID     | int        | YES  | MUL | NULL    |                |
+
+#### New Messages Schema from Gemini API
+
+```sql
+CREATE TABLE `Messages` (
+  `MessageID` int NOT NULL AUTO_INCREMENT,
+  `ThreadID` int DEFAULT NULL,
+  `Text` text,
+  `Timestamp` timestamp NULL DEFAULT NULL,
+  `SentByUser` ENUM('user', 'model') DEFAULT NULL,
+  `UserID` int DEFAULT NULL,
+  PRIMARY KEY (`MessageID`),
+  KEY `ThreadID` (`ThreadID`),
+  KEY `UserID` (`UserID`),
+  CONSTRAINT `Messages_ibfk_1` FOREIGN KEY (`ThreadID`) REFERENCES `Threads` (`ThreadID`),
+  CONSTRAINT `Messages_ibfk_2` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`)
+)
+```
+
+| Field      | Type       | Null | Key | Default | Extra          |
+|------------|------------|------|-----|---------|----------------|
+| MessageID  | int        | NO   | PRI | NULL    | auto_increment |
+| ThreadID   | int        | YES  | MUL | NULL    |                |
+| Text       | text       | YES  |     | NULL    |                |
+| Timestamp  | timestamp  | YES  |     | NULL    |                |
+| SentByUser | ENUM		  | YES  |     | NULL    |                |
+| UserID     | int        | YES  | MUL | NULL    |                |
+
+#### Commands to update existing database in-place (without backing up table)
+
+This assumes you don't back up the data in the table first, which is typically recommended.
+However, we don't do it here since it is just test data. 
+
+__Warning: In real world settings you should always backup data before altering or dropping tables.__
+
+```sql
+-- Step 1: Change the column type
+ALTER TABLE `Messages`
+CHANGE `SentByUser` `SentByUser` ENUM('user', 'model') DEFAULT NULL;
+
+-- Step 2: Update existing data
+UPDATE `Messages`
+SET `SentByUser` = CASE 
+    WHEN `SentByUser` = 0 THEN 'user'
+    WHEN `SentByUser` = 1 THEN 'model'
+    ELSE NULL
+END;
+
+-- Step 3: Verify the migration
+SELECT * FROM `Messages` WHERE `SentByUser` IS NULL; -- Optional check
+```
+
 
 ## POST Request URL
 
