@@ -16,7 +16,6 @@ export async function generatePalmMessage({
 		contents,
 		generationConfig: { temperature, candidateCount, topK, topP }
 	}
-	console.log(requestData)
 	const result = tryCatchAsync(
 		async () => axios.post(apiURL, requestData, headers),
 		e => e?.response?.data?.error || e?.message)
