@@ -33,6 +33,15 @@ export const getTemperature = async ({ userID, threadID }) => {
   return result
 }
 
+// GET TypingSpeed - Function to get Temperature for a user and thread
+export const getTypingSpeed = async ({ userID, threadID }) => {
+  const result = await tryCatchAsync(async () => {
+    const res = await axios.get('/api/getTypingSpeed', { params: { userID, threadID } })
+    return res?.data
+  }, e => e?.response?.data?.error || e?.message)
+  return result
+}
+
 // POST Message - Function to post Messsage for the user and thread that is currently active AND return a value
 export const addMessage = async ({ text, userID, threadID, sentByUser = 0 }) => {
   const result = await tryCatchAsync(async () => {

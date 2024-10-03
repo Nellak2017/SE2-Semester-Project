@@ -39,6 +39,9 @@ export default function SideBar({ state, services, ...props }) {
 		exportHandler = messages => handleExportButtonClick(messages),
 		threadListServices,
 	} = services || {}
+
+	const threadID = threads[threadIndex]?.ThreadID
+
 	return (
 		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSideBarOpen} {...props}>
 			<section>
@@ -77,7 +80,7 @@ export default function SideBar({ state, services, ...props }) {
 							min={1}
 							step={1}
 							max={SLIDER_LENGTH}
-							onMouseUp={() => temperatureUpdate({ userId, threadID: threads[threadIndex]?.ThreadID, temperature })}
+							onMouseUp={() => temperatureUpdate({ userId, threadID, temperature })}
 							onChange={(_, temperature) => temperatureChange(temperature)}
 							sx={SX_SLIDER}
 							defaultValue={temperature}
@@ -94,7 +97,7 @@ export default function SideBar({ state, services, ...props }) {
 							min={1}
 							step={1}
 							max={SLIDER_LENGTH}
-							onMouseUp={() => typingSpeedUpdate({ userId, typingSpeed })}
+							onMouseUp={() => typingSpeedUpdate({ userId, threadID, typingSpeed })}
 							onChange={(_, typingSpeed) => typingSpeedChange(typingSpeed)}
 							sx={SX_SLIDER}
 							defaultValue={typingSpeed}

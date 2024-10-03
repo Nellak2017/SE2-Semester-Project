@@ -35,8 +35,8 @@ export const createLLMPageServices = store => {
 			typingSpeedChange: (typingSpeed) => {
 				dispatch(setTypingSpeed(typingSpeed))
 			}, // reducer
-			typingSpeedUpdate: ({ userId, typingSpeed }) => {
-				dispatch(typingSpeedUpdate({ userId, typingSpeed }))
+			typingSpeedUpdate: ({ userId, threadID, typingSpeed }) => {
+				dispatch(typingSpeedUpdate({ userId, threadID, typingSpeed }))
 			}, // thunk
 			// TODO: Logout
 			setThreadIndex: (index) => {

@@ -1,4 +1,4 @@
-import { getThreads, getMessages, getTemperature } from './api'
+import { getThreads, getMessages, getTemperature, getTypingSpeed } from './api'
 import { isOk, err, ok, handle } from './result'
 import { highlightThread } from './helpers'
 
@@ -29,14 +29,14 @@ export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 
 	// 1. fetch threads ({ userID })
 	const threadsResult = await getThreads({ userID })
-	if (!isOk(threadsResult)) return err('No threads found when initializing.')
+	if (!isOk(threadsResult)) return err('Could not fetch threads when initializing.')
 	const threads = highlightThread(threadsResult.ok, threadIndex)
 	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
 	const threadID = threads?.[processedIndex]?.ThreadID
 
 	// 2. fetch messages for threadIndex'th thread's threadId ({ userID, threadID = okResponse?.[0]?.ThreadID })
 	const messagesResult = await getMessages({ userID, threadID })
-	if (!isOk(messagesResult)) return err('No messages found when initializing.')
+	if (!isOk(messagesResult)) return err('Could not fetch messages when initializing.')
 	const messages = messagesResult.ok
 
 	// 3. fetch temperature
@@ -45,22 +45,26 @@ export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 	const temperature = temperatureResult.ok[0].Temperature
 
 	// 4. fetch typing speed
+	const typingSpeedResult = await getTypingSpeed({ userID, threadID })
+	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.')
+	const typingSpeed = typingSpeedResult.ok[0].TypingSpeed
 
 	// 5. return ok({ userId, threads, messages, temperature, typingSpeed }) if both are ok
-	return ok({ userID, threads, messages, temperature })
+	return ok({ userID, threads, messages, temperature, typingSpeed })
 }
 
+// TODO: See if you can stop repeating yourself in openThreadWorkflow, it is basically identical to initialize.
 // Side-effects: fetch threads, fetch messages for thread with threadId 
-// Input/Output: ({ userId, threadId }) => <Result> of { ok: { threads, messages } | '' , error: string | ''} 
+// Input/Output: ({ userId, threadId }) => <Result> of { ok: { threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
 export const openThreadWorkflow = async ({ userId, threadid }) => {
 	// 1. Get threads
 	const threadsResult = await getThreads({ userID: userId })
-	if (!isOk(threadsResult)) return err('No threads found when opening existing thread.')
+	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.')
 	const threads = threadsResult.ok
 
 	// 2. Get messages
 	const messagesResult = await getMessages({ userID: userId, threadID: threadid })
-	if (!isOk(messagesResult)) return err('No messages found when opening existing thread.')
+	if (!isOk(messagesResult)) return err('Could not fetch messages when opening existing thread.')
 	const messages = messagesResult.ok
 
 	// 3. Get temperature
@@ -68,6 +72,11 @@ export const openThreadWorkflow = async ({ userId, threadid }) => {
 	if (!isOk(temperatureResult)) return err('Could not fetch temperature when opening existing thread.')
 	const temperature = temperatureResult.ok[0].Temperature
 
-	// 3. return result
-	return ok({ threads, messages, temperature })
+	// 4. Get typing speed
+	const typingSpeedResult = await getTypingSpeed({ userID: userId, threadID: threadid })
+	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.')
+	const typingSpeed = typingSpeedResult.ok[0].TypingSpeed
+
+	// 5. return result
+	return ok({ threads, messages, temperature, typingSpeed })
 }

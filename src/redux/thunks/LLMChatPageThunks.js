@@ -22,6 +22,7 @@ import {
 
 import {
 	patchTemperature,
+	patchTypingSpeed,
 } from '../../utils/api.js'
 
 import { isOk } from '../../utils/result.js'
@@ -36,15 +37,16 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	// 2. update threads and messages OR display an error when handling the result
 	if (!isOk(result)) {
 		// log it with console.log and the other method using the logging aspect or other means
-		console.log("surrogate for proper logging of initialization error")
+		console.error(result.error)
 		return false
 	}
 	// otherwise, update userId, threads, messages
-	const { userID, threads, messages, temperature } = result.ok
+	const { userID, threads, messages, temperature, typingSpeed } = result.ok
 	dispatch(setUserId(userID))
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
 	dispatch(setTemperature(temperature))
+	dispatch(setTypingSpeed(typingSpeed))
 	return true
 }
 
@@ -68,11 +70,9 @@ export const temperatureUpdate = ({ userId, threadID, temperature }) => dispatch
 	patchTemperature({ userID: userId, threadID, newTemperature: temperature })
 }
 
-export const typingSpeedUpdate = ({ userId, typingSpeed }) => dispatch => {
+export const typingSpeedUpdate = ({ userId, threadID, typingSpeed }) => dispatch => {
 	dispatch(setTypingSpeed(typingSpeed))
-	console.log("Implement thunk for typing speed")
-	console.log(typingSpeed)
-	// POST requests using userId to update typing field
+	patchTypingSpeed({ userID: userId, threadID, newTypingSpeed: typingSpeed })
 }
 
 // TODO: Log in thunk
@@ -107,13 +107,13 @@ export const openExistingThread = ({ userId, index, threadid }) => async (dispat
 	dispatch(setUserInput(''))
 	const result = await openThreadWorkflow({ userId, threadid })
 	if (!isOk(result)) {
-		console.error('Failed to open existing thread')
-		console.error(result.error)
+		console.error('Failed to open existing thread\n' + result.error)
 		return
 	}
-	const { threads, messages, temperature } = result.ok
+	const { threads, messages, temperature, typingSpeed } = result.ok
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
 	dispatch(setTemperature(temperature))
+	dispatch(setTypingSpeed(typingSpeed))
 	dispatch(highlightThread(index))
 }
