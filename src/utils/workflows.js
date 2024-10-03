@@ -45,6 +45,17 @@ export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 
 // Side-effects: fetch threads, fetch messages for thread with threadId 
 // Input/Output: ({ userId, threadId }) => <Result> of { ok: { threads, messages } | '' , error: string | ''} 
-export const openThreadWorkflow = async () => {
+export const openThreadWorkflow = async ({ userId, threadid }) => {
+	// 1. Get threads
+	const threadsResult = await getThreads({ userID: userId })
+	if (!isOk(threadsResult)) return err('No threads found when opening existing thread.')
+	const threads = threadsResult.ok
 
+	// 2. Get messages
+	const messagesResult = await getMessages({ userID: userId, threadID: threadid })
+	if (!isOk(messagesResult)) return err('No messages found when opening existing thread.')
+	const messages = messagesResult.ok
+
+	// 3. return result
+	return ok({ threads, messages })
 }

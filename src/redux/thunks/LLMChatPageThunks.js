@@ -6,10 +6,10 @@ import {
 	setUserId, // logout potentially
 	setUserInput, // userInputSubmit, openExistingThread
 	setThreadIndex, // openExistingThread, newChat
-	setThreads, // initialize
+	setThreads, // initialize, openExistingThread
 	setIsNewChat, // openExistingThread, newChat, userInputSubmit
 	highlightThread, // openExistingThread, newChat
-	setMessages, // newChat
+	setMessages, // newChat, openExistingThread
 	addMessage, // userInputSubmit
 	// whatever would be used for onScroll?
 } from '../reducers/LLMChatPageSlice.js'
@@ -18,7 +18,10 @@ import {
 	dialogueWorkflow,
 	titleWorkflow,
 	initializeWorkflow,
+	openThreadWorkflow,
 } from '../../utils/workflows.js'
+
+import { isOk } from '../../utils/result.js'
 
 // TODO: Add API calls and other required actions to these thunks
 // TODO: Define what credentials mean
@@ -95,14 +98,19 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, messag
 	dispatch(setIsNewChat(false))
 	dispatch(setThreadIndex(nextThreadIndex))
 }
-// TODO: Make all threadID and userId and other consistent casing universally!
-// TODO: openExistingThread ({userId, index, threadID}): theadIndex = i, isNewchat = false, userInput = '', get new messages, get new threads
-export const openExistingThread = ({ userId, index, threadid }) => dispatch => {
-	console.log("implement thunk for openExisting Thread")
+
+export const openExistingThread = ({ userId, index, threadid }) => async (dispatch) => {
 	dispatch(setThreadIndex(index))
 	dispatch(setIsNewChat(false))
 	dispatch(setUserInput(''))
-	// GET threads for the user
-	// GET messages for the user given the threadId
+	const result = await openThreadWorkflow({ userId, threadid })
+	if (!isOk(result)) {
+		console.error('Failed to open existing thread')
+		console.error(result.error)
+		return
+	}
+	const { threads, messages } = result.ok
+	dispatch(setThreads(threads))
+	dispatch(setMessages(messages))
 	dispatch(highlightThread(index))
 }
