@@ -23,8 +23,8 @@ export const createLLMPageServices = store => {
 			sideBarOpen: () => {
 				dispatch(toggleSidebarOpen())
 			}, // reducer
-			newChat: ({ userId, threadid }) => {
-				dispatch(newChat({ userId, threadid }))
+			newChat: () => {
+				dispatch(newChat())
 			}, // thunk
 			temperatureChange: (temperature) => {
 				dispatch(setTemperature(temperature))

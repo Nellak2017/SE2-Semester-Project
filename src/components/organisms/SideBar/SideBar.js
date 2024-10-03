@@ -43,7 +43,7 @@ export default function SideBar({ state, services, ...props }) {
 				<IconContainer>
 					<OutlineButton
 						state={{ variant, text: buttonText, centered: false, maxheight: 44 }}
-						services={{ onClick: () => newChat({ userId }) }}
+						services={{ onClick: () => newChat() }}
 					/>
 					<OutlineButton
 						state={{

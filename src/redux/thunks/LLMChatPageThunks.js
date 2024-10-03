@@ -41,14 +41,11 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	return true
 }
 
-export const newChat = ({ userId, threadid }) => dispatch => {
-	// don't highlight anything, thread index = 0, messages = [], isNewChat = true
-	console.log(`Implement thunk for delete newChat with userID: ${userId}, with threadid: ${threadid}`)
+export const newChat = () => dispatch => {
 	dispatch(highlightThread(-1))
 	dispatch(setThreadIndex(0))
 	dispatch(setMessages([]))
 	dispatch(setIsNewChat(true))
-	// POST requests using userId to make a new thread?
 }
 
 export const deleteThreadThunk = ({ userId, index, threadid }) => dispatch => {
