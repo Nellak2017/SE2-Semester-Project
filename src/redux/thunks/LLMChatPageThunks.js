@@ -6,6 +6,7 @@ import {
 	setUserId, // logout potentially
 	setUserInput, // userInputSubmit, openExistingThread
 	setThreadIndex, // openExistingThread, newChat
+	setThreads, // initialize
 	setIsNewChat, // openExistingThread, newChat, userInputSubmit
 	highlightThread, // openExistingThread, newChat
 	setMessages, // newChat
@@ -19,25 +20,25 @@ import {
 	initializeWorkflow,
 } from '../../utils/workflows.js'
 
-import { generatePalmMessage } from '../../utils/palmApi.js'
-
 // TODO: Add API calls and other required actions to these thunks
+// TODO: Define what credentials mean
 
-// initial userId update
-export const initialUserIdUpdate = ({ userId }) => dispatch => {
-	dispatch(setUserId(userId))
-}
-
-// initialize LLMChatPage
-export const initialize = ({ userId }) => async (dispatch) => {
-	
-	const LLMResult = generatePalmMessage({ messages: [] })
-
-	// 0. initial userIdUpdate
-	dispatch(initialUserIdUpdate({ userId }))
-	// 1. initializeWorkflow({ userId, threadIndex }) => <Result> of { ok: { threads, messages } | '' , error: string | ''}
-	const result = initializeWorkflow()
+// initialize LLMChatPage (used in Login/Signup), returns boolean to indicate if successful updating userId, threads, and messages
+export const initialize = ({ credentials }) => async (dispatch) => {
+	// 1. initializeWorkflow({ credentials, threadIndex:0 }) => <Result> of { ok: { userId, threads, messages } | '' , error: string | ''}
+	const result = await initializeWorkflow({ credentials, threadIndex: 0 })
 	// 2. update threads and messages OR display an error when handling the result
+	if (result?.error) {
+		// log it with console.log and the other method using the logging aspect or other means
+		console.log("surrogate for proper logging of initialization error")
+		return false
+	}
+	// otherwise, update userId, threads, messages
+	const { userID, threads, messages } = result.ok
+	dispatch(setUserId(userID))
+	dispatch(setThreads(threads))
+	dispatch(setMessages(messages))
+	return true
 }
 
 export const newChat = ({ userId, threadid }) => dispatch => {

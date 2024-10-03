@@ -116,7 +116,7 @@ const exampleChatHistory = [
 ]
 
 const exampleUserLogos = {
-	'gpt': <PiPlaceholderLight />,
+	'model': <PiPlaceholderLight />,
 	'user': <PiPlaceholderDuotone />
 }
 

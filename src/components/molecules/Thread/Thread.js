@@ -2,7 +2,6 @@ import { FiMessageSquare, FiTrash2 } from 'react-icons/fi'
 import { ThreadContainerStyled, IconContainer } from './Thread.elements'
 import { VARIANTS } from '../../utils/constants'
 
-// TODO: change user: 'gpt'|'user' to use boolean instead
 export default function Thread({ state, services, ...props }) {
 	const {
 		variant = VARIANTS.dark,

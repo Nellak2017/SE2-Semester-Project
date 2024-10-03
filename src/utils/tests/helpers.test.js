@@ -4,7 +4,7 @@ import {
 	updateObjInList,
 	apiRelevantFields,
 	formatMessagesForExport,
-} from './helpers'
+} from '../helpers.js'
 
 describe('Parameterized Test Cases', () => {
 	// Test Cases for highlightThread

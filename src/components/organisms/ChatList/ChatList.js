@@ -1,6 +1,6 @@
 import Chat from '../../molecules/Chat/Chat'
 import ChatInput from '../../atoms/ChatInput/ChatInput.js'
-import { VARIANTS, USERS, USER_LOGOS } from '../../utils/constants'
+import { VARIANTS, USER_LOGOS } from '../../utils/constants'
 import { ChatListContainer, MessageContainer } from './ChatList.elements.js'
 import { PiPlaceholderDuotone } from 'react-icons/pi'
 
@@ -20,7 +20,7 @@ export default function ChatList({ state, services }) {
 		<ChatListContainer variant={variant}>
 			<MessageContainer onScroll={scrollHandler}>
 				{chatHistory.toReversed()?.map((el, i) => {
-					const { user, text, error } = el || {}
+					const { SentByUser: user, Text: text, MessageID: messageId, error } = el || {}
 					return (
 						<Chat
 							state={{
@@ -28,9 +28,9 @@ export default function ChatList({ state, services }) {
 								text,
 								error,
 								userLogo: userLogos[user] || <PiPlaceholderDuotone />,
-								typingSpeed: i === 0 && user === USERS.gpt && typingSpeed, // typingSpeed or false
+								typingSpeed: i === 0 && typingSpeed, // typingSpeed or false
 							}}
-							key={`text-${el?.messageId}`}
+							key={`text-${messageId}`}
 						/>)
 				})}
 			</MessageContainer>

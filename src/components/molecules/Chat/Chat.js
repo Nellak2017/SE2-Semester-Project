@@ -13,39 +13,33 @@ import TypingSimulator from "../TypingSimulator/TypingSimulator.js"
 import { PiPlaceholderDuotone } from 'react-icons/pi'
 import { MarkdownComponents } from '../TypingSimulator/markdownComponents.js'
 
+const NormalComponent = ({ error, typingSpeed, user, text = '' }) => !error && (user !== USERS.model || !typingSpeed)
+	? (<Message><ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown></Message>)
+	: undefined
+
+const TypingSimulationComponent = ({ error, typingSpeed, user, text = '' }) => !error && user === USERS.model && typingSpeed
+	? (<Message><TypingSimulator message={text} typingSpeed={typingSpeed} /></Message>)
+	: undefined
+
+const ErrorComponent = ({ error }) => error
+	? (<ErrorContainer><ErrorMessage message={error} /></ErrorContainer>)
+	: undefined
+
 export default function Chat({ state, ...props }) {
 	const {
 		user = USERS.user,
 		userLogo = <PiPlaceholderDuotone />,
 		text = '',
-		error = false, // this is a code smell...
-		typingSpeed = undefined,
+		error = '',
+		typingSpeed = 0,
 	} = state || {}
 	return (
-		<ChatContainer user={user === 0 ? 'user' : 'gpt'} {...props}>
+		<ChatContainer user={user} {...props}> {/* possible users are: 'user' or 'model'. Invalid defaults to 'user' styles */}
 			<MessageContainer>
-				<LogoContainer>
-					{userLogo}
-				</LogoContainer>
-				{!error && (!typingSpeed && typingSpeed !== 0) && (
-					// Render normally if no typingSpeed
-					<Message>
-						<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
-							{text}
-						</ReactMarkdown>
-					</Message>
-				)}
-				{!error && (typingSpeed || typingSpeed === 0) && user === USERS.gpt && (
-					// Render typing simulation if typingSpeed is provided
-					<Message>
-						<TypingSimulator message={text} typingSpeed={typingSpeed} />
-					</Message>
-				)}
-				{error &&
-					<ErrorContainer>
-						<ErrorMessage />
-					</ErrorContainer>
-				}
+				<LogoContainer>{userLogo}</LogoContainer>
+				{NormalComponent({ error, typingSpeed, user, text }) /* Render normal component if no errors and typing speed provided */}
+				{TypingSimulationComponent({ error, typingSpeed, user, text }) /* Render typing simulation if typingSpeed is provided */}
+				{ErrorComponent({ error }) /* Render error if error is provided */}
 			</MessageContainer>
 		</ChatContainer>
 	)

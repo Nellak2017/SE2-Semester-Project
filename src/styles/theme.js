@@ -751,7 +751,7 @@ export const chatPresets = {
     user: css`
       background-color: ${props => props.theme.colors.darkNeutral};
     `,
-    gpt: css`
+    model: css`
       background-color: ${props => props.theme.colors.lightNeutral};
     `
   },

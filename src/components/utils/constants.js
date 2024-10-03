@@ -1,6 +1,6 @@
 import { FaRegUserCircle, FaInstalod } from "react-icons/fa"
 export const VARIANTS = { light: 'light', dark: 'dark' }
-export const USERS = { user: 0, gpt: 1 }
+export const USERS = { user: 'user', model: 'model' }
 export const SX_SLIDER = {
 	//color: theme.palette.mode === 'dark' ? '#fff' : 'rgba(0,0,0,0.87)',
 	height: 4,
@@ -22,8 +22,6 @@ export const SX_SLIDER = {
 }
 export const USER_LOGOS = {
 	'user': <FaRegUserCircle />,
-	0: <FaRegUserCircle />,
-	'gpt': <FaInstalod />,
-	1: <FaInstalod />,
+	'model': <FaInstalod />,
 }
 export const SLIDER_LENGTH = 100

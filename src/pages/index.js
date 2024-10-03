@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import LLMChat from '../components/templates/LLMChat/LLMChat'
 import 'react-toastify/dist/ReactToastify.css'
 import { USER_LOGOS } from '../components/utils/constants'
@@ -8,13 +8,17 @@ import { useSelector } from 'react-redux'
 import { initialize } from '../redux/thunks/LLMChatPageThunks.js'
 
 // TODO: When error, use error component
-export default function Home() {
-  const [userId] = useState(1)
+export const Home = () => {
 
   // --- Initial State Loaded in from DB. Update userId, fetch threads, fetch messages for 0th thread
-  useEffect(() => { store.dispatch(initialize({ userId })) }, [userId])
+  // if the userId does not exist, then we can not render this page, but another page and re-direct to home
+  // We actually don't need to update the userId at all since it is managed by login/signup and by the logout feature
+  // However, we need it now since we only have one page..
+  useEffect(() => { store.dispatch(initialize({ credentials: {} })) }, [])
 
   // ----- State aggregation for this page
+  // TODO: make naming conventions consistent
+  // TODO: De-duplicate data
   const LLMChatState = {
     sideBarState: {
       variant: useSelector(state => state.LLMChatPage.variant),
@@ -61,3 +65,4 @@ export default function Home() {
     />
   )
 }
+export default Home

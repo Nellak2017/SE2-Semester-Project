@@ -36,7 +36,7 @@ export default function ThreadList({ state, services, ...props }) {
 					<Thread
 						state={threadState}
 						services={threadServices}
-						key={`thread-trash-icon-${index}`}
+						key={`thread-trash-icon-${threadid}`}
 					/>
 				)
 			})}

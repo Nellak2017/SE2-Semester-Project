@@ -15,30 +15,6 @@ export default {
 
 const Template = args => <Chat {...args} />
 
-const exampleChatHistory = [
-	{
-		user: 'LLM',
-		Text: 'Example Text here',
-		messageId: 0
-	},
-	{
-		user: 'User',
-		Text: 'I am a User I made this request',
-		messageId: 1
-	},
-	{
-		user: 'LLM',
-		Text: 'Example Text here number 2',
-		messageId: 2
-	}
-]
-
-const exampleUserLogos = {
-	'LLM': <PiPlaceholderLight />,
-	'User': <PiPlaceholderDuotone />
-}
-
-
 const markdownContent =
 	`
 Text Preceeding the Code Block.
@@ -81,14 +57,14 @@ User.args = {
 		user: USERS.user,
 		text: "This is user example content with nothing special.",
 		userLogo: <PiPlaceholderDuotone />,
-		//error: true
+		error: ''
 	}
 }
 
 export const Gpt = Template.bind({})
 Gpt.args = {
 	state: {
-		user: USERS.gpt,
+		user: USERS.model,
 		text: markdownContent,
 		userLogo: <PiPlaceholderLight />,
 		typingSpeed: 50

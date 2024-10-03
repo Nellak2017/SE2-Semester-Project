@@ -1,3 +1,7 @@
+import { getThreads, getMessages } from './api'
+import { isOk, err, ok, handle } from './result'
+import { highlightThread } from './helpers'
+
 // This file contains combinations of API endpoints called in sequence
 
 // --- Sequential API convienience functions
@@ -14,30 +18,29 @@ export const titleWorkflow = async () => {
 
 }
 
-// Side-effects: fetch threads, fetch messages for 0th thread 
-// Input/Output: ({ userID }) => <Result> of { ok: { threads, messages } | '' , error: string | ''} 
-export const initializeWorkflow = async () => {
-	// 1. fetch threads ({ userID, threadIndex = 0 })
+// Side-effects: get userID, fetch threads, fetch messages for 0th thread 
+// Input/Output: ({ credentials, threadIndex }) => <Result> of { ok: { userId, threads, messages } | '' , error: string | ''} 
+export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
+	// 0. get userId based on credentials
+	// if no credentials return err('No credentials provided.')
+	// TODO: get userId based on credentials
+	const userID = 1
+	if (userID <= 0) return err('No userId found for the given credentials.')
 
-	// -> const getThreads = async ({ userID }) => {
-	//     const result = await tryCatchAsync(() => axios.get('/api/getThreads', { params: { userID } }), 'Error fetching threads: ')
-	//     return result }
-	// -> const result = await getThreads({userID})
-	// -> okResponse => ok(highlightThread(okResponse, threadIndex))
-	// -> errorResponse => err(errorResponse)
+	// 1. fetch threads ({ userID })
+	const threadsResult = await getThreads({ userID })
+	if (!isOk(threadsResult)) return err('No threads found when initializing.')
+	const threads = highlightThread(threadsResult.ok, threadIndex)
+	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
+	const threadID = threads?.[processedIndex]?.ThreadID
 
-	// if no threads when fetching, early return err('No threads found when initializing')
+	// 2. fetch messages for threadIndex'th thread's threadId ({ userID, threadID = okResponse?.[0]?.ThreadID })
+	const messagesResult = await getMessages({ userID, threadID })
+	if (!isOk(messagesResult)) return err('No messages found when initializing.')
+	const messages = messagesResult.ok
 
-	// 2. fetch messages for 0th thread's threadId ({ userID, threadID = okResponse?.[0]?.ThreadID })
-
-	// -> const getMessages = async ({ userID, threadID }) => { // min = 0, max = step
-	// 			const result = await tryCatchAsync(() => axios.get('/api/getMessages', { params: { userID, threadID } }), 'Error fetching messages: ')
-	// 			return result}
-	// -> const result = await getMessages({ userID, threadID })
-	// -> okResponse => ok(okResponse.map(msg => ({ author: String(msg?.SentByUser), content: msg?.Text, messageId: msg?.MessageID })))
-	// -> errorResponse => err(errorResponse)
-
-	// 3. return ok({ threads, messages }) if both are ok, else return err(threadError + messageError)
+	// 3. return ok({ userId, threads, messages }) if both are ok
+	return ok({ userID, threads, messages })
 }
 
 // Side-effects: fetch threads, fetch messages for thread with threadId 
