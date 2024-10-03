@@ -30,6 +30,8 @@ export const Home = () => {
       buttonText: "New Chat",
       logoutText: "Log Out",
       exportText: "Export to Text",
+      threadIndex: useSelector(state => state.LLMChatPage.threadIndex),
+      threads: useSelector(state => state.LLMChatPage.sideBar.threads),
       threadListState: {
         variant: useSelector(state => state.LLMChatPage.variant),
         userId: useSelector(state => state.LLMChatPage.userId),

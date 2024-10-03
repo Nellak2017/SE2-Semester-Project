@@ -1,4 +1,4 @@
-import { getThreads, getMessages } from './api'
+import { getThreads, getMessages, getTemperature } from './api'
 import { isOk, err, ok, handle } from './result'
 import { highlightThread } from './helpers'
 
@@ -19,7 +19,7 @@ export const titleWorkflow = async () => {
 }
 
 // Side-effects: get userID, fetch threads, fetch messages for 0th thread 
-// Input/Output: ({ credentials, threadIndex }) => <Result> of { ok: { userId, threads, messages } | '' , error: string | ''} 
+// Input/Output: ({ credentials, threadIndex }) => <Result> of { ok: { userId, threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
 export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 	// 0. get userId based on credentials
 	// if no credentials return err('No credentials provided.')
@@ -39,8 +39,15 @@ export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 	if (!isOk(messagesResult)) return err('No messages found when initializing.')
 	const messages = messagesResult.ok
 
-	// 3. return ok({ userId, threads, messages }) if both are ok
-	return ok({ userID, threads, messages })
+	// 3. fetch temperature
+	const temperatureResult = await getTemperature({ userID, threadID })
+	if (!isOk(temperatureResult)) return err('Could not fetch temperature when initializing.')
+	const temperature = temperatureResult.ok[0].Temperature
+
+	// 4. fetch typing speed
+
+	// 5. return ok({ userId, threads, messages, temperature, typingSpeed }) if both are ok
+	return ok({ userID, threads, messages, temperature })
 }
 
 // Side-effects: fetch threads, fetch messages for thread with threadId 
@@ -56,6 +63,11 @@ export const openThreadWorkflow = async ({ userId, threadid }) => {
 	if (!isOk(messagesResult)) return err('No messages found when opening existing thread.')
 	const messages = messagesResult.ok
 
+	// 3. Get temperature
+	const temperatureResult = await getTemperature({ userID: userId, threadID: threadid })
+	if (!isOk(temperatureResult)) return err('Could not fetch temperature when opening existing thread.')
+	const temperature = temperatureResult.ok[0].Temperature
+
 	// 3. return result
-	return ok({ threads, messages })
+	return ok({ threads, messages, temperature })
 }

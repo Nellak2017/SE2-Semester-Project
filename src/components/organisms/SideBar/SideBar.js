@@ -25,6 +25,8 @@ export default function SideBar({ state, services, ...props }) {
 		buttonText = "New Chat",
 		logoutText = "Log Out",
 		exportText = "Export to Text",
+		threadIndex = 0,
+		threads = [],
 		threadListState,
 	} = state || {}
 	const {
@@ -75,7 +77,7 @@ export default function SideBar({ state, services, ...props }) {
 							min={1}
 							step={1}
 							max={SLIDER_LENGTH}
-							onMouseUp={() => temperatureUpdate({ userId, temperature })}
+							onMouseUp={() => temperatureUpdate({ userId, threadID: threads[threadIndex]?.ThreadID, temperature })}
 							onChange={(_, temperature) => temperatureChange(temperature)}
 							sx={SX_SLIDER}
 							defaultValue={temperature}

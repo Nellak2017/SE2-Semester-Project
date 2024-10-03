@@ -1,8 +1,7 @@
 import {
-	addThread, // newChat
 	deleteThread, // deleteThreadThunk 
-	setTemperature, // temperatureUpdate
-	setTypingSpeed, // typingSpeedUpdate
+	setTemperature, // temperatureUpdate, openExistingThread, initialize
+	setTypingSpeed, // typingSpeedUpdate, openExistingThread, initialize
 	setUserId, // logout potentially
 	setUserInput, // userInputSubmit, openExistingThread
 	setThreadIndex, // openExistingThread, newChat
@@ -21,6 +20,10 @@ import {
 	openThreadWorkflow,
 } from '../../utils/workflows.js'
 
+import {
+	patchTemperature,
+} from '../../utils/api.js'
+
 import { isOk } from '../../utils/result.js'
 
 // TODO: Add API calls and other required actions to these thunks
@@ -31,16 +34,17 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	// 1. initializeWorkflow({ credentials, threadIndex:0 }) => <Result> of { ok: { userId, threads, messages } | '' , error: string | ''}
 	const result = await initializeWorkflow({ credentials, threadIndex: 0 })
 	// 2. update threads and messages OR display an error when handling the result
-	if (result?.error) {
+	if (!isOk(result)) {
 		// log it with console.log and the other method using the logging aspect or other means
 		console.log("surrogate for proper logging of initialization error")
 		return false
 	}
 	// otherwise, update userId, threads, messages
-	const { userID, threads, messages } = result.ok
+	const { userID, threads, messages, temperature } = result.ok
 	dispatch(setUserId(userID))
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
+	dispatch(setTemperature(temperature))
 	return true
 }
 
@@ -59,11 +63,9 @@ export const deleteThreadThunk = ({ userId, index, threadid }) => dispatch => {
 	// possible highlighting logic upon deletion
 }
 
-export const temperatureUpdate = ({ userId, temperature }) => dispatch => {
+export const temperatureUpdate = ({ userId, threadID, temperature }) => dispatch => {
 	dispatch(setTemperature(temperature))
-	console.log("Implement thunk for temperature")
-	console.log(temperature)
-	// POST requests using userId to update temperature field
+	patchTemperature({ userID: userId, threadID, newTemperature: temperature })
 }
 
 export const typingSpeedUpdate = ({ userId, typingSpeed }) => dispatch => {
@@ -109,8 +111,9 @@ export const openExistingThread = ({ userId, index, threadid }) => async (dispat
 		console.error(result.error)
 		return
 	}
-	const { threads, messages } = result.ok
+	const { threads, messages, temperature } = result.ok
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
+	dispatch(setTemperature(temperature))
 	dispatch(highlightThread(index))
 }

@@ -24,6 +24,15 @@ export const getMessages = async ({ userID, threadID }) => { // min = 0, max = s
   return result
 }
 
+// GET Temperature - Function to get Temperature for a user and thread
+export const getTemperature = async ({ userID, threadID }) => {
+  const result = await tryCatchAsync(async () => {
+    const res = await axios.get('/api/getTemperature', { params: { userID, threadID } })
+    return res?.data
+  }, e => e?.response?.data?.error || e?.message)
+  return result
+}
+
 // POST Message - Function to post Messsage for the user and thread that is currently active AND return a value
 export const addMessage = async ({ text, userID, threadID, sentByUser = 0 }) => {
   const result = await tryCatchAsync(async () => {

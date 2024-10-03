@@ -29,8 +29,8 @@ export const createLLMPageServices = store => {
 			temperatureChange: (temperature) => {
 				dispatch(setTemperature(temperature))
 			}, // reducer
-			temperatureUpdate: ({ userId, temperature }) => {
-				dispatch(temperatureUpdate({ userId, temperature }))
+			temperatureUpdate: ({ userId, threadID, temperature }) => {
+				dispatch(temperatureUpdate({ userId, threadID, temperature }))
 			}, // thunk
 			typingSpeedChange: (typingSpeed) => {
 				dispatch(setTypingSpeed(typingSpeed))
