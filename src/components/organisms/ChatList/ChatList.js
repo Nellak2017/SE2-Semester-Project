@@ -19,7 +19,7 @@ export default function ChatList({ state, services }) {
 	return (
 		<ChatListContainer variant={variant}>
 			<MessageContainer onScroll={scrollHandler}>
-				{chatHistory.toReversed()?.map((el, i) => {
+				{chatHistory?.map((el, i) => {
 					const { SentByUser: user, Text: text, MessageID: messageId, error } = el || {}
 					return (
 						<Chat

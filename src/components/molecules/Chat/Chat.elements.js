@@ -8,6 +8,8 @@ export const ChatContainer = styled.div`
 	justify-content: center;
 	padding: ${props => props.theme.spaces.small};
 
+	max-width: 100%;
+	width: 100%;
 	* {
 		font-size: ${props => props.theme.fontSizes.medium};
 	}
@@ -55,6 +57,14 @@ export const CodeHeader = styled.div`
 `
 
 export const ErrorContainer = styled.div`
-	display: flex;
+	/* display: flex;
+	padding-top: ${props => props.theme.spaces.smaller};
+	width: 100%;
+	max-width: 694px; */
+	font-size: ${props => props.theme.fontSizes.small};
+	font-weight: 300;
+	width: 100%;
+	white-space: pre-wrap;
+  	word-wrap: break-word;
 	padding-top: ${props => props.theme.spaces.smaller};
 `

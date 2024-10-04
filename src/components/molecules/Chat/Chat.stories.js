@@ -70,3 +70,14 @@ Gpt.args = {
 		typingSpeed: 50
 	}
 }
+
+export const ErrorChat = Template.bind({})
+ErrorChat.args = {
+	state: {
+		user: USERS.user,
+		text: '',
+		error: 'An error occurred. Please refresh and try again.',
+		userLogo: <PiPlaceholderLight />,
+		typingSpeed: 50,
+	}
+}

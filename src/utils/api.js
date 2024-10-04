@@ -43,9 +43,18 @@ export const getTypingSpeed = async ({ userID, threadID }) => {
 }
 
 // POST Message - Function to post Messsage for the user and thread that is currently active AND return a value
-export const addMessage = async ({ text, userID, threadID, sentByUser = 0 }) => {
+export const addMessage = async ({ text, userID, threadID, sentByUser = 'user' }) => {
   const result = await tryCatchAsync(async () => {
     const res = await axios.post('/api/postMessage', { threadID, userID, text, sentByUser })
+    return res?.data
+  }, e => e?.response?.data?.error || e?.message)
+  return result
+}
+
+// POST Messages - Function to post Messsages for the user and AI for the thread that is currently active AND return a value
+export const addMessageAndResponse = async ({ userID, threadID, userText, AIText }) => {
+  const result = await tryCatchAsync(async () => {
+    const res = await axios.post('/api/postMessageAndResponse', { userID, threadID, userText, AIText })
     return res?.data
   }, e => e?.response?.data?.error || e?.message)
   return result

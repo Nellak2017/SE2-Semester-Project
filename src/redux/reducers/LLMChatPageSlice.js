@@ -67,12 +67,16 @@ const LLMChatPageSlice = createSlice({
 			state.sideBar.threads = [...state.sideBar.threads, thread]
 		},
 		addMessage: (state, action) => {
+			if (state.chatHistory[0]?.error) return // prevents 2 errors displayed at once
 			const message = action.payload
-			state.chatHistory = [...state.chatHistory, message]
+			state.chatHistory = [message, ...state.chatHistory]
 		},
 		setMessages: (state, action) => {
 			const messages = action.payload
 			state.chatHistory = messages
+		},
+		deleteMessages: (state, _) => {
+			state.chatHistory = [] 
 		},
 		setUserInput: (state, action) => {
 			const userInput = action.payload
@@ -101,6 +105,7 @@ export const {
 	addThread,
 	addMessage,
 	setMessages,
+	deleteMessages,
 	setUserInput,
 	setIsNewChat,
 	highlightThread,

@@ -8,7 +8,7 @@ export const ChatListContainer = styled.section`
 	align-items: flex-start;
 	height: 100vh;
 	//height: 97vh;
-	width: 100%;
+	max-width: 100%;
 
 	${space} 
     ${layout}

@@ -66,6 +66,15 @@ export const convertKeysToLowerCase = obj => Object.keys(obj).reduce((acc, curre
 	acc[currentKey.toLowerCase()] = obj[currentKey]
 	return acc
 }, {})
+
+// Function used to convert old format messages to the new Gemini format
+export const convertMessagesToGemini = old => old.map(message => ({
+	role: message.SentByUser,
+	parts: [{
+		text: message.Text
+	}]
+}))
+
 // ---------------------------------------------------------------
 // --- API Helpers (API request and SET state using return values)
 

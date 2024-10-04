@@ -106,7 +106,7 @@ export default function SideBar({ state, services, ...props }) {
 				</SliderContainer>
 				<OutlineButton
 					state={{ variant, icon: <BiExport />, text: exportText, centered: false, maxheight: 44 }}
-					services={{ onClick: exportHandler }}
+					services={{ onClick: () => exportHandler([{ author: 'dev', content: 'TODO: Add support for this' }]) }}
 				// TODO: We need to use messages local variable with exportHandler for it to work
 				/>
 				<OutlineButton

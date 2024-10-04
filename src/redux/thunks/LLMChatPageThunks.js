@@ -10,6 +10,7 @@ import {
 	highlightThread, // openExistingThread, newChat
 	setMessages, // newChat, openExistingThread
 	addMessage, // userInputSubmit
+	deleteMessages, // deleteThreadThunk
 	// whatever would be used for onScroll?
 } from '../reducers/LLMChatPageSlice.js'
 
@@ -19,13 +20,12 @@ import {
 	initializeWorkflow,
 	openThreadWorkflow,
 } from '../../utils/workflows.js'
-
 import {
 	patchTemperature,
 	patchTypingSpeed,
 } from '../../utils/api.js'
-
-import { isOk } from '../../utils/result.js'
+import { isOk, handle, getError, getValue } from '../../utils/result.js'
+import { convertMessagesToGemini } from '../../utils/helpers.js'
 
 // TODO: Add API calls and other required actions to these thunks
 // TODO: Define what credentials mean
@@ -36,17 +36,18 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	const result = await initializeWorkflow({ credentials, threadIndex: 0 })
 	// 2. update threads and messages OR display an error when handling the result
 	if (!isOk(result)) {
-		// log it with console.log and the other method using the logging aspect or other means
-		console.error(result.error)
+		console.error(getError(result))
+		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'An initialization error occurred.' + getError(result) }))
 		return false
 	}
 	// otherwise, update userId, threads, messages
-	const { userID, threads, messages, temperature, typingSpeed } = result.ok
+	const { userID, threads, messages, temperature, typingSpeed } = getValue(result)
 	dispatch(setUserId(userID))
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
 	dispatch(setTemperature(temperature))
 	dispatch(setTypingSpeed(typingSpeed))
+	dispatch(setIsNewChat(threads.length === 0 || messages.length === 0))
 	return true
 }
 
@@ -57,12 +58,12 @@ export const newChat = () => dispatch => {
 	dispatch(setIsNewChat(true))
 }
 
-export const deleteThreadThunk = ({ userId, index, threadid }) => dispatch => {
+export const deleteThreadThunk = ({ userId, index, threadid = 0 }) => dispatch => {
 	dispatch(deleteThread(index))
-	console.log(`Implement thunk for delete thread: ${index} with userID: ${userId}, with threadid: ${threadid}`)
-	// DELETE requests using userId to delete a thread
-	// TODO: Change this to delete based on threadId instead of index
-	// possible highlighting logic upon deletion
+	dispatch(highlightThread(threadid))
+	dispatch(deleteMessages())
+	// TODO: DELETE requests using userId to delete a thread
+	dispatch(openExistingThread({ userId, index, threadid }))
 }
 
 export const temperatureUpdate = ({ userId, threadID, temperature }) => dispatch => {
@@ -78,24 +79,36 @@ export const typingSpeedUpdate = ({ userId, threadID, typingSpeed }) => dispatch
 // TODO: Log in thunk
 // TODO: Log out thunk
 
-export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, messageId, nextThreadIndex }) => async (dispatch) => {
-	console.log('implement userInputSubmit thunk')
+export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, updatedThreadId, messageId, nextThreadIndex, chatHistory }) => async (dispatch) => {
+	const userMessage = { MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user' }
+	const processedNewChatHistory = convertMessagesToGemini([userMessage, ...chatHistory]).toReversed()
+
+	const updateMessagesWithAIResponse = async (processedThreadId) => {
+		const result = await dialogueWorkflow({ userId, chatHistory: processedNewChatHistory, threadId: processedThreadId, userText: userMessage.Text })
+		if (chatHistory?.[0]?.error) dispatch(setMessages(chatHistory.slice(1, chatHistory.length))) // if we have an error displayed, remove it before proceeding
+		handle(result,
+			val => {
+				dispatch(addMessage(userMessage)) // user message reducer		
+				dispatch(addMessage({ MessageID: messageId + 1, ThreadID: processedThreadId, Text: val.LLMResponse, TimeStamp: new Date().toISOString(), SentByUser: 'model' }))
+				dispatch(setUserInput(''))
+			},
+			err => {
+				console.error(err)
+				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: err }))
+			}
+		)
+	}
+	const updateTitleWithAIResponse = async () => {
+		//const titleResult = await titleWorkflow()
+		// ok => dispatch(addThread( ... ))
+		// error => console.error(error)
+	}
 	if (!isNewChat) {
-		dispatch(addMessage({ user: 0, text: userInput, messageId })) // user message reducer
-		console.log('addMessage dispatched')
-		const result = await dialogueWorkflow({ userId, userInput, threadId })
-		// ok => dispatch(addMessage({ user: 1, text: LLMResponse, messageId: messageId + 1 }))
-		// error => console.error(error) 
+		await updateMessagesWithAIResponse(threadId)
 		return
 	}
-	const titleResult = await titleWorkflow()
-	// ok => dispatch(addThread( ... ))
-	// error => console.error(error)
-
-	dispatch(addMessage({ user: 0, text: userInput, messageId })) // user message reducer
-	const dialogueResult = await dialogueWorkflow({ userId, userInput, threadId })
-	// ok => dispatch(addMessage({ user: 1, text: LLMResponse, messageId: messageId + 1 }))
-	// error => console.error(error)
+	await updateTitleWithAIResponse(updatedThreadId)
+	//await updateMessagesWithAIResponse()
 
 	dispatch(setIsNewChat(false))
 	dispatch(setThreadIndex(nextThreadIndex))
@@ -107,10 +120,11 @@ export const openExistingThread = ({ userId, index, threadid }) => async (dispat
 	dispatch(setUserInput(''))
 	const result = await openThreadWorkflow({ userId, threadid })
 	if (!isOk(result)) {
-		console.error('Failed to open existing thread\n' + result.error)
+		console.error('Failed to open existing thread.\n' + getError(result))
+		dispatch(addMessage({ MessageID: -1, ThreadID: threadid, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Failed to open existing thread.\n' + getError(result) }))
 		return
 	}
-	const { threads, messages, temperature, typingSpeed } = result.ok
+	const { threads, messages, temperature, typingSpeed } = getValue(result)
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
 	dispatch(setTemperature(temperature))

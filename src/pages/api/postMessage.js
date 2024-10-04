@@ -4,14 +4,12 @@ import { tryCatchAsyncPlain } from '../../utils/result'
 // Serverless function handler
 export const handler = async (req, res) => {
 	const { threadID, userID, text, sentByUser } = req.body
-
 	if ((!threadID && threadID !== 0) ||
 		(!userID && userID !== 0) ||
 		(!text && text !== '') ||
 		sentByUser === undefined) {
-		return res.status(400).json({ error: 'threadID, userID, text, and sentByUser are required parameters.' });
+		return res.status(400).json({ error: 'threadID, userID, text, and sentByUser are required parameters.' })
 	}
-
 	const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
 		const query = `

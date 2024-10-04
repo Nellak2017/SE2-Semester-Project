@@ -1,15 +1,28 @@
-import { getThreads, getMessages, getTemperature, getTypingSpeed } from './api'
-import { isOk, err, ok, handle } from './result'
+import { getThreads, getMessages, getTemperature, getTypingSpeed, addMessage, addMessageAndResponse } from './api'
+import { isOk, err, ok, getError } from './result'
 import { highlightThread } from './helpers'
+import { generatePalmMessage } from './palmApi'
 
 // This file contains combinations of API endpoints called in sequence
 
 // --- Sequential API convienience functions
 
 // Side-effects: Post user message, Get LLM response, Post LLM message
-// Input/Output: ({ userId, userInput, threadId }) => <Result> of { ok: { userMessage, LLMResponse } | '', error: string | '' }
-export const dialogueWorkflow = async ({ userId, userInput, threadId }) => {
+// Input/Output: ({ userId, chatHistory, threadId }) => <Result> of { ok: { userMessage, LLMResponse } | '', error: string | '' }
+export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText }) => {
+	// 1. Get AI response
+	const LLMResult = await generatePalmMessage({ contents: chatHistory })
+	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Response. Please try again. \n' + getError(LLMResult))
+	const { parts, role } = LLMResult?.ok?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
+	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
+	const AIText = parts[0].text
 
+	// 2. Update Database with user and AI messages
+	const messagesResult = await addMessageAndResponse({ userID: userId, threadID: threadId, userText, AIText })
+	if (!isOk(messagesResult)) return err('Failed to update the database with the user and LLM messages.\n' + getError(messagesResult))
+
+	// 3. If all ok, then return ok({userMessage, LLMResponse})
+	return ok({ userMessage: userText, LLMResponse: AIText })
 }
 
 // Side-effects: Get LLM chat title based on user message, Post that chat title for thread name

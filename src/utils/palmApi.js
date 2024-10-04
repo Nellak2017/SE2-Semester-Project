@@ -7,8 +7,9 @@ dotenv.config()
 
 const API_KEY = process.env.NEXT_PUBLIC_PALM_API_KEY
 const headers = { 'Content-Type': 'application/json' }
-const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`
+const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-002:generateContent?key=${API_KEY}`
 
+// TODO: Make a model drop down component that lets you choose any of the available models
 export async function generatePalmMessage({
 	contents = [], temperature = .5, candidateCount = 1, topK = 40, topP = .95
 }) {

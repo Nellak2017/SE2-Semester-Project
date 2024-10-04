@@ -22,6 +22,6 @@ export const SX_SLIDER = {
 }
 export const USER_LOGOS = {
 	'user': <FaRegUserCircle />,
-	'model': <FaInstalod />,
+	'model': <FaInstalod />, 
 }
 export const SLIDER_LENGTH = 100

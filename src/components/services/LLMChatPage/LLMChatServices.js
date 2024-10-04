@@ -62,8 +62,8 @@ export const createLLMPageServices = store => {
 				userInputChange: (userInput) => {
 					dispatch(setUserInput(userInput))
 				}, // reducer
-				userInputSubmit: ({ userId, userInput, isNewChat, threadId, messageId, threads }) => {
-					dispatch(userInputSubmit({ userId, userInput, isNewChat, threadId, messageId, threads }))
+				userInputSubmit: ({ userId, userInput, isNewChat, threadId, updatedThreadId, messageId, nextThreadIndex, threads, chatHistory }) => {
+					dispatch(userInputSubmit({ userId, userInput, isNewChat, threadId, updatedThreadId, messageId, nextThreadIndex, threads, chatHistory }))
 				}, // thunk
 				// OnBlur: not defined
 			},

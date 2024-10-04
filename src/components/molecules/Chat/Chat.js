@@ -22,7 +22,7 @@ const TypingSimulationComponent = ({ error, typingSpeed, user, text = '' }) => !
 	: undefined
 
 const ErrorComponent = ({ error }) => error
-	? (<ErrorContainer><ErrorMessage message={error} /></ErrorContainer>)
+	? (<ErrorMessage message={error} />) 
 	: undefined
 
 export default function Chat({ state, ...props }) {
