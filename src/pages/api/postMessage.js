@@ -17,7 +17,7 @@ export const handler = async (req, res) => {
 			VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?);
     	`
 		await db.query(query, [threadID, userID, text, sentByUser])
-		res.status(200).json({ success: true })
+		res.status(200).json({ message: 'Message added successfully.' })
 	}, e => res.status(500).json({ error: e.message }))
 
 	return result 

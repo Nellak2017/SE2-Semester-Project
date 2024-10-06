@@ -11,6 +11,7 @@ import {
 	setMessages, // newChat, openExistingThread
 	addMessage, // userInputSubmit
 	deleteMessages, // deleteThreadThunk
+	addThread, // userInputSubmit
 	// whatever would be used for onScroll?
 } from '../reducers/LLMChatPageSlice.js'
 
@@ -23,12 +24,15 @@ import {
 import {
 	patchTemperature,
 	patchTypingSpeed,
+	deleteThread as deleteThreadAPI
 } from '../../utils/api.js'
 import { isOk, handle, getError, getValue } from '../../utils/result.js'
 import { convertMessagesToGemini } from '../../utils/helpers.js'
 
 // TODO: Add API calls and other required actions to these thunks
 // TODO: Define what credentials mean
+
+// TODO: Make every error generic in production. Sometimes database structure can be leaked!
 
 // initialize LLMChatPage (used in Login/Signup), returns boolean to indicate if successful updating userId, threads, and messages
 export const initialize = ({ credentials }) => async (dispatch) => {
@@ -58,12 +62,17 @@ export const newChat = () => dispatch => {
 	dispatch(setIsNewChat(true))
 }
 
-export const deleteThreadThunk = ({ userId, index, threadid = 0 }) => dispatch => {
+export const deleteThreadThunk = ({ userId, index, threadid = 0 }) => async (dispatch) => {
 	dispatch(deleteThread(index))
-	dispatch(highlightThread(threadid))
 	dispatch(deleteMessages())
-	// TODO: DELETE requests using userId to delete a thread
-	dispatch(openExistingThread({ userId, index, threadid }))
+	dispatch(highlightThread(-1))
+	const deleteResult = await deleteThreadAPI({ userID: userId, threadID: threadid })
+	handle(deleteResult,
+		_ => dispatch(openExistingThread({ userId, index, threadid, isNewChat: true })),
+		err => {
+			console.error('Error deleting.\n' + err)
+		},
+	)
 }
 
 export const temperatureUpdate = ({ userId, threadID, temperature }) => dispatch => {
@@ -97,26 +106,40 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: err }))
 			}
 		)
+		return result
 	}
 	const updateTitleWithAIResponse = async () => {
-		//const titleResult = await titleWorkflow()
-		// ok => dispatch(addThread( ... ))
-		// error => console.error(error)
+		const result = await titleWorkflow({ userId, userInput })
+		if (chatHistory?.[0]?.error) dispatch(setMessages(chatHistory.slice(1, chatHistory.length))) // if we have an error displayed, remove it before proceeding
+		handle(result,
+			val => {
+				dispatch(addThread({ ThreadID: val.newThreadID, Name: val.LLMResponse, Temperature: 50, TypingSpeed: 50, UserID: userId, highlighted: true }))
+			},
+			err => {
+				console.error(err)
+				dispatch(addThread({ ThreadID: updatedThreadId, Name: 'New Chat', Temperature: 50, TypingSpeed: 50, UserID: userId, highlighted: true }))
+				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: err }))
+			}
+		)
+		return result
 	}
 	if (!isNewChat) {
 		await updateMessagesWithAIResponse(threadId)
 		return
 	}
-	await updateTitleWithAIResponse(updatedThreadId)
-	//await updateMessagesWithAIResponse()
+	const titleResult = await updateTitleWithAIResponse() // Result of { newThreadID, LLMResponse }
+	if (!isOk(titleResult)) return
+	const { newThreadID } = getValue(titleResult)
+	const messagesResult = await updateMessagesWithAIResponse(newThreadID)
+	if (!isOk(messagesResult)) return
 
 	dispatch(setIsNewChat(false))
 	dispatch(setThreadIndex(nextThreadIndex))
 }
 
-export const openExistingThread = ({ userId, index, threadid }) => async (dispatch) => {
+export const openExistingThread = ({ userId, index, threadid, isNewChat = false }) => async (dispatch) => {
 	dispatch(setThreadIndex(index))
-	dispatch(setIsNewChat(false))
+	dispatch(setIsNewChat(isNewChat)) // if deleting it should be true, if otherwise it should be false
 	dispatch(setUserInput(''))
 	const result = await openThreadWorkflow({ userId, threadid })
 	if (!isOk(result)) {

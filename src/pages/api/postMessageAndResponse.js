@@ -25,7 +25,7 @@ export const handler = async (req, res) => {
 			if (!LLMMessageResult || LLMMessageResult.affectedRows === 0) throw new Error('The transaction failed because it could not insert the AI message.')
 
 			await db.query('COMMIT')
-			return res.status(200).json({ ok: { userMessage: userText, LLMResponse: AIText } })
+			return res.status(200).json({ userMessage: userText, LLMResponse: AIText })
 		} catch (e) {
 			await db.query('ROLLBACK')
 			return res.status(500).json({ error: e.message })
