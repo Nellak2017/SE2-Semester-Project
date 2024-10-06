@@ -12,14 +12,14 @@ import { generatePalmMessage } from './palmApi'
 export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText }) => {
 	// 1. Get AI response
 	const LLMResult = await generatePalmMessage({ contents: chatHistory })
-	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Response. Please try again. \n' + getError(LLMResult))
+	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Response. Please try again.')
 	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
 	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
 	const AIText = parts[0].text
 
 	// 2. Update Database with user and AI messages
 	const messagesResult = await addMessageAndResponse({ userID: userId, threadID: threadId, userText, AIText })
-	if (!isOk(messagesResult)) return err('Failed to update the database with the user and LLM messages.\n' + getError(messagesResult))
+	if (!isOk(messagesResult)) return err('Failed to update the database with the user and LLM messages.')
 
 	// 3. If all ok, then return ok({userMessage, LLMResponse})
 	return ok({ userMessage: userText, LLMResponse: AIText })
@@ -32,14 +32,14 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 	const text = `Using this supplied user input create a LLM Chat title that is between 2 and 5 words long. Your response must only be those words.\n"${userInput}"`
 	const contents = [{ role: 'user', parts: [{ text }] }]
 	const LLMResult = await generatePalmMessage({ contents })
-	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Title. Using Default. \n' + getError(LLMResult))
+	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Title. Using Default.')
 	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
 	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
 	const AIText = parts[0].text
 
 	// 2. Update Database with title
 	const titleResult = await postThread({ userID: userId, threadName: AIText.slice(0, 99).trim() })
-	if (!isOk(titleResult)) return err('Could not make thread title updated in the database.\n' + getError(titleResult))
+	if (!isOk(titleResult)) return err('Could not make thread title updated in the database.')
 
 	const { newThreadID } = getValue(titleResult) // { message , newThreadID: int }
 	// TODO: Address the unique thread name oversight where if duplicate name exists then some other one will be used to make it unique

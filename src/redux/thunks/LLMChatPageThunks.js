@@ -29,9 +29,7 @@ import {
 import { isOk, handle, getError, getValue } from '../../utils/result.js'
 import { convertMessagesToGemini } from '../../utils/helpers.js'
 
-// TODO: Add API calls and other required actions to these thunks
 // TODO: Define what credentials mean
-
 // TODO: Make every error generic in production. Sometimes database structure can be leaked!
 
 // initialize LLMChatPage (used in Login/Signup), returns boolean to indicate if successful updating userId, threads, and messages
@@ -41,7 +39,7 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	// 2. update threads and messages OR display an error when handling the result
 	if (!isOk(result)) {
 		console.error(getError(result))
-		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'An initialization error occurred.' + getError(result) }))
+		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'An initialization error occurred.'}))
 		return false
 	}
 	// otherwise, update userId, threads, messages
@@ -69,8 +67,8 @@ export const deleteThreadThunk = ({ userId, index, threadid = 0 }) => async (dis
 	const deleteResult = await deleteThreadAPI({ userID: userId, threadID: threadid })
 	handle(deleteResult,
 		_ => dispatch(openExistingThread({ userId, index, threadid, isNewChat: true })),
-		err => {
-			console.error('Error deleting.\n' + err)
+		_ => {
+			console.error('Error deleting.')
 		},
 	)
 }
@@ -101,9 +99,9 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 				dispatch(addMessage({ MessageID: messageId + 1, ThreadID: processedThreadId, Text: val.LLMResponse, TimeStamp: new Date().toISOString(), SentByUser: 'model' }))
 				dispatch(setUserInput(''))
 			},
-			err => {
-				console.error(err)
-				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: err }))
+			_ => {
+				console.error('Could not update messages with AI response.')
+				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Could not update messages with AI response.' }))
 			}
 		)
 		return result
@@ -115,10 +113,10 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 			val => {
 				dispatch(addThread({ ThreadID: val.newThreadID, Name: val.LLMResponse, Temperature: 50, TypingSpeed: 50, UserID: userId, highlighted: true }))
 			},
-			err => {
-				console.error(err)
+			_ => {
+				console.error('Could not update title.')
 				dispatch(addThread({ ThreadID: updatedThreadId, Name: 'New Chat', Temperature: 50, TypingSpeed: 50, UserID: userId, highlighted: true }))
-				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: err }))
+				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Could not update title.' }))
 			}
 		)
 		return result
@@ -143,8 +141,8 @@ export const openExistingThread = ({ userId, index, threadid, isNewChat = false 
 	dispatch(setUserInput(''))
 	const result = await openThreadWorkflow({ userId, threadid })
 	if (!isOk(result)) {
-		console.error('Failed to open existing thread.\n' + getError(result))
-		dispatch(addMessage({ MessageID: -1, ThreadID: threadid, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Failed to open existing thread.\n' + getError(result) }))
+		console.error('Failed to open existing thread.')
+		dispatch(addMessage({ MessageID: -1, ThreadID: threadid, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Failed to open existing thread.' }))
 		return
 	}
 	const { threads, messages, temperature, typingSpeed } = getValue(result)
