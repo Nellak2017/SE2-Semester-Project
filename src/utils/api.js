@@ -42,6 +42,15 @@ export const getTypingSpeed = async ({ userID, threadID }) => {
   return result
 }
 
+// GET If Thread by Name exists - Function to get if a Thread exists for a given user
+export const getThreadNameExists = async ({ userID, threadName }) => {
+  const result = await tryCatchAsync(async () => {
+    const res = await axios.get('/api/getIsThreadNameExist', { params: { userID, threadName } })
+    return res?.data
+  }, e => e?.response?.data?.error || e?.message)
+  return result
+}
+
 // POST Message - Function to post Messsage for the user and thread that is currently active AND return a value
 export const addMessage = async ({ text, userID, threadID, sentByUser = 'user' }) => {
   const result = await tryCatchAsync(async () => {

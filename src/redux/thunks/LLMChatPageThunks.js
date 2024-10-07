@@ -58,6 +58,8 @@ export const newChat = () => dispatch => {
 	dispatch(setThreadIndex(0))
 	dispatch(setMessages([]))
 	dispatch(setIsNewChat(true))
+	dispatch(setTemperature(50))
+	dispatch(setTypingSpeed(50))
 }
 
 export const deleteThreadThunk = ({ userId, index, threadid = 0 }) => async (dispatch) => {

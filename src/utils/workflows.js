@@ -1,4 +1,4 @@
-import { getThreads, getMessages, getTemperature, getTypingSpeed, addMessage, addMessageAndResponse, postThread } from './api'
+import { getThreads, getMessages, getTemperature, getTypingSpeed, addMessage, addMessageAndResponse, postThread, getThreadNameExists } from './api'
 import { isOk, err, ok, getError, getValue } from './result'
 import { highlightThread } from './helpers'
 import { generatePalmMessage } from './palmApi'
@@ -16,6 +16,8 @@ export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText
 	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
 	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
 	const AIText = parts[0].text
+
+	// TODO: Address the messages edge case where the context window is too large
 
 	// 2. Update Database with user and AI messages
 	const messagesResult = await addMessageAndResponse({ userID: userId, threadID: threadId, userText, AIText })
@@ -37,15 +39,15 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
 	const AIText = parts[0].text
 
-	// 2. Update Database with title
-	const titleResult = await postThread({ userID: userId, threadName: AIText.slice(0, 99).trim() })
+	// 2. Update Database with unique title
+	const AIBaseText = AIText.slice(0, 50).trim()
+	const threadExistsResult = await getThreadNameExists({ userID: userId, threadName: AIBaseText })
+	if (!isOk(threadExistsResult)) return err('Could not verify if the thread existed already or not. New thread was not added.')
+	const threadAlreadyExists = getValue(threadExistsResult)?.exists
+	const titleResult = await postThread({ userID: userId, threadName: threadAlreadyExists ? AIBaseText + (new Date().toISOString()) : AIBaseText }) // the date string is used to guaranteee uniqueness
 	if (!isOk(titleResult)) return err('Could not make thread title updated in the database.')
 
 	const { newThreadID } = getValue(titleResult) // { message , newThreadID: int }
-	// TODO: Address the unique thread name oversight where if duplicate name exists then some other one will be used to make it unique
-	// hydration-error-info.js:67 Could not make thread title updated in the database.
-	// Duplicate entry 'Google Gemini-1' for key 'Threads.unique_name_per_user'
-	// ---> Append the newThreadID if the title exists in the database for that user already, the threadID is guaranteed to be unique by definition
 	// TODO: Address thread length edge case, limit threads to 10 for each user
 	return ok({ LLMResponse: AIText, newThreadID })
 }
