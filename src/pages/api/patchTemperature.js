@@ -16,7 +16,7 @@ export const handler = async (req, res) => {
     	`
 		await db.query(query, [newTemperature, threadID])
 		res.status(200).json({ message: 'Temperature updated successfully.' })
-	}, e => res.status(500).json({ error: e.message }))
+	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result
 }

@@ -1,5 +1,5 @@
-import { getThreads, getMessages, getTemperature, getTypingSpeed, addMessage, addMessageAndResponse, postThread, getThreadNameExists } from './api'
-import { isOk, err, ok, getError, getValue } from './result'
+import { getThreads, getMessages, getTemperature, getTypingSpeed, addMessageAndResponse, postThread, getThreadNameExists } from './api'
+import { isOk, err, ok, getValue, getError } from './result'
 import { highlightThread } from './helpers'
 import { generatePalmMessage } from './palmApi'
 
@@ -12,7 +12,7 @@ import { generatePalmMessage } from './palmApi'
 export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText }) => {
 	// 1. Get AI response
 	const LLMResult = await generatePalmMessage({ contents: chatHistory })
-	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Response. Please try again.')
+	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Response. Please try again.\n' + getError(LLMResult))
 	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
 	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
 	const AIText = parts[0].text
@@ -21,7 +21,7 @@ export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText
 
 	// 2. Update Database with user and AI messages
 	const messagesResult = await addMessageAndResponse({ userID: userId, threadID: threadId, userText, AIText })
-	if (!isOk(messagesResult)) return err('Failed to update the database with the user and LLM messages.')
+	if (!isOk(messagesResult)) return err('Failed to update the database with the user and LLM messages.\n' + getError(messagesResult))
 
 	// 3. If all ok, then return ok({userMessage, LLMResponse})
 	return ok({ userMessage: userText, LLMResponse: AIText })
@@ -31,10 +31,10 @@ export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText
 // Input/Output: ({ userInput }) => <Result> of { ok: { LLMResponse, newThreadID } | '', error: string | ''} 
 export const titleWorkflow = async ({ userId, userInput }) => {
 	// 1. Get AI Response for title
-	const text = `Using this supplied user input create a LLM Chat title that is between 2 and 5 words long. Your response must only be those words.\n"${userInput}"`
+	const text = `Using this supplied user input create a LLM Chat title that is between 2 and 5 words long. Your response must only be those words.\n---User Input\n"${userInput}"`
 	const contents = [{ role: 'user', parts: [{ text }] }]
 	const LLMResult = await generatePalmMessage({ contents })
-	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Title. Using Default.')
+	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Title. Using Default.\n' + getError(LLMResult))
 	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
 	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
 	const AIText = parts[0].text
@@ -42,10 +42,10 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 	// 2. Update Database with unique title
 	const AIBaseText = AIText.slice(0, 50).trim()
 	const threadExistsResult = await getThreadNameExists({ userID: userId, threadName: AIBaseText })
-	if (!isOk(threadExistsResult)) return err('Could not verify if the thread existed already or not. New thread was not added.')
+	if (!isOk(threadExistsResult)) return err('Could not verify if the thread existed already or not. New thread was not added.\n' + getError(threadExistsResult))
 	const threadAlreadyExists = getValue(threadExistsResult)?.exists
 	const titleResult = await postThread({ userID: userId, threadName: threadAlreadyExists ? AIBaseText + (new Date().toISOString()) : AIBaseText }) // the date string is used to guaranteee uniqueness
-	if (!isOk(titleResult)) return err('Could not make thread title updated in the database.')
+	if (!isOk(titleResult)) return err('Could not update thread title in the database.\n' + getError(titleResult))
 
 	const { newThreadID } = getValue(titleResult) // { message , newThreadID: int }
 	// TODO: Address thread length edge case, limit threads to 10 for each user
@@ -63,24 +63,24 @@ export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 
 	// 1. fetch threads ({ userID })
 	const threadsResult = await getThreads({ userID })
-	if (!isOk(threadsResult)) return err('Could not fetch threads when initializing.')
+	if (!isOk(threadsResult)) return err('Could not fetch threads when initializing.\n' + getError(threadsResult))
 	const threads = highlightThread(getValue(threadsResult), threadIndex)
 	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
 	const threadID = threads?.[processedIndex]?.ThreadID
 
 	// 2. fetch messages for threadIndex'th thread's threadId ({ userID, threadID = okResponse?.[0]?.ThreadID })
 	const messagesResult = await getMessages({ userID, threadID })
-	if (!isOk(messagesResult)) return err('Could not fetch messages when initializing.')
+	if (!isOk(messagesResult)) return err('Could not fetch messages when initializing.\n' + getError(messagesResult))
 	const messages = getValue(messagesResult)
 
 	// 3. fetch temperature
 	const temperatureResult = await getTemperature({ userID, threadID })
-	if (!isOk(temperatureResult)) return err('Could not fetch temperature when initializing.')
+	if (!isOk(temperatureResult)) return err('Could not fetch temperature when initializing.\n' + getError(temperatureResult))
 	const temperature = getValue(temperatureResult)[0]?.Temperature
 
 	// 4. fetch typing speed
 	const typingSpeedResult = await getTypingSpeed({ userID, threadID })
-	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.')
+	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.\n' + getError(typingSpeedResult))
 	const typingSpeed = getValue(typingSpeedResult)[0]?.TypingSpeed
 
 	// 5. return ok({ userId, threads, messages, temperature, typingSpeed }) if both are ok
@@ -93,22 +93,22 @@ export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 export const openThreadWorkflow = async ({ userId, threadid }) => {
 	// 1. Get threads
 	const threadsResult = await getThreads({ userID: userId })
-	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.')
+	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.\n' + getError(threadsResult))
 	const threads = getValue(threadsResult)
 
 	// 2. Get messages
 	const messagesResult = await getMessages({ userID: userId, threadID: threadid })
-	if (!isOk(messagesResult)) return err('Could not fetch messages when opening existing thread.')
+	if (!isOk(messagesResult)) return err('Could not fetch messages when opening existing thread.\n' + getError(messagesResult))
 	const messages = getValue(messagesResult)
 
 	// 3. Get temperature
 	const temperatureResult = await getTemperature({ userID: userId, threadID: threadid })
-	if (!isOk(temperatureResult)) return err('Could not fetch temperature when opening existing thread.')
+	if (!isOk(temperatureResult)) return err('Could not fetch temperature when opening existing thread.\n' + getError(temperatureResult))
 	const temperature = getValue(temperatureResult)[0]?.Temperature
 
 	// 4. Get typing speed
 	const typingSpeedResult = await getTypingSpeed({ userID: userId, threadID: threadid })
-	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.')
+	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.\n' + getError(typingSpeedResult))
 	const typingSpeed = getValue(typingSpeedResult)[0]?.TypingSpeed
 
 	// 5. return result

@@ -24,7 +24,7 @@ export const handler = async (req, res) => {
 			? res.status(200).json({ exists: true })
 			: res.status(200).json({ exists: false })
 
-	}, e => res.status(500).json({ error: e.message }))
+	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result
 }

@@ -15,7 +15,7 @@ export const handler = async (req, res) => {
 			`
 		const result = await db.query(query, [userID, threadID])
 		return res.status(200).json(result[0])
-	}, e => res.status(500).json({ error: e.message }))
+	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result
 }

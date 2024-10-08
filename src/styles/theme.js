@@ -550,10 +550,8 @@ const containerSizePreset = {
 export const outlineButtonPreSets = {
   variant: {
     light: css`
-      // TODO: Add Light theme here for the Outline Button
     `,
     dark: css`
-      // TODO: Add Dark theme here for the Outline Button
     `
   },
   size: {

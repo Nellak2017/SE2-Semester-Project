@@ -10,14 +10,16 @@ export const handler = async (req, res) => {
 
 	const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
+		// 1. If existing threads less than or equal to 10, get them 
 		const query = `
 			SELECT Threads.*
 			FROM Threads
-			WHERE Threads.UserID = ?;
+			WHERE Threads.UserID = ?
+			LIMIT 10;
 			`
 		const result = await db.query(query, [userID])
 		return res.status(200).json(result[0])
-	}, e => res.status(500).json({ error: e.message }))
+	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result
 }

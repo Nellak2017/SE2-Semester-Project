@@ -100,6 +100,7 @@ export const requestAndUpdate = async ({ args, transformer = res => res, operati
 }
 
 // Generalized Operation then Fetch/Update
+// TODO: Remove useless helpers
 // TODO: Look closer into the return type for this and the rest of the operationAndUpdate users
 // input => [result value, updated]
 export const operationAndUpdate = async ({ operationArgs, fetchArgs, operation, fetch, type = 'message', errorMessage = 'Error adding', setter = (_) => { } }) => {

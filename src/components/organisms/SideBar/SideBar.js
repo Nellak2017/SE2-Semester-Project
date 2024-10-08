@@ -13,7 +13,6 @@ import Slider from '@mui/material/Slider'
 import { handleExportButtonClick } from "../../../utils/helpers.js"
 import { VARIANTS, SX_SLIDER, SLIDER_LENGTH } from '../../utils/constants.js'
 
-// TODO: Potentially add temperature sliders OR other thing like link to settings page
 export default function SideBar({ state, services, ...props }) {
 	const {
 		variant = VARIANTS.dark,

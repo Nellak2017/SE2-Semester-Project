@@ -28,10 +28,10 @@ export const handler = async (req, res) => {
 			return res.status(200).json({ userMessage: userText, LLMResponse: AIText })
 		} catch (e) {
 			await db.query('ROLLBACK')
-			return res.status(500).json({ error: e.message })
+			return res.status(500).json({ error: 'Messages rolled back, failed to insert User and AI messages.' }) // e.message
 		}
 
-	}, e => res.status(500).json({ error: e.message }))
+	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result
 }

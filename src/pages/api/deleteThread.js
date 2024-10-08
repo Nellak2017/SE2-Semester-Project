@@ -16,9 +16,9 @@ export const handler = async (req, res) => {
     } catch (e) {
       // Rollback the transaction in case of an error
       await db.query('ROLLBACK')
-      res.status(500).json({ error: e.message })
+      res.status(500).json({ error: 'Delete did not go through due to an Internal Server Error.' }) // e.message
     }
-  }, e => res.status(500).json({ error: e.message }))
+  }, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
   return result
 }
