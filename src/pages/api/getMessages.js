@@ -8,6 +8,7 @@ export const handler = async (req, res) => {
 
 	const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
+		// 1. If existing messages less than or equal to 150, get them
 		const query = `
 			SELECT Messages.* 
 			FROM Messages 
@@ -15,7 +16,8 @@ export const handler = async (req, res) => {
 			JOIN Threads ON Messages.ThreadID = Threads.ThreadID 
 			WHERE Users.UserID = ? 
 			AND Threads.ThreadID = ?
-			ORDER BY Messages.MessageID DESC;
+			ORDER BY Messages.MessageID DESC
+			LIMIT 150;
 	  	` // GET messages operation with pagination and chronological order
 		const result = await db.query(query, [userID, threadID]) // maxNumber - minNumber + 1, minNumber
 		res.status(200).json(result[0])

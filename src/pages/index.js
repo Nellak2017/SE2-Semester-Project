@@ -7,7 +7,6 @@ import store from '../redux/store.js'
 import { useSelector } from 'react-redux'
 import { initialize } from '../redux/thunks/LLMChatPageThunks.js'
 
-// TODO: When error, use error component
 export const Home = () => {
 
   // --- Initial State Loaded in from DB. Update userId, fetch threads, fetch messages for 0th thread

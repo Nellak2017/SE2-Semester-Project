@@ -9,6 +9,19 @@ export const handler = async (req, res) => {
 
 	const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
+
+		// 1. Check if the messages is below the message limit and if it isn't, return an error
+		// Check the number of messages for the user in the given thread
+        const countQuery = `
+            SELECT COUNT(*) AS messageCount
+            FROM Messages
+            WHERE ThreadID = ? AND UserID = ?;
+        `
+        const countResult = await db.query(countQuery, [threadID, userID])
+        const messageCount = countResult[0][0].messageCount
+        if (messageCount >= 150) return res.status(403).json({ error: 'User has reached the maximum limit of 150 messages in this thread.' })
+
+		// 2. Do message posting transaction
 		await db.query('START TRANSACTION')
 
 		try {

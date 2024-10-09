@@ -4,8 +4,7 @@ import {
 } from './helpers.js'
 
 // --- Error Aspects with default functions
-// Error Aspects are abbreviated to 'EA'
-// Error Aspect bindings are abbreviated to 'EAB'
+// Error Aspects are abbreviated to 'EA', Error Aspect bindings are abbreviated to 'EAB'
 
 // ex: highlightThreadEA()(threadList)
 const highlightThreadEA = (fn = highlightThread) => (threadList, index = 0) => {

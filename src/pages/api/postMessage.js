@@ -12,6 +12,17 @@ export const handler = async (req, res) => {
 	}
 	const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
+		// 1. Check number of messages for user and given thread
+		const countQuery = `
+			SELECT COUNT(*) AS messageCount
+			FROM Messages
+			WHERE ThreadID = ? AND UserID = ?;
+		`
+		const countResult = await db.query(countQuery, [threadID, userID])
+		const messageCount = countResult[0][0].messageCount
+		if (messageCount >= 150) return res.status(403).json({ error: 'User has reached the maximum limit of 150 threads.' })
+
+		// 2. If the number of messages is less than the limit, then POST
 		const query = `
 			INSERT INTO Messages (ThreadID, UserID, Text, Timestamp, SentByUser) 
 			VALUES (?, ?, ?, CURRENT_TIMESTAMP, ?);
