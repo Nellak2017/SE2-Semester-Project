@@ -1,42 +1,14 @@
-const elevations = [
-  '0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12)',
-  '0px 1px 8px 0px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 3px 3px -2px rgba(0, 0, 0, 0.12)',
-  '0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12)',
-  '0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12)',
-  '0px 7px 8px -4px rgba(0, 0, 0, 0.2), 0px 12px 17px 2px rgba(0, 0, 0, 0.14), 0px 5px 22px 4px rgba(0, 0, 0, 0.12)']
-elevations.extraSmall = elevations[0] // 1dp : elements closest to application background, like cards
-elevations.small = elevations[1] // 3dp : tooltips, banners, elevated buttons, FAB
-elevations.medium = elevations[2] // 6dp : contextual overlays for components, Menu, Dropdown, Nav bar
-elevations.large = elevations[3] // 8dp : element that rise above most, like dialouges, time picker, search bar
-elevations.extraLarge = elevations[4] // 12dp : elements highest in stacking order, like notifications
-
-const insets = ['1px 1px 5px rgba(1, 1, 0, 0.7) inset']
-insets.normal = insets[0] // completely guessed
-
-// see also: https://zaat.dev/blog/building-a-design-system-in-react-with-styled-components/
-const fontSizes = ['10px', '12px', '14px', '16px', '24px', '40px', '64px']
-fontSizes.extraSmall = fontSizes[0]
-fontSizes.smaller = fontSizes[1]
-fontSizes.small = fontSizes[2]
-fontSizes.medium = fontSizes[3]
-fontSizes.large = fontSizes[4]
-fontSizes.larger = fontSizes[5]
-fontSizes.extraLarge = fontSizes[6]
-
-const breakpoints = ['320px', '425px', '768px', '1024px', '1440px']
-breakpoints.xs = breakpoints[0] // small phones, portrait (320x653)
-breakpoints.sm = breakpoints[1] // large phones, portrait (425x915)
-breakpoints.md = breakpoints[2] // ipads, landscape (768x1180)
-breakpoints.lg = breakpoints[3] // laptops (1366x768)
-breakpoints.xl = breakpoints[4] // desktops (2560x1440)
-
-const spaces = ['4px', '8px', '16px', '32px', '48px', '56px']
-spaces.smaller = spaces[0]
-spaces.small = spaces[1]
-spaces.medium = spaces[2]
-spaces.large = spaces[3]
-spaces.larger = spaces[4]
-spaces.extraLarge = spaces[5]
+const elevations = {
+  extraSmall: '0px 1px 3px 0px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12)', // 1dp : elements closest to application background, like cards
+  small: '0px 1px 8px 0px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14), 0px 3px 3px -2px rgba(0, 0, 0, 0.12)', // 3dp : tooltips, banners, elevated buttons, FAB
+  medium: '0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14), 0px 1px 18px 0px rgba(0, 0, 0, 0.12)', // 6dp : contextual overlays for components, Menu, Dropdown, Nav bar
+  large: '0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12)', // 8dp : element that rise above most, like dialouges, time picker, search bar
+  extraLarge: '0px 7px 8px -4px rgba(0, 0, 0, 0.2), 0px 12px 17px 2px rgba(0, 0, 0, 0.14), 0px 5px 22px 4px rgba(0, 0, 0, 0.12)' // 12dp : elements highest in stacking order, like notifications
+}
+const insets = { normal: '1px 1px 5px rgba(1, 1, 0, 0.7) inset' }
+const fontSizes = { extraSmall: '10px', smaller: '12px', small: '14px', medium: '16px', large: '24px', larger: '40px', extraLarge: '64px' }
+const spaces = { smaller: '4px', small: '8px', medium: '16px', large: '32px', larger: '48px', extraLarge: '56px' }
+const breakpoints = { xs: '320px', sm: '425px', md: '768px', lg: '1024px', xl: '1440px' } // small phones, large phones, ipads, laptops, desktops
 
 export const getPresetCSS = (preSets, preSetProp) => props => preSets[preSetProp][props[preSetProp]]
 

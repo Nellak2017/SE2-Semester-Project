@@ -1,12 +1,35 @@
+// This file contains combinations of API endpoints called in sequence
 import { getThreads, getMessages, getTemperature, getTypingSpeed, addMessageAndResponse, postThread, getThreadNameExists } from './api'
 import { isOk, err, ok, getValue, getError } from './result'
 import { highlightThread } from './helpers'
 import { generatePalmMessage } from './palmApi'
 
-// This file contains combinations of API endpoints called in sequence
-// TODO: Increase abstraction level. Instead of if(err) return, do some kind of chain operation?
-// --- Sequential API convienience functions
+// --- Helpers
+const fetchThreadData = async ({ userID, threadID, threadIndex = -1 }) => {
+	const threadsResult = await getThreads({ userID })
+	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.\n' + getError(threadsResult))
+	const threads = highlightThread(getValue(threadsResult), threadIndex)
+	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
+	const processedThreadID = !threadID ? threads?.[processedIndex]?.ThreadID : threadID
 
+	const messagesResult = await getMessages({ userID, threadID: processedThreadID })
+	if (!isOk(messagesResult)) return err('Could not fetch messages.\n' + getError(messagesResult))
+	const messages = getValue(messagesResult)
+
+	const temperatureResult = await getTemperature({ userID, threadID: processedThreadID })
+	if (!isOk(temperatureResult)) return err('Could not fetch temperature.\n' + getError(temperatureResult))
+	const temperature = getValue(temperatureResult)[0]?.Temperature
+
+	const typingSpeedResult = await getTypingSpeed({ userID, threadID: processedThreadID })
+	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed.\n' + getError(typingSpeedResult))
+	const typingSpeed = getValue(typingSpeedResult)[0]?.TypingSpeed
+
+	return ok({ userID, threads, messages, temperature, typingSpeed })
+}
+
+// TODO: Increase abstraction level. Instead of if(err) return, do some kind of chain operation?
+
+// --- Sequential API convienience functions
 // Side-effects: Post user message, Get LLM response, Post LLM message
 // Input/Output: ({ userId, chatHistory, threadId, userText }) => <Result> of { ok: { userMessage, LLMResponse } | '', error: string | '' }
 export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText }) => {
@@ -54,60 +77,12 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 	// 0. get userId based on credentials
 	// if no credentials return err('No credentials provided.')
-	// TODO: get userId based on credentials
-	const userID = 1
+	const userID = 1 // TODO: get userId based on credentials
 	if (userID <= 0) return err('No userId found for the given credentials.')
-
-	// 1. fetch threads ({ userID })
-	const threadsResult = await getThreads({ userID })
-	if (!isOk(threadsResult)) return err('Could not fetch threads when initializing.\n' + getError(threadsResult))
-	const threads = highlightThread(getValue(threadsResult), threadIndex)
-	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
-	const threadID = threads?.[processedIndex]?.ThreadID
-
-	// 2. fetch messages for threadIndex'th thread's threadId ({ userID, threadID = okResponse?.[0]?.ThreadID })
-	const messagesResult = await getMessages({ userID, threadID })
-	if (!isOk(messagesResult)) return err('Could not fetch messages when initializing.\n' + getError(messagesResult))
-	const messages = getValue(messagesResult)
-
-	// 3. fetch temperature
-	const temperatureResult = await getTemperature({ userID, threadID })
-	if (!isOk(temperatureResult)) return err('Could not fetch temperature when initializing.\n' + getError(temperatureResult))
-	const temperature = getValue(temperatureResult)[0]?.Temperature
-
-	// 4. fetch typing speed
-	const typingSpeedResult = await getTypingSpeed({ userID, threadID })
-	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.\n' + getError(typingSpeedResult))
-	const typingSpeed = getValue(typingSpeedResult)[0]?.TypingSpeed
-
-	// 5. return ok({ userId, threads, messages, temperature, typingSpeed }) if both are ok
-	return ok({ userID, threads, messages, temperature, typingSpeed })
+	return fetchThreadData({ userID, threadID: undefined, threadIndex })
 }
 
 // TODO: See if you can stop repeating yourself in openThreadWorkflow, it is basically identical to initialize.
 // Side-effects: fetch threads, fetch messages for thread with threadId 
 // Input/Output: ({ userId, threadId }) => <Result> of { ok: { threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
-export const openThreadWorkflow = async ({ userId, threadid }) => {
-	// 1. Get threads
-	const threadsResult = await getThreads({ userID: userId })
-	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.\n' + getError(threadsResult))
-	const threads = getValue(threadsResult)
-
-	// 2. Get messages
-	const messagesResult = await getMessages({ userID: userId, threadID: threadid })
-	if (!isOk(messagesResult)) return err('Could not fetch messages when opening existing thread.\n' + getError(messagesResult))
-	const messages = getValue(messagesResult)
-
-	// 3. Get temperature
-	const temperatureResult = await getTemperature({ userID: userId, threadID: threadid })
-	if (!isOk(temperatureResult)) return err('Could not fetch temperature when opening existing thread.\n' + getError(temperatureResult))
-	const temperature = getValue(temperatureResult)[0]?.Temperature
-
-	// 4. Get typing speed
-	const typingSpeedResult = await getTypingSpeed({ userID: userId, threadID: threadid })
-	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed when initializing.\n' + getError(typingSpeedResult))
-	const typingSpeed = getValue(typingSpeedResult)[0]?.TypingSpeed
-
-	// 5. return result
-	return ok({ threads, messages, temperature, typingSpeed })
-}
+export const openThreadWorkflow = async ({ userId, threadid }) => fetchThreadData({ userID: userId, threadID: threadid })
