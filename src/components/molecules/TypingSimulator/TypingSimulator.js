@@ -17,19 +17,13 @@ const TypingSimulator = ({ message, typingSpeed }) => {
 		},
 		[message, calculateDelay] // Dependencies for the callback
 	)
-
 	useEffect(() => {
 		if (initialMount.current) {
 			typeCharacter(0)
 			initialMount.current = false
 		}
 	}, [message, typingSpeed, typeCharacter])
-
-	return (
-		<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>
-			{typedText}
-		</ReactMarkdown>
-	)
+	return (<ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>{typedText}</ReactMarkdown>)
 }
 
 export default TypingSimulator

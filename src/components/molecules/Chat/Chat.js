@@ -4,7 +4,6 @@ import {
 	MessageContainer,
 	LogoContainer,
 	Message,
-	ErrorContainer
 } from './Chat.elements.js'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from "remark-gfm"

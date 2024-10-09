@@ -29,8 +29,6 @@ import {
 import { isOk, handle, getError, getValue } from '../../utils/result.js'
 import { convertMessagesToGemini } from '../../utils/helpers.js'
 
-// TODO: Define what credentials mean
-
 // initialize LLMChatPage (used in Login/Signup), returns boolean to indicate if successful updating userId, threads, and messages
 export const initialize = ({ credentials }) => async (dispatch) => {
 	// 1. initializeWorkflow({ credentials, threadIndex:0 }) => <Result> of { ok: { userId, threads, messages } | '' , error: string | ''}

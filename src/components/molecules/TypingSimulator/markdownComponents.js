@@ -14,24 +14,16 @@ export const MarkdownComponents = {
 	code({ node, inline, className, ...props }) {
 		const hasLang = /language-(\w+)/.exec(className || '')
 		const hasMeta = node?.data?.meta
-
 		const applyHighlights = (applyHighlight) => {
 			if (hasMeta) {
 				const RE = /{([\d,-]+)}/
 				const metadata = node.data.meta?.replace(/\s/g, '')
-				const strlineNumbers = RE?.test(metadata)
-					? RE?.exec(metadata)[1]
-					: '0'
-				const highlightLines = rangeParser(strlineNumbers)
-				const highlight = highlightLines
-				const data = highlight.includes(applyHighlight)
-					? 'highlight'
-					: null
+				const strlineNumbers = RE?.test(metadata) ? RE?.exec(metadata)[1] : '0'
+				const data = rangeParser(strlineNumbers).includes(applyHighlight) ? 'highlight' : null
 				return { data }
 			}
 			return {}
 		}
-
 		return hasLang ? (
 			<CodeHeader>
 				<p>{hasLang[1]}</p>
@@ -48,8 +40,6 @@ export const MarkdownComponents = {
 					{props.children}
 				</SyntaxHighlighter>
 			</CodeHeader>
-		) : (
-			<code className={className} {...props} />
-		)
+		) : (<code className={className} {...props} />)
 	}
 }

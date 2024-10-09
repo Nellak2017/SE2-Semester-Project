@@ -20,8 +20,5 @@ export const SX_SLIDER = {
 		opacity: 0.28,
 	},
 }
-export const USER_LOGOS = {
-	'user': <FaRegUserCircle />,
-	'model': <FaInstalod />, 
-}
+export const USER_LOGOS = { 'user': <FaRegUserCircle />, 'model': <FaInstalod />, }
 export const SLIDER_LENGTH = 100

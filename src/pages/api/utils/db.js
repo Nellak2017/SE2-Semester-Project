@@ -1,9 +1,7 @@
 import mysql from 'mysql2/promise'
 import dotenv from 'dotenv'
 
-// Load environment variables from the .env file
-dotenv.config()
-
+dotenv.config() // Load environment variables from the .env file
 export async function connectToDatabase() {
         const pool = mysql.createPool({
                 host: '127.0.0.1', // or 'localhost'

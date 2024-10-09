@@ -12,5 +12,5 @@ const Template = args => <ErrorMessage {...args} />
 
 export const DefaultComponent = Template.bind({})
 DefaultComponent.args = {
-  
+  message: 'An error occurred, please try again.'
 }

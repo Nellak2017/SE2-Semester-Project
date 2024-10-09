@@ -34,10 +34,7 @@ export default function ChatList({ state, services }) {
 						/>)
 				})}
 			</MessageContainer>
-			<ChatInput
-				state={chatInputState}
-				services={chatInputServices}
-			/>
+			<ChatInput state={chatInputState} services={chatInputServices} />
 		</ChatListContainer>
 	)
 }
