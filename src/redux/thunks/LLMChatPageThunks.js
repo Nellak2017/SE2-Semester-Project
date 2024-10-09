@@ -135,7 +135,6 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 	const messagesResult = await updateMessagesWithAIResponse(newThreadID)
 	if (!isOk(messagesResult)) return
 
-	// TODO: Do we open existing thread?
 	dispatch(setIsNewChat(false))
 	dispatch(setThreadIndex(nextThreadIndex))
 }

@@ -40,7 +40,6 @@
     "redux": "^4.2.1",
     "remark-gfm": "^4.0.0",
     "styled-components": "^6.1.13",
-    "styled-system": "^5.1.5",
     "tls": "^0.0.1",
     "yup": "^1.2.0"
   },

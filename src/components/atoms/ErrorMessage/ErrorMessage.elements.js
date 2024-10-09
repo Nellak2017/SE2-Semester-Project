@@ -1,11 +1,9 @@
 import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
 
 export const ErrorContainer = styled.pre`
 	height: fit-content;
 	padding: ${props => props.theme.spaces.small};
 	border-radius: ${props => props.theme.spaces.small};
-
 	width: 100%;
 	max-width: 692px;
 	word-wrap: break-word;
@@ -15,8 +13,4 @@ export const ErrorContainer = styled.pre`
 	&:hover {
 		background-color: ${props => props.theme.colors.dangerDarkActive}50;
 	}
-
-	${space} 
-    ${layout}
-    ${typography}
 `

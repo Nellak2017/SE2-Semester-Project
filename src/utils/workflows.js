@@ -17,8 +17,6 @@ export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText
 	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
 	const AIText = parts[0].text
 
-	// TODO: Address the messages edge case where the context window is too large
-
 	// 2. Update Database with user and AI messages
 	const messagesResult = await addMessageAndResponse({ userID: userId, threadID: threadId, userText, AIText })
 	if (!isOk(messagesResult)) return err('Failed to update the database with the user and LLM messages.\n' + getError(messagesResult))

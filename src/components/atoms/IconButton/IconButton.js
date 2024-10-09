@@ -1,11 +1,4 @@
 import { IconButtonStyled } from './IconButton.elements'
 
-export function IconButton({ children, ...rest }) {
-	return (
-		<IconButtonStyled {...rest}>
-			{children}
-		</IconButtonStyled>
-	)
-}
-
+export const IconButton = ({ children, ...rest }) => (<IconButtonStyled {...rest}>{children}</IconButtonStyled>)
 export default IconButton

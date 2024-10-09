@@ -1,6 +1,4 @@
 import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
-import { getPresetCSS, chatListPresets } from '../../../styles/theme.js'
 
 export const ChatListContainer = styled.section`
 	display: flex;
@@ -11,12 +9,6 @@ export const ChatListContainer = styled.section`
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 0 ${props => props.theme.spaces.medium} 0;
-
-	${space} 
-    ${layout}
-    ${typography}
-    ${getPresetCSS(chatListPresets, 'variant')}
-    ${getPresetCSS(chatListPresets, 'color')}
 `
 
 export const MessageContainer = styled.div`

@@ -1,8 +1,71 @@
-import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
-import { getPresetCSS, iconButtonPreSets } from '../../../styles/theme.js'
+import styled, { css } from 'styled-components'
+import { getPresetCSS } from '../../../styles/theme.js'
 
-// NOTE: Responsive Size is in beta, use at your own risk
+const iconSizePreset = {
+  xs: css`
+    height: ${props => props.theme.fontSizes.smaller};
+    width: ${props => props.theme.fontSizes.smaller};
+    padding: 1px;
+    font-size: ${props => props.theme.fontSizes.extraSmall};
+  `,
+  s: css`
+    height: ${props => props.theme.fontSizes.small};
+    width: ${props => props.theme.fontSizes.small};
+    padding: 2px;
+    font-size: ${props => props.theme.fontSizes.smaller};
+  `,
+  m: css`
+    height: ${props => props.theme.fontSizes.medium};
+    width: ${props => props.theme.fontSizes.medium};
+    padding: 2px;
+    font-size: ${props => props.theme.fontSizes.small};
+  `,
+  l: css`
+    height: ${props => props.theme.fontSizes.large};
+    width: ${props => props.theme.fontSizes.large};
+    padding: 4px;
+    font-size: ${props => props.theme.fontSizes.medium};
+  `,
+  xl: css`
+    height: ${props => props.theme.fontSizes.larger};
+    width: ${props => props.theme.fontSizes.larger};
+    padding: 8px;
+    font-size: ${props => props.theme.fontSizes.large};
+  `,
+  xxl: css`
+    height: ${props => props.theme.fontSizes.extraLarge};
+    width: ${props => props.theme.fontSizes.extraLarge};
+    padding: 10px;
+    font-size: ${props => props.theme.fontSizes.larger};
+  `,
+}
+const iconButtonPreSets = {
+  variant: {
+    icon: css`
+      // primary color
+      color: ${props => props.theme.colors.primary};
+
+      // background transparentPrimary
+      background-color: ${props => props.theme.colors.primary}00;
+      &:hover {
+        background-color: ${props => props.theme.colors.primaryHover}20;
+      }
+      &:active {
+        background-color: ${props => props.theme.colors.primaryActive}20;
+      }
+      // outlineSize none
+      outline-width: 0;
+
+      // initially xl size
+      height: ${props => props.theme.fontSizes.larger};
+      width: ${props => props.theme.fontSizes.larger};
+      padding: 8px;
+      font-size: ${props => props.theme.fontSizes.large};
+    `
+  },
+  size: iconSizePreset,
+}
+
 // Note: make sure the icons are of sizes -> [12px, 14px, 16px, 24px, 40px, 64px]
 export const IconButtonStyled = styled.button`
     outline-style: solid;
@@ -22,20 +85,12 @@ export const IconButtonStyled = styled.button`
       height: 100%;
       width: 100%;
     }
-
     &:hover {
         box-shadow: ${props => props.theme.elevations.small};
-      }
+    }
     &:active {
         box-shadow: ${props => props.theme.insets.normal};
     }
-    ${space} 
-    ${layout}
-    ${typography}
     ${getPresetCSS(iconButtonPreSets, 'variant')}
-    ${getPresetCSS(iconButtonPreSets, 'color')}
-    ${getPresetCSS(iconButtonPreSets, 'outlineSize')}
-    ${getPresetCSS(iconButtonPreSets, 'outlineColor')}
-    ${getPresetCSS(iconButtonPreSets, 'background')} 
     ${getPresetCSS(iconButtonPreSets, 'size')} 
 `

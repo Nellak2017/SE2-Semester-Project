@@ -1,6 +1,4 @@
 import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
-import { getPresetCSS, outlineButtonPreSets } from '../../../styles/theme.js'
 
 export const StyledOutlineButton = styled.button`
 	display: flex;
@@ -20,22 +18,9 @@ export const StyledOutlineButton = styled.button`
 	// If maxwidth prop is defined, we use this as the width of the button, otherwise it is normal
 	max-width: ${props => props.$maxwidth ? props.$maxwidth + 'px' : '100%'}; // optional max-width prop
 	width: 100%; 
-
 	min-height: ${props => props.$maxheight ? props.$maxheight + 'px' : '100%'};
-	
-
-	// TODO: In the theme.js test the effect of different sizes and fix. I sloppily put it in there
-	// TODO: Factor the below styles out if you need to parameterize based on sizes
 	padding: ${props => props.theme.spaces.small}; 
 	svg {
 		font-size: ${props => props.theme.fontSizes.medium}; 
 	}
-
-	// ------ 
-    ${space} 
-    ${layout}
-    ${typography}
-	${getPresetCSS(outlineButtonPreSets, 'variant')}
-	${getPresetCSS(outlineButtonPreSets, 'size')}
-	${getPresetCSS(outlineButtonPreSets, 'color')}
 `

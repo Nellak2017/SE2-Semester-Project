@@ -23,10 +23,7 @@ export default function ChatInput({ state, services, ...rest }) {
 		onBlur = () => { },
 	} = services || {}
 
-	const ref = useRef(null)
-	const handleClick = () => ref.current.focus()
-
-	//const maxMessageId = chatHistory?.length === 0 || !Array.isArray(chatHistory) ? 1 : chatHistory.reduce((maxID, obj) => Math.max(maxID, obj.MessageID), -Infinity)   
+	const ref = useRef(null), handleClick = () => ref.current.focus()
 	const submitArgs = {
 		userId: userID,
 		userInput,
@@ -37,11 +34,10 @@ export default function ChatInput({ state, services, ...rest }) {
 		nextThreadIndex: threads.length || 0,
 		chatHistory
 	}
-
 	return (
 		<ChatInputParent variant={variant} onClick={handleClick}>
 			<ChatInputChild placeholder={placeholder} name={name} onChange={e => userInputChange(e.target.value)} value={userInput} onBlur={onBlur} ref={ref} {...rest} />
-			<IconButton variant='icon' type={buttonType} onClick={() => userInputSubmit(submitArgs)} size='xl'><IoIosSend /></IconButton>
+			<IconButton variant='icon' size='xl' type={buttonType} onClick={() => userInputSubmit(submitArgs)}><IoIosSend /></IconButton>
 		</ChatInputParent>
 	)
 }

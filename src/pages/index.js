@@ -8,16 +8,8 @@ import { useSelector } from 'react-redux'
 import { initialize } from '../redux/thunks/LLMChatPageThunks.js'
 
 export const Home = () => {
-
-  // --- Initial State Loaded in from DB. Update userId, fetch threads, fetch messages for 0th thread
-  // if the userId does not exist, then we can not render this page, but another page and re-direct to home
-  // We actually don't need to update the userId at all since it is managed by login/signup and by the logout feature
-  // However, we need it now since we only have one page..
   useEffect(() => { store.dispatch(initialize({ credentials: {} })) }, [])
-
-  // ----- State aggregation for this page
   // TODO: make naming conventions consistent
-  // TODO: De-duplicate data
   const LLMChatState = {
     sideBarState: {
       variant: useSelector(state => state.LLMChatPage.variant),
@@ -54,16 +46,9 @@ export const Home = () => {
         threads: useSelector(state => state.LLMChatPage.sideBar.threads),
         threadIndex: useSelector(state => state.LLMChatPage.threadIndex),
         chatHistory: useSelector(state => state.LLMChatPage.chatHistory),
-        // threadId and messageId are derived from threads and chatHistory
-      },
+      },// threadId and messageId are derived from threads and chatHistory
     },
   }
-
-  return (
-    <LLMChat
-      state={LLMChatState}
-      services={createLLMPageServices(store)}
-    />
-  )
+  return (<LLMChat state={LLMChatState} services={createLLMPageServices(store)} />)
 }
 export default Home

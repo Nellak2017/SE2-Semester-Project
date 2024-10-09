@@ -1,6 +1,4 @@
 import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
-import { getPresetCSS, sidebarPresets } from '../../../styles/theme.js'
 
 export const SideBarContainer = styled.div`
 	display: flex;
@@ -14,7 +12,6 @@ export const SideBarContainer = styled.div`
 	background-color: ${props => props.theme.colors.darkNeutralDark};
 
 	// styles for hiding or not hiding on button press
-
 	transform: ${props => props.$isOpen ? 'translateX(0)' : 'translateX(-110%)'};
   	transition: transform 0.3s ease-in-out;
 
@@ -30,12 +27,6 @@ export const SideBarContainer = styled.div`
 		justify-content: center;
 		row-gap: ${props => props.theme.spaces.smaller};
 	}
-
-	${space} 
-    ${layout}
-    ${typography}
-    ${getPresetCSS(sidebarPresets, 'variant')}
-    ${getPresetCSS(sidebarPresets, 'color')}
 `
 
 export const IconContainer = styled.div`

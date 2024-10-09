@@ -1,3 +1,4 @@
+/* eslint-disable fp/no-throw */
 import { connectToDatabase } from './utils/db'
 import { tryCatchAsyncPlain } from '../../utils/result'
 

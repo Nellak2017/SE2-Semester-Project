@@ -1,6 +1,16 @@
-import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
-import { getPresetCSS, chatPresets } from '../../../styles/theme.js'
+import styled, { css } from 'styled-components'
+import { getPresetCSS } from '../../../styles/theme.js'
+
+const chatPresets = {
+	user: {
+		user: css`
+		background-color: ${props => props.theme.colors.darkNeutral};
+	  `,
+		model: css`
+		background-color: ${props => props.theme.colors.lightNeutral};
+	  `
+	},
+}
 
 export const ChatContainer = styled.div`
 	display: flex;
@@ -14,11 +24,7 @@ export const ChatContainer = styled.div`
 		font-size: ${props => props.theme.fontSizes.medium};
 	}
 
-	${space} 
-    ${layout}
-    ${typography}
     ${getPresetCSS(chatPresets, 'user')}
-    ${getPresetCSS(chatPresets, 'color')}
 `
 
 export const MessageContainer = styled.div`
@@ -57,10 +63,6 @@ export const CodeHeader = styled.div`
 `
 
 export const ErrorContainer = styled.div`
-	/* display: flex;
-	padding-top: ${props => props.theme.spaces.smaller};
-	width: 100%;
-	max-width: 694px; */
 	font-size: ${props => props.theme.fontSizes.small};
 	font-weight: 300;
 	width: 100%;

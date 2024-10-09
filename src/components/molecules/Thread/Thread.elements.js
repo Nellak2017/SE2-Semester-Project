@@ -1,6 +1,4 @@
 import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
-import { getPresetCSS, threadPresets } from '../../../styles/theme.js'
 
 export const ThreadContainerStyled = styled.section`
 	display: flex;
@@ -28,11 +26,6 @@ export const ThreadContainerStyled = styled.section`
 		cursor: pointer;
 		background-color: ${props => props.theme.colors.lightNeutralActive};
 	}
-    ${space} 
-    ${layout}
-    ${typography}
-    ${getPresetCSS(threadPresets, 'variant')}
-    ${getPresetCSS(threadPresets, 'color')}
 `
 
 export const IconContainer = styled.div`

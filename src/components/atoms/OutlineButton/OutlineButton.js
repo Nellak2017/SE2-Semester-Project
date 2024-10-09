@@ -15,7 +15,6 @@ export default function OutlineButton({ state, services, ...props }) {
 	return (
 		<StyledOutlineButton
 			variant={variant}
-			//onClick={e => { e.stopPropagation() }}
 			onClick={onClick}
 			$maxwidth={maxwidth}
 			$maxheight={maxheight}

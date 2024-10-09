@@ -1,7 +1,25 @@
-import styled from 'styled-components'
-import { space, layout, typography } from 'styled-system'
-import { getPresetCSS, chatInputPresets } from '../../../styles/theme.js'
+import styled, { css } from 'styled-components'
+import { getPresetCSS } from '../../../styles/theme.js'
 import TextareaAutosize from 'react-textarea-autosize' // imported to save headache in getting resizable input
+
+const chatInputPresets = {
+    variant: {
+        small: css`
+        & textarea {
+          padding: 0;
+        }
+        & button {
+          height: ${props => props.theme.fontSizes.large};
+          width: ${props => props.theme.fontSizes.large};
+          padding: 4px;
+          font-size: ${props => props.theme.fontSizes.medium};
+        }
+      `,
+        default: css`
+        padding: .5rem ${props => props.theme.fontSizes.smaller};
+      `
+    },
+}
 
 // This should be a div with div children. The first child should have role='textbox'
 export const ChatInputParent = styled.div`
@@ -29,10 +47,6 @@ export const ChatInputParent = styled.div`
     }
 
     ${getPresetCSS(chatInputPresets, 'variant')}
-    ${getPresetCSS(chatInputPresets, 'color')}
-    ${space}
-    ${layout}
-    ${typography}  
 `
 
 // This is the actual input element that is made from TextareaAutosize component downloaded from npm
