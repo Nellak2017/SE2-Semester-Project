@@ -4,7 +4,7 @@ import { highlightThread } from './helpers'
 import { generatePalmMessage } from './palmApi'
 
 // This file contains combinations of API endpoints called in sequence
-
+// TODO: Increase abstraction level. Instead of if(err) return, do some kind of chain operation?
 // --- Sequential API convienience functions
 
 // Side-effects: Post user message, Get LLM response, Post LLM message
@@ -48,7 +48,6 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 	if (!isOk(titleResult)) return err('Could not update thread title in the database.\n' + getError(titleResult))
 
 	const { newThreadID } = getValue(titleResult) // { message , newThreadID: int }
-	// TODO: Address thread length edge case, limit threads to 10 for each user
 	return ok({ LLMResponse: AIText, newThreadID })
 }
 

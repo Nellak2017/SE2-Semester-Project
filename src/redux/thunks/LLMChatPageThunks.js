@@ -38,7 +38,7 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	// 2. update threads and messages OR display an error when handling the result
 	if (!isOk(result)) {
 		console.error(getError(result))
-		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'An initialization error occurred.'}))
+		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'An initialization error occurred.\n' + getError(result) }))
 		return false
 	}
 	// otherwise, update userId, threads, messages
@@ -105,7 +105,7 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 			err => {
 				console.error('Could not update messages with AI response.')
 				console.error(err)
-				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Could not update messages with AI response.' }))
+				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Could not update messages with AI response.\n' + err }))
 			}
 		)
 		return result

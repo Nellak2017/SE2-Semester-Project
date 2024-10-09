@@ -1,7 +1,6 @@
 import { ThreadListContainer } from './ThreadList.elements'
 import Thread from '../Thread/Thread.js'
 import { VARIANTS } from '../../utils/constants.js'
-import { convertKeysToLowerCase } from '../../../utils/helpers.js'
 
 export default function ThreadList({ state, services, ...props }) {
 	const {
@@ -18,25 +17,24 @@ export default function ThreadList({ state, services, ...props }) {
 	return (
 		<ThreadListContainer variant={variant} $maxwidth={maxwidth} {...props}>
 			{threads?.map((info, index) => {
-				// everything is lowercased to ensure consistency
-				const { name, threadid, highlighted } = convertKeysToLowerCase(info)
+				const { Name, ThreadID, highlighted } = info
 				const threadState = {
 					variant,
 					maxwidth,
 					maxheight: 44,
-					name,
-					idno: threadid || index,
+					name: Name,
+					idno: ThreadID || index,
 					highlighted,
 				}
 				const threadServices = {
-					threadListener: () => openExistingThread({ userId, index, threadid }),
-					trashListener: () => deleteThread({ userId, index, threadid }),
+					threadListener: () => openExistingThread({ userId, index, threadid: ThreadID }),
+					trashListener: () => deleteThread({ userId, index, threadid: ThreadID }),
 				}
 				return (
 					<Thread
 						state={threadState}
 						services={threadServices}
-						key={`thread-trash-icon-${threadid}`}
+						key={`thread-trash-icon-${ThreadID}`}
 					/>
 				)
 			})}
