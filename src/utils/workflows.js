@@ -5,6 +5,14 @@ import { highlightThread } from './helpers'
 import { generatePalmMessage } from './palmApi'
 
 // --- Helpers
+const fetchAIResponse = async ({ contents }) => {
+	const LLMResult = await generatePalmMessage({ contents })
+	if (!isOk(LLMResult)) return err('Unable to get a valid LLM response.\n' + getError(LLMResult))
+	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' }
+	if (!parts || !role) return err('The AI response is malformed.\n' + JSON.stringify(LLMResult))
+	return ok(parts[0].text)
+}
+
 const fetchThreadData = async ({ userID, threadID, threadIndex = -1 }) => {
 	const threadsResult = await getThreads({ userID })
 	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.\n' + getError(threadsResult))
@@ -34,11 +42,9 @@ const fetchThreadData = async ({ userID, threadID, threadIndex = -1 }) => {
 // Input/Output: ({ userId, chatHistory, threadId, userText }) => <Result> of { ok: { userMessage, LLMResponse } | '', error: string | '' }
 export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText }) => {
 	// 1. Get AI response
-	const LLMResult = await generatePalmMessage({ contents: chatHistory })
-	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Response. Please try again.\n' + getError(LLMResult))
-	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
-	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
-	const AIText = parts[0].text
+	const LLMResult = await fetchAIResponse({ contents: chatHistory })
+	if (!isOk(LLMResult)) return LLMResult
+	const AIText = getValue(LLMResult)
 
 	// 2. Update Database with user and AI messages
 	const messagesResult = await addMessageAndResponse({ userID: userId, threadID: threadId, userText, AIText })
@@ -53,15 +59,11 @@ export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText
 export const titleWorkflow = async ({ userId, userInput }) => {
 	// 1. Get AI Response for title
 	const text = `Using this supplied user input create a LLM Chat title that is between 2 and 5 words long. Your response must only be those words.\n---User Input\n"${userInput}"`
-	const contents = [{ role: 'user', parts: [{ text }] }]
-	const LLMResult = await generatePalmMessage({ contents })
-	if (!isOk(LLMResult)) return err('Unable to get a valid LLM Title. Using Default.\n' + getError(LLMResult))
-	const { parts, role } = getValue(LLMResult)?.candidates?.[0]?.content || { parts: [], role: '' } // {parts: [{...}], role: 'model'|'user'}
-	if (!parts || !role) return err('The AI response is malformed. \n' + JSON.stringify(LLMResult))
-	const AIText = parts[0].text
+	const LLMResult = await fetchAIResponse({ contents: [{ role: 'user', parts: [{ text }] }] })
+	if (!isOk(LLMResult)) return LLMResult
 
 	// 2. Update Database with unique title
-	const AIBaseText = AIText.slice(0, 50).trim()
+	const AIBaseText = getValue(LLMResult).slice(0, 50).trim()
 	const threadExistsResult = await getThreadNameExists({ userID: userId, threadName: AIBaseText })
 	if (!isOk(threadExistsResult)) return err('Could not verify if the thread existed already or not. New thread was not added.\n' + getError(threadExistsResult))
 	const threadAlreadyExists = getValue(threadExistsResult)?.exists
@@ -69,7 +71,7 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 	if (!isOk(titleResult)) return err('Could not update thread title in the database.\n' + getError(titleResult))
 
 	const { newThreadID } = getValue(titleResult) // { message , newThreadID: int }
-	return ok({ LLMResponse: AIText, newThreadID })
+	return ok({ LLMResponse: AIBaseText, newThreadID })
 }
 
 // Side-effects: get userID, fetch threads, fetch messages for 0th thread 
