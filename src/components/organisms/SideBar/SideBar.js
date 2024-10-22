@@ -1,9 +1,4 @@
-/* eslint-disable max-lines-per-function */
-import {
-	SideBarContainer,
-	IconContainer,
-	SliderContainer,
-} from "./SideBar.elements"
+import { SideBarContainer, IconContainer, SliderContainer, } from "./SideBar.elements"
 import { BsLayoutSidebar } from 'react-icons/bs'
 import { BiExport } from 'react-icons/bi'
 import { MdLogout } from 'react-icons/md'
@@ -28,47 +23,27 @@ export default function SideBar({ state, services, ...props }) {
 		threads = [],
 		threadListState,
 	} = state || {}
-	const {
-		sideBarOpen = () => { },
-		newChat = () => { },
-		temperatureChange = () => { },
-		temperatureUpdate = () => { },
-		typingSpeedChange = () => { },
-		typingSpeedUpdate = () => { },
-		exportHandler = messages => handleExportButtonClick(messages),
-		threadListServices,
-	} = services || {}
-
+	const { sideBarOpen = () => { }, newChat = () => { }, temperatureChange = () => { }, temperatureUpdate = () => { }, typingSpeedChange = () => { }, typingSpeedUpdate = () => { }, exportHandler = messages => handleExportButtonClick(messages), threadListServices, } = services || {}
 	const threadID = threads[threadIndex]?.ThreadID
-
 	return (
 		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSideBarOpen} {...props}>
 			<section>
 				<IconContainer>
+					{/* TODO: Map through these buttons instead*/}
 					<OutlineButton
 						state={{ variant, text: buttonText, centered: false, maxheight: 44 }}
 						services={{ onClick: () => newChat() }}
 					/>
 					<OutlineButton
-						state={{
-							variant,
-							text: '',
-							icon: <BsLayoutSidebar />,
-							maxwidth: 44,
-							maxheight: 44,
-							centered: true,
-						}}
+						state={{ variant, text: '', centered: true, maxwidth: 44, maxheight: 44, icon: <BsLayoutSidebar />, }}
 						services={{ onClick: e => { e.stopPropagation(); sideBarOpen() } }}
 						className={!isSideBarOpen ? 'toggle-button' : ''}
 					/>
 				</IconContainer>
-				<ThreadList
-					state={threadListState}
-					services={threadListServices}
-				/>
+				<ThreadList state={threadListState} services={threadListServices} />
 			</section>
-
 			<section>
+				{/* TODO: Don't repeat yourself with the SliderContainers, extract to a molecule then map through them */}
 				<SliderContainer>
 					<div>
 						<h1>Temperature</h1>
@@ -103,6 +78,7 @@ export default function SideBar({ state, services, ...props }) {
 						/>
 					</div>
 				</SliderContainer>
+				{/* TODO: Map through the outline buttons*/}
 				<OutlineButton
 					state={{ variant, icon: <BiExport />, text: exportText, centered: false, maxheight: 44 }}
 					services={{ onClick: () => exportHandler([{ author: 'dev', content: 'TODO: Add support for this' }]) }}

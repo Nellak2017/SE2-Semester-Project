@@ -1,13 +1,8 @@
 import axios from 'axios'
 import dotenv from 'dotenv'
 import { tryCatchAsync } from '../utils/result.js'
-
-dotenv.config() // Load environment variables from the .env file
-const API_KEY = process.env.NEXT_PUBLIC_PALM_API_KEY
-const headers = { 'Content-Type': 'application/json' }
-const apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-002:generateContent?key=${API_KEY}`
-
-// TODO: Make a model drop down component that lets you choose any of the available models
+dotenv.config() // TODO: Make a model drop down component that lets you choose any of the available models
+const headers = { 'Content-Type': 'application/json' }, apiURL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-002:generateContent?key=${process.env.NEXT_PUBLIC_PALM_API_KEY}`
 export const generatePalmMessage = async ({ contents = [], temperature = .5, candidateCount = 1, topK = 40, topP = .95 }) => {
 	const requestData = { contents, generationConfig: { temperature, candidateCount, topK, topP } }
 	const result = await tryCatchAsync(

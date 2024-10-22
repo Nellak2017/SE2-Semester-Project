@@ -1,6 +1,5 @@
 // This file contains all the API functions
 // The API functions have a side-effect involving the database and return a value
-
 import axios from 'axios'
 import { tryCatchAsync } from './result.js'
 

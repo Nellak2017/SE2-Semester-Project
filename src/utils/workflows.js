@@ -13,10 +13,11 @@ const fetchAIResponse = async ({ contents }) => {
 	return ok(parts[0].text)
 }
 
+// Input/Output: ({ userID, threadID, threadIndex }) => <Result> of { ok: { userID, threads, messages, temperature, typingSpeed } | '', error: string | '' }
 const fetchThreadData = async ({ userID, threadID, threadIndex = -1 }) => {
 	const threadsResult = await getThreads({ userID })
 	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.\n' + getError(threadsResult))
-	const threads = highlightThread(getValue(threadsResult), threadIndex)
+	const threads = highlightThread(getValue(threadsResult), threadIndex) // if threadIndex = -1 it doesn't highlight
 	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
 	const processedThreadID = !threadID ? threads?.[processedIndex]?.ThreadID : threadID
 
@@ -77,14 +78,12 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 // Side-effects: get userID, fetch threads, fetch messages for 0th thread 
 // Input/Output: ({ credentials, threadIndex }) => <Result> of { ok: { userId, threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
 export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
-	// 0. get userId based on credentials
-	// if no credentials return err('No credentials provided.')
+	// get userId based on credentials, if no credentials return err('No credentials provided.')
 	const userID = 1 // TODO: get userId based on credentials
 	if (userID <= 0) return err('No userId found for the given credentials.')
 	return fetchThreadData({ userID, threadID: undefined, threadIndex })
 }
 
-// TODO: See if you can stop repeating yourself in openThreadWorkflow, it is basically identical to initialize.
 // Side-effects: fetch threads, fetch messages for thread with threadId 
 // Input/Output: ({ userId, threadId }) => <Result> of { ok: { threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
 export const openThreadWorkflow = async ({ userId, threadid }) => fetchThreadData({ userID: userId, threadID: threadid })

@@ -9,14 +9,8 @@ export default function LLMChat({ state, services = createLLMPageServices(store)
 	const { sideBarServices, chatListServices } = services || {}
 	return (
 		<ChatListContainer>
-			<SideBar
-				state={sideBarState}
-				services={sideBarServices}
-			/>
-			<ChatList
-				state={chatListState}
-				services={chatListServices}
-			/>
+			<SideBar state={sideBarState} services={sideBarServices} />
+			<ChatList state={chatListState} services={chatListServices} />
 		</ChatListContainer>
 	)
 }

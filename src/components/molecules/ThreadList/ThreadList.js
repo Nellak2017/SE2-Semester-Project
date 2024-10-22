@@ -3,17 +3,8 @@ import Thread from '../Thread/Thread.js'
 import { VARIANTS } from '../../utils/constants.js'
 
 export default function ThreadList({ state, services, ...props }) {
-	const {
-		variant = VARIANTS.dark,
-		userId = 0,
-		maxwidth = 260,
-		threads = [],
-	} = state || {}
-	const {
-		deleteThread = () => { },
-		openExistingThread = () => { }
-	} = services || {}
-
+	const { variant = VARIANTS.dark, userId = 0, maxwidth = 260, threads = [], } = state || {}
+	const { deleteThread = () => { }, openExistingThread = () => { } } = services || {}
 	return (
 		<ThreadListContainer variant={variant} $maxwidth={maxwidth} {...props}>
 			{threads?.map((info, index) => {
@@ -26,10 +17,7 @@ export default function ThreadList({ state, services, ...props }) {
 					idno: ThreadID || index,
 					highlighted,
 				}
-				const threadServices = {
-					threadListener: () => openExistingThread({ userId, index, threadid: ThreadID }),
-					trashListener: () => deleteThread({ userId, index, threadid: ThreadID }),
-				}
+				const threadServices = { threadListener: () => openExistingThread({ userId, index, threadid: ThreadID }), trashListener: () => deleteThread({ userId, index, threadid: ThreadID }), }
 				return (
 					<Thread
 						state={threadState}

@@ -42,21 +42,11 @@ const iconSizePreset = {
 const iconButtonPreSets = {
   variant: {
     icon: css`
-      // primary color
       color: ${props => props.theme.colors.primary};
-
-      // background transparentPrimary
       background-color: ${props => props.theme.colors.primary}00;
-      &:hover {
-        background-color: ${props => props.theme.colors.primaryHover}20;
-      }
-      &:active {
-        background-color: ${props => props.theme.colors.primaryActive}20;
-      }
-      // outlineSize none
+      &:hover { background-color: ${props => props.theme.colors.primaryHover}20; }
+      &:active { background-color: ${props => props.theme.colors.primaryActive}20; }
       outline-width: 0;
-
-      // initially xl size
       height: ${props => props.theme.fontSizes.larger};
       width: ${props => props.theme.fontSizes.larger};
       padding: 8px;
@@ -66,7 +56,6 @@ const iconButtonPreSets = {
   size: iconSizePreset,
 }
 
-// Note: make sure the icons are of sizes -> [12px, 14px, 16px, 24px, 40px, 64px]
 export const IconButtonStyled = styled.button`
     outline-style: solid;
     // Styles to make it a perfect circle, no matter what the child is
@@ -85,12 +74,8 @@ export const IconButtonStyled = styled.button`
       height: 100%;
       width: 100%;
     }
-    &:hover {
-        box-shadow: ${props => props.theme.elevations.small};
-    }
-    &:active {
-        box-shadow: ${props => props.theme.insets.normal};
-    }
+    &:hover { box-shadow: ${props => props.theme.elevations.small}; }
+    &:active { box-shadow: ${props => props.theme.insets.normal}; }
     ${getPresetCSS(iconButtonPreSets, 'variant')}
     ${getPresetCSS(iconButtonPreSets, 'size')} 
 `

@@ -10,7 +10,5 @@ export const ErrorContainer = styled.pre`
 	white-space: pre-wrap;
 	background-color: ${props => props.theme.colors.dangerDark}50;
 	border: 1px solid ${props => props.theme.colors.danger};
-	&:hover {
-		background-color: ${props => props.theme.colors.dangerDarkActive}50;
-	}
+	&:hover { background-color: ${props => props.theme.colors.dangerDarkActive}50;}
 `

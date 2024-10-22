@@ -1,31 +1,6 @@
-import {
-	deleteThread, // deleteThreadThunk 
-	setTemperature, // temperatureUpdate, openExistingThread, initialize
-	setTypingSpeed, // typingSpeedUpdate, openExistingThread, initialize
-	setUserId, // logout potentially
-	setUserInput, // userInputSubmit, openExistingThread
-	setThreadIndex, // openExistingThread, newChat
-	setThreads, // initialize, openExistingThread
-	setIsNewChat, // openExistingThread, newChat, userInputSubmit
-	highlightThread, // openExistingThread, newChat
-	setMessages, // newChat, openExistingThread
-	addMessage, // userInputSubmit
-	deleteMessages, // deleteThreadThunk
-	addThread, // userInputSubmit
-	// whatever would be used for onScroll?
-} from '../reducers/LLMChatPageSlice.js'
-
-import {
-	dialogueWorkflow,
-	titleWorkflow,
-	initializeWorkflow,
-	openThreadWorkflow,
-} from '../../utils/workflows.js'
-import {
-	patchTemperature,
-	patchTypingSpeed,
-	deleteThread as deleteThreadAPI
-} from '../../utils/api.js'
+import { deleteThread, setTemperature, setTypingSpeed, setUserId, setUserInput, setThreadIndex, setThreads, setIsNewChat, highlightThread, setMessages, addMessage, deleteMessages, addThread, } from '../reducers/LLMChatPageSlice.js'
+import { dialogueWorkflow, titleWorkflow, initializeWorkflow, openThreadWorkflow, } from '../../utils/workflows.js'
+import { patchTemperature, patchTypingSpeed, deleteThread as deleteThreadAPI } from '../../utils/api.js'
 import { isOk, handle, getError, getValue } from '../../utils/result.js'
 import { convertMessagesToGemini } from '../../utils/helpers.js'
 
@@ -50,6 +25,7 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	return true
 }
 
+// TODO: Extract all sequential dispatches to a single reducer wherever it is done for simplicity!
 export const newChat = () => dispatch => {
 	dispatch(highlightThread(-1))
 	dispatch(setThreadIndex(0))
@@ -143,12 +119,12 @@ export const openExistingThread = ({ userId, index, threadid, isNewChat = false 
 	dispatch(setUserInput(''))
 	const result = await openThreadWorkflow({ userId, threadid })
 	if (!isOk(result)) {
-		console.error('Failed to open existing thread.')
-		console.error(getError(result))
+		console.error('Failed to open existing thread.\n' + getError(result))
 		dispatch(addMessage({ MessageID: -1, ThreadID: threadid, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Failed to open existing thread.' }))
 		return
 	}
 	const { threads, messages, temperature, typingSpeed } = getValue(result)
+	// Note: setThreads ... setTypingSpeed are repeated in initialize, extract to common reducer
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
 	dispatch(setTemperature(temperature))

@@ -5,24 +5,8 @@ import IconButton from '../IconButton/IconButton'
 import { VARIANTS } from '../../utils/constants'
 
 export default function ChatInput({ state, services, ...rest }) {
-	const {
-		variant = VARIANTS.dark,
-		placeholder = 'Write a Message...',
-		name = '',
-		buttonType = 'submit',
-		userID = 0,
-		userInput = '',
-		isNewChat = false,
-		threads = [],
-		threadIndex = 0,
-		chatHistory = [],
-	} = state || {}
-	const {
-		userInputSubmit = () => { },
-		userInputChange = () => { },
-		onBlur = () => { },
-	} = services || {}
-
+	const { variant = VARIANTS.dark, placeholder = 'Write a Message...', name = '', buttonType = 'submit', userID = 0, userInput = '', isNewChat = false, threads = [], threadIndex = 0, chatHistory = [], } = state || {}
+	const { userInputSubmit = () => { }, userInputChange = () => { }, onBlur = () => { }, } = services || {}
 	const ref = useRef(null), handleClick = () => ref.current.focus()
 	const submitArgs = {
 		userId: userID,
@@ -30,7 +14,7 @@ export default function ChatInput({ state, services, ...rest }) {
 		isNewChat,
 		threadId: threads?.[threadIndex]?.ThreadID || 0,
 		updatedThreadId: threads?.[threads.length - 1]?.ThreadID + 1 || 0,
-		messageId: chatHistory?.[0]?.MessageID + 1 || 0, 
+		messageId: chatHistory?.[0]?.MessageID + 1 || 0,
 		nextThreadIndex: threads.length || 0,
 		chatHistory
 	}

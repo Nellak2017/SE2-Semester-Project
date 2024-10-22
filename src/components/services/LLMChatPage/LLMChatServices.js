@@ -1,19 +1,5 @@
-import {
-	toggleSidebarOpen,
-	setTemperature,
-	setTypingSpeed,
-	setThreadIndex,
-	setUserInput,
-} from '../../../redux/reducers/LLMChatPageSlice.js'
-import {
-	newChat,
-	temperatureUpdate,
-	typingSpeedUpdate,
-	// logout / signin,
-	deleteThreadThunk,
-	userInputSubmit,
-	openExistingThread
-} from '../../../redux/thunks/LLMChatPageThunks.js'
+import { toggleSidebarOpen, setTemperature, setTypingSpeed, setThreadIndex, setUserInput, } from '../../../redux/reducers/LLMChatPageSlice.js'
+import { newChat, temperatureUpdate, typingSpeedUpdate, deleteThreadThunk, userInputSubmit, openExistingThread } from '../../../redux/thunks/LLMChatPageThunks.js'
 import { handleExportButtonClick } from '../../../utils/helpers.js'
 
 export const createLLMPageServices = store => {
@@ -56,7 +42,6 @@ export const createLLMPageServices = store => {
 		},
 		chatListServices: {
 			scrollHandler: () => {
-
 			}, // not implemented
 			chatInputServices: {
 				userInputChange: (userInput) => {

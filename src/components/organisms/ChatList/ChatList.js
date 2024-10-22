@@ -5,17 +5,8 @@ import { ChatListContainer, MessageContainer } from './ChatList.elements.js'
 import { PiPlaceholderDuotone } from 'react-icons/pi'
 
 export default function ChatList({ state, services }) {
-	const {
-		variant = VARIANTS.dark,
-		chatHistory = [],
-		userLogos = USER_LOGOS,
-		typingSpeed = 50,
-		chatInputState,
-	} = state || {}
-	const {
-		scrollHandler = () => { },
-		chatInputServices,
-	} = services || {}
+	const { variant = VARIANTS.dark, chatHistory = [], userLogos = USER_LOGOS, typingSpeed = 50, chatInputState, } = state || {}
+	const { scrollHandler = () => { }, chatInputServices,} = services || {}
 	return (
 		<ChatListContainer variant={variant}>
 			<MessageContainer onScroll={scrollHandler}>

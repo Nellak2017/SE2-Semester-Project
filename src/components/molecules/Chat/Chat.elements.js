@@ -3,12 +3,8 @@ import { getPresetCSS } from '../../../styles/theme.js'
 
 const chatPresets = {
 	user: {
-		user: css`
-		background-color: ${props => props.theme.colors.darkNeutral};
-	  `,
-		model: css`
-		background-color: ${props => props.theme.colors.lightNeutral};
-	  `
+		user: css` background-color: ${props => props.theme.colors.darkNeutral}; `,
+		model: css` background-color: ${props => props.theme.colors.lightNeutral};`
 	},
 }
 
@@ -17,13 +13,9 @@ export const ChatContainer = styled.div`
 	align-items: center;
 	justify-content: center;
 	padding: ${props => props.theme.spaces.small};
-
 	max-width: 100%;
 	width: 100%;
-	* {
-		font-size: ${props => props.theme.fontSizes.medium};
-	}
-
+	* { font-size: ${props => props.theme.fontSizes.medium};}
     ${getPresetCSS(chatPresets, 'user')}
 `
 
@@ -37,9 +29,7 @@ export const MessageContainer = styled.div`
 `
 
 export const LogoContainer = styled.div`
-	svg {
-		font-size: ${props => props.theme.fontSizes.larger};
-	}
+	svg { font-size: ${props => props.theme.fontSizes.larger}; }
 `
 
 export const Message = styled.pre`
@@ -51,12 +41,10 @@ export const Message = styled.pre`
 	padding-top: ${props => props.theme.spaces.smaller};
 `
 
-// Style copied pixel perfectly from ChatGPT
 export const CodeHeader = styled.div`
 	background-color: ${props => props.theme.colors.darkNeutralDarker};
 	border-radius: ${props => props.theme.spaces.smaller};
 	width: 100%;
-
 	p {
 		padding: ${props => props.theme.spaces.smaller} ${props => props.theme.spaces.medium} 0 ${props => props.theme.spaces.medium};
 	}
