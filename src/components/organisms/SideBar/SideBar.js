@@ -55,7 +55,7 @@ export default function SideBar({ state, services, ...props }) {
 							step={1}
 							max={SLIDER_LENGTH}
 							onMouseUp={() => temperatureUpdate({ userId, threadID, temperature })}
-							onChange={(_, temperature) => temperatureChange(temperature)}
+							onChange={(_, temp) => temperatureChange(temp)}
 							sx={SX_SLIDER}
 							defaultValue={temperature}
 						/>
@@ -72,7 +72,7 @@ export default function SideBar({ state, services, ...props }) {
 							step={1}
 							max={SLIDER_LENGTH}
 							onMouseUp={() => typingSpeedUpdate({ userId, threadID, typingSpeed })}
-							onChange={(_, typingSpeed) => typingSpeedChange(typingSpeed)}
+							onChange={(_, typSpd) => typingSpeedChange(typSpd)}
 							sx={SX_SLIDER}
 							defaultValue={typingSpeed}
 						/>

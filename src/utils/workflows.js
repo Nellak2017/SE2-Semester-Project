@@ -13,27 +13,27 @@ const fetchAIResponse = async ({ contents }) => {
 	return ok(parts[0].text)
 }
 
-// Input/Output: ({ userID, threadID, threadIndex }) => <Result> of { ok: { userID, threads, messages, temperature, typingSpeed } | '', error: string | '' }
-const fetchThreadData = async ({ userID, threadID, threadIndex = -1 }) => {
-	const threadsResult = await getThreads({ userID })
+// Input/Output: ({ userId, threadID, threadIndex }) => <Result> of { ok: { userId, threads, messages, temperature, typingSpeed } | '', error: string | '' }
+const fetchThreadData = async ({ userId, threadID, threadIndex = -1 }) => {
+	const threadsResult = await getThreads({ userID: userId })
 	if (!isOk(threadsResult)) return err('Could not fetch threads when opening existing thread.\n' + getError(threadsResult))
 	const threads = highlightThread(getValue(threadsResult), threadIndex) // if threadIndex = -1 it doesn't highlight
 	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
 	const processedThreadID = !threadID ? threads?.[processedIndex]?.ThreadID : threadID
 
-	const messagesResult = await getMessages({ userID, threadID: processedThreadID })
+	const messagesResult = await getMessages({ userID: userId, threadID: processedThreadID })
 	if (!isOk(messagesResult)) return err('Could not fetch messages.\n' + getError(messagesResult))
 	const messages = getValue(messagesResult)
 
-	const temperatureResult = await getTemperature({ userID, threadID: processedThreadID })
+	const temperatureResult = await getTemperature({ userID: userId, threadID: processedThreadID })
 	if (!isOk(temperatureResult)) return err('Could not fetch temperature.\n' + getError(temperatureResult))
 	const temperature = getValue(temperatureResult)[0]?.Temperature
 
-	const typingSpeedResult = await getTypingSpeed({ userID, threadID: processedThreadID })
+	const typingSpeedResult = await getTypingSpeed({ userID: userId, threadID: processedThreadID })
 	if (!isOk(typingSpeedResult)) return err('Could not fetch typing speed.\n' + getError(typingSpeedResult))
 	const typingSpeed = getValue(typingSpeedResult)[0]?.TypingSpeed
 
-	return ok({ userID, threads, messages, temperature, typingSpeed })
+	return ok({ userId, threads, messages, temperature, typingSpeed })
 }
 
 // TODO: Increase abstraction level. Instead of if(err) return, do some kind of chain operation?
@@ -79,11 +79,11 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 // Input/Output: ({ credentials, threadIndex }) => <Result> of { ok: { userId, threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
 export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 	// get userId based on credentials, if no credentials return err('No credentials provided.')
-	const userID = 1 // TODO: get userId based on credentials
-	if (userID <= 0) return err('No userId found for the given credentials.')
-	return fetchThreadData({ userID, threadID: undefined, threadIndex })
+	const userId = 1 // TODO: get userId based on credentials
+	if (userId <= 0) return err('No userId found for the given credentials.')
+	return fetchThreadData({ userId, threadID: undefined, threadIndex })
 }
 
 // Side-effects: fetch threads, fetch messages for thread with threadId 
 // Input/Output: ({ userId, threadId }) => <Result> of { ok: { threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
-export const openThreadWorkflow = async ({ userId, threadid }) => fetchThreadData({ userID: userId, threadID: threadid })
+export const openThreadWorkflow = async ({ userId, threadid }) => fetchThreadData({ userId, threadID: threadid })

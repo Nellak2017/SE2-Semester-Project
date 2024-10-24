@@ -1,28 +1,28 @@
 export const result = (ok, error) => ({ ok, error }) // (ok, error) => <Result>{ ok, error }
 export const ok = value => result(value, '') // value => { ok: value, error: '' }
 export const err = error => result('', error) // error => { ok: '', error: error }
-export const isOk = result => result.error === ''
-export const getValue = result => result.ok
-export const getError = result => result.error
-export const map = (result, fn) => isOk(result) ? ok(fn(getValue(result))) : result
-export const flatMap = (result, fn) => isOk(result) ? fn(getValue(result)) : result
-export const apply = (result, fn) => fn(getValue(result))
-export const handle = (result, successFn, falureFn) => isOk(result) ? successFn(getValue(result)) : falureFn(getError(result))
+export const isOk = res => res.error === ''
+export const getValue = res => res.ok
+export const getError = res => res.error
+export const map = (res, fn) => isOk(res) ? ok(fn(getValue(res))) : res
+export const flatMap = (res, fn) => isOk(res) ? fn(getValue(res)) : res
+export const apply = (res, fn) => fn(getValue(res))
+export const handle = (res, successFn, falureFn) => isOk(res) ? successFn(getValue(res)) : falureFn(getError(res))
 export const tryCatchSync = (fn, errFn = e => e) => { // sync fn => <Result>
 	try { return ok(fn()) } catch (e) { return err(errFn(e)) }
 }
 export const tryCatchAsync = async (fn, errFn = e => e) => { // async fn => <Result>
 	try {
-		const result = await fn()
-		return ok(result)
+		const res = await fn()
+		return ok(res)
 	} catch (e) {
 		return err(errFn(e))
 	}
 }
 export const tryCatchAsyncPlain = async (okFn, errFn = e => e) => { // async fn => plain
 	try {
-		const result = await okFn()
-		return result
+		const res = await okFn()
+		return res
 	} catch (e) {
 		return errFn(e)
 	}

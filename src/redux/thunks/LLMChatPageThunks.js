@@ -15,8 +15,8 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 		return false
 	}
 	// otherwise, update userId, threads, messages
-	const { userID, threads, messages, temperature, typingSpeed } = getValue(result)
-	dispatch(setUserId(userID))
+	const { userId, threads, messages, temperature, typingSpeed } = getValue(result)
+	dispatch(setUserId(userId))
 	dispatch(setThreads(threads))
 	dispatch(setMessages(messages))
 	dispatch(setTemperature(temperature))
@@ -33,6 +33,25 @@ export const newChat = () => dispatch => {
 	dispatch(setIsNewChat(true))
 	dispatch(setTemperature(50))
 	dispatch(setTypingSpeed(50))
+}
+
+export const openExistingThread = ({ userId, index, threadid, isNewChat = false }) => async (dispatch) => {
+	dispatch(setThreadIndex(index))
+	dispatch(setIsNewChat(isNewChat)) // if deleting it should be true, if otherwise it should be false
+	dispatch(setUserInput(''))
+	const result = await openThreadWorkflow({ userId, threadid })
+	if (!isOk(result)) {
+		console.error('Failed to open existing thread.\n' + getError(result))
+		dispatch(addMessage({ MessageID: -1, ThreadID: threadid, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Failed to open existing thread.' }))
+		return
+	}
+	const { threads, messages, temperature, typingSpeed } = getValue(result)
+	// Note: setThreads ... setTypingSpeed are repeated in initialize, extract to common reducer
+	dispatch(setThreads(threads))
+	dispatch(setMessages(messages))
+	dispatch(setTemperature(temperature))
+	dispatch(setTypingSpeed(typingSpeed))
+	dispatch(highlightThread(index))
 }
 
 export const deleteThreadThunk = ({ userId, index, threadid = 0 }) => async (dispatch) => {
@@ -111,23 +130,4 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 
 	dispatch(setIsNewChat(false))
 	dispatch(setThreadIndex(nextThreadIndex))
-}
-
-export const openExistingThread = ({ userId, index, threadid, isNewChat = false }) => async (dispatch) => {
-	dispatch(setThreadIndex(index))
-	dispatch(setIsNewChat(isNewChat)) // if deleting it should be true, if otherwise it should be false
-	dispatch(setUserInput(''))
-	const result = await openThreadWorkflow({ userId, threadid })
-	if (!isOk(result)) {
-		console.error('Failed to open existing thread.\n' + getError(result))
-		dispatch(addMessage({ MessageID: -1, ThreadID: threadid, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Failed to open existing thread.' }))
-		return
-	}
-	const { threads, messages, temperature, typingSpeed } = getValue(result)
-	// Note: setThreads ... setTypingSpeed are repeated in initialize, extract to common reducer
-	dispatch(setThreads(threads))
-	dispatch(setMessages(messages))
-	dispatch(setTemperature(temperature))
-	dispatch(setTypingSpeed(typingSpeed))
-	dispatch(highlightThread(index))
 }

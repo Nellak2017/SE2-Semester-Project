@@ -13,9 +13,9 @@ export const handler = async (req, res) => {
 			`SELECT Temperature FROM Threads
 			 WHERE UserID = ? AND ThreadID = ?;
 			`
-		const result = await db.query(query, [userID, threadID])
-		return res.status(200).json(result[0])
-	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
+		const dbResult = await db.query(query, [userID, threadID])
+		return res.status(200).json(dbResult[0])
+	}, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result
 }

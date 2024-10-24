@@ -18,13 +18,13 @@ export const handler = async (req, res) => {
       FROM Threads
       WHERE UserID = ? AND Name = ?;
     `
-		const [result] = await db.query(query, [userID, threadName])
+		const [dbResult] = await db.query(query, [userID, threadName])
 
-		return result[0].count > 0
+		return dbResult[0].count > 0
 			? res.status(200).json({ exists: true })
 			: res.status(200).json({ exists: false })
 
-	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
+	}, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result
 }

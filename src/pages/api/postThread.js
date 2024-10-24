@@ -22,10 +22,10 @@ export const handler = async (req, res) => {
 			INSERT INTO Threads (Name, UserID)
 			VALUES (?, ?);
     	`
-		const result = await db.query(query, [threadName, userID])
-		const newThreadID = result[0].insertId
+		const dbResult = await db.query(query, [threadName, userID])
+		const newThreadID = dbResult[0].insertId
 		res.status(200).json({ message: 'Thread created successfully.', newThreadID })
-	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message (security vulnerability)
+	}, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message (security vulnerability)
 
 	return result 
 }
