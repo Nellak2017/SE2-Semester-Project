@@ -18,7 +18,7 @@ export const handler = async (req, res) => {
       await db.query('ROLLBACK')
       res.status(500).json({ error: 'Delete did not go through due to an Internal Server Error.' }) // e.message
     }
-  }, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
+  }, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
   return result
 }

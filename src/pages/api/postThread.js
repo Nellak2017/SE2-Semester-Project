@@ -5,7 +5,7 @@ export const handler = async (req, res) => {
 	const { userID, threadName } = req.body
 	if ((!userID && userID !== 0) || !threadName) return res.status(400).json({ error: 'Both userID and threadName are required parameters and must not be missing.' })
 
-	const result = await tryCatchAsyncPlain(async () => {
+const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
 		// 1. Check number of threads for user
 		const countQuery = `
@@ -25,6 +25,7 @@ export const handler = async (req, res) => {
 		const dbResult = await db.query(query, [threadName, userID])
 		const newThreadID = dbResult[0].insertId
 		res.status(200).json({ message: 'Thread created successfully.', newThreadID })
+		return null
 	}, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message (security vulnerability)
 
 	return result 

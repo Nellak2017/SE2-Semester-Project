@@ -42,7 +42,8 @@ export const createLLMPageServices = store => {
 		},
 		chatListServices: {
 			scrollHandler: () => {
-			}, // not implemented
+				// empty because not implemented
+			},
 			chatInputServices: {
 				userInputChange: (userInput) => {
 					dispatch(setUserInput(userInput))

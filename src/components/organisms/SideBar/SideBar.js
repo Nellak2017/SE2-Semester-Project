@@ -4,9 +4,9 @@ import { BiExport } from 'react-icons/bi'
 import { MdLogout } from 'react-icons/md'
 import OutlineButton from "../../atoms/OutlineButton/OutlineButton.js"
 import ThreadList from "../../molecules/ThreadList/ThreadList"
-import Slider from '@mui/material/Slider'
-import { handleExportButtonClick } from "../../../utils/helpers.js"
-import { VARIANTS, SX_SLIDER, SLIDER_LENGTH } from '../../utils/constants.js'
+import { handleExportButtonClick, noop } from "../../../utils/helpers.js"
+import { VARIANTS } from '../../utils/constants.js'
+import CustomSlider from "../../molecules/CustomSlider/CustomSlider.js"
 
 export default function SideBar({ state, services, ...props }) {
 	const {
@@ -23,8 +23,18 @@ export default function SideBar({ state, services, ...props }) {
 		threads = [],
 		threadListState,
 	} = state || {}
-	const { sideBarOpen = () => { }, newChat = () => { }, temperatureChange = () => { }, temperatureUpdate = () => { }, typingSpeedChange = () => { }, typingSpeedUpdate = () => { }, exportHandler = messages => handleExportButtonClick(messages), threadListServices, } = services || {}
+	const { sideBarOpen = noop, newChat = noop, temperatureChange = noop, temperatureUpdate = noop, typingSpeedChange = noop, typingSpeedUpdate = noop, exportHandler = messages => handleExportButtonClick(messages), threadListServices, } = services || {}
 	const threadID = threads[threadIndex]?.ThreadID
+	const slidersConfig = [
+		{
+			state: { title: "Temperature", value: temperature, },
+			services: { onMouseUp: () => temperatureUpdate({ userId, threadID, temperature }), onChange: (_, temp) => temperatureChange(temp), },
+		},
+		{
+			state: { title: "Typing Speed", value: typingSpeed, },
+			services: { onMouseUp: () => typingSpeedUpdate({ userId, threadID, typingSpeed }), onChange: (_, typSpd) => typingSpeedChange(typSpd), },
+		},
+	]
 	return (
 		<SideBarContainer $maxwidth={maxwidth} $isOpen={isSideBarOpen} {...props}>
 			<section>
@@ -43,41 +53,7 @@ export default function SideBar({ state, services, ...props }) {
 				<ThreadList state={threadListState} services={threadListServices} />
 			</section>
 			<section>
-				{/* TODO: Don't repeat yourself with the SliderContainers, extract to a molecule then map through them */}
-				<SliderContainer>
-					<div>
-						<h1>Temperature</h1>
-						<Slider
-							aria-label="Temperature"
-							size="small"
-							value={temperature}
-							min={1}
-							step={1}
-							max={SLIDER_LENGTH}
-							onMouseUp={() => temperatureUpdate({ userId, threadID, temperature })}
-							onChange={(_, temp) => temperatureChange(temp)}
-							sx={SX_SLIDER}
-							defaultValue={temperature}
-						/>
-					</div>
-				</SliderContainer>
-				<SliderContainer>
-					<div>
-						<h1>Typing Speed</h1>
-						<Slider
-							aria-label="Typing Speed"
-							size="small"
-							value={typingSpeed}
-							min={1}
-							step={1}
-							max={SLIDER_LENGTH}
-							onMouseUp={() => typingSpeedUpdate({ userId, threadID, typingSpeed })}
-							onChange={(_, typSpd) => typingSpeedChange(typSpd)}
-							sx={SX_SLIDER}
-							defaultValue={typingSpeed}
-						/>
-					</div>
-				</SliderContainer>
+				{slidersConfig.map((slider, index) => (<CustomSlider key={slider.state.title || index} state={slider.state} services={slider.services} />))}
 				{/* TODO: Map through the outline buttons*/}
 				<OutlineButton
 					state={{ variant, icon: <BiExport />, text: exportText, centered: false, maxheight: 44 }}

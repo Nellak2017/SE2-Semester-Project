@@ -42,14 +42,3 @@ export const IconContainer = styled.div`
 		z-index: 999; /* Adjust z-index as needed */
 	}
 `
-
-export const SliderContainer = styled.div`
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-
-	& div {
-		width: 80%;
-	}
-`
