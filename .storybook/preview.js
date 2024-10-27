@@ -28,6 +28,7 @@ export default {
   // Wrap every story in the story book with a ThemeProvider and the GlobalStyles
   decorators: [
     (Story) => (
+      // skipcq: JS-0417
       <StyleSheetManager shouldForwardProp={prop => isPropValid(prop)}>
         <ThemeProvider theme={theme}>
           <ToastContainer position="bottom-left" autoClose={3000} />
