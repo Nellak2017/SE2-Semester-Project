@@ -29,6 +29,7 @@ export const Home = () => {
         maxwidth: 260,
         threads: useSelector(state => state.LLMChatPage.sideBar.threads),
       },
+      chatHistory: useSelector(state => state.LLMChatPage.chatHistory),
     },
     chatListState: {
       variant: useSelector(state => state.LLMChatPage.variant),
