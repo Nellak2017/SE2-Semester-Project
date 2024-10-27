@@ -1,4 +1,5 @@
 import SideBar from './SideBar'
+import { noop } from '../../../utils/helpers'
 
 export default {
 	title: 'Organisms/SideBar',
@@ -46,8 +47,8 @@ Dark.args = {
 		threads: exampleThreadInfo,
 		initialTemperature: 50,
 		initialTypingSpeed: 50,
-		threadListenerList: [() => { }],
-		trashListenerList: [() => { }],
+		threadListenerList: [noop],
+		trashListenerList: [noop],
 		maxwidth: 260,
 		buttonText: "New Chat",
 		logoutText: "Log Out",

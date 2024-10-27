@@ -10,7 +10,7 @@ export const handler = async (req, res) => {
 		sentByUser === undefined) {
 		return res.status(400).json({ error: 'threadID, userID, text, and sentByUser are required parameters.' })
 	}
-	const result = await tryCatchAsyncPlain(async () => {
+const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
 		// 1. Check number of messages for user and given thread
 		const countQuery = `
@@ -29,7 +29,8 @@ export const handler = async (req, res) => {
     	`
 		await db.query(query, [threadID, userID, text, sentByUser])
 		res.status(200).json({ message: 'Message added successfully.' })
-	}, e => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
+		return null
+	}, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 
 	return result 
 }

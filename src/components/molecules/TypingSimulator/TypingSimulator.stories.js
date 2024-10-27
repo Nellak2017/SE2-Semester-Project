@@ -44,7 +44,7 @@ const typeCharacters = async () => {
 export const Light = Template.bind({})
 Light.args = {
   message: 'light',
-  typingSpeed: .5
+  typingSpeed: 0.5
 }
 
 export const Dark = Template.bind({})
