@@ -9,7 +9,7 @@
     "test": "jest",
     "lint": "next lint",
     "lint-count": "next lint 2>&1 | grep -Ei \"error|warning\" | wc -l | xargs -I {} echo \"{} problems\"",
-    "line-count-sorted-no-fluff": "find ./src/ -type f \\( -name '*.js' -o -name '*.mjs' \\) ! \\( -name '*stories*' -o -name '*test*' \\) -exec wc -l {} + | sort", 
+    "line-count-sorted-no-fluff": "find ./src/ -type f \\( -name '*.js' -o -name '*.mjs' \\) ! \\( -name '*stories*' -o -name '*test*' \\) -exec wc -l {} + | sort",
     "storybook": "storybook dev -p 6007",
     "build-storybook": "storybook build"
   },
@@ -30,6 +30,7 @@
     "mysql2": "^3.6.5",
     "net": "^1.0.2",
     "next": "^14.2.7",
+    "parse-numeric-range": "^1.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.12.0",

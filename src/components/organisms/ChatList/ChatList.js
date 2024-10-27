@@ -3,10 +3,11 @@ import ChatInput from '../../atoms/ChatInput/ChatInput.js'
 import { VARIANTS, USER_LOGOS } from '../../utils/constants'
 import { ChatListContainer, MessageContainer } from './ChatList.elements.js'
 import { PiPlaceholderDuotone } from 'react-icons/pi'
+import { noop } from '../../../utils/helpers.js'
 
 export default function ChatList({ state, services }) {
 	const { variant = VARIANTS.dark, chatHistory = [], userLogos = USER_LOGOS, typingSpeed = 50, chatInputState, } = state || {}
-	const { scrollHandler = () => { }, chatInputServices,} = services || {}
+	const { scrollHandler = noop, chatInputServices } = services || {}
 	return (
 		<ChatListContainer variant={variant}>
 			<MessageContainer onScroll={scrollHandler}>

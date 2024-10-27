@@ -38,7 +38,7 @@ export default function SideBar({ state, services, ...props }) {
 	},
 	{
 		state: { variant, icon: <MdLogout />, text: logoutText, centered: false, maxheight: 44 },
-		services: { onClick: () => console.warn("TODO: Add logout feature") }, // TODO: Add logout feature
+		services: { onClick: () => console.warn("Add logout feature") }, // Logout feature goes here
 		key: 'logoutButton',
 	}]
 	return (

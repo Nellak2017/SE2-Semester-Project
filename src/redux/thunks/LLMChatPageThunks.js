@@ -11,7 +11,7 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	// 2. update threads and messages OR display an error when handling the result
 	if (!isOk(result)) {
 		console.error(getError(result))
-		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'An initialization error occurred.\n' + getError(result) }))
+		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: `An initialization error occurred.\n${getError(result)}` }))
 		return false
 	}
 	// otherwise, update userId, threads, messages
@@ -41,7 +41,7 @@ export const openExistingThread = ({ userId, index, threadid, isNewChat = false 
 	dispatch(setUserInput(''))
 	const result = await openThreadWorkflow({ userId, threadid })
 	if (!isOk(result)) {
-		console.error('Failed to open existing thread.\n' + getError(result))
+		console.error(`Failed to open existing thread.\n${getError(result)}`)
 		dispatch(addMessage({ MessageID: -1, ThreadID: threadid, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Failed to open existing thread.' }))
 		return
 	}
@@ -55,18 +55,14 @@ export const openExistingThread = ({ userId, index, threadid, isNewChat = false 
 }
 
 export const deleteThreadThunk = ({ userId, index, threadid = 0 }) => async (dispatch) => {
-	dispatch(deleteThread(index))
-	dispatch(deleteMessages())
-	dispatch(highlightThread(-1))
 	const deleteResult = await deleteThreadAPI({ userID: userId, threadID: threadid })
 	handle(deleteResult,
-		_ => dispatch(openExistingThread({ userId, index, threadid, isNewChat: true })),
-		err => {
-			console.error('Error deleting.')
-			console.error(err)
-		},
-	)
-	// TODO: If deletion fails rollback UI
+		_ => { // NOTE: doing it this way will make the UI appear to lag but it will trivially never get into invalid states
+			dispatch(deleteThread(index))
+			dispatch(deleteMessages())
+			dispatch(highlightThread(-1))
+			dispatch(openExistingThread({ userId, index, threadid, isNewChat: true }))
+		}, err => { console.error(`Error deleting.\n${err}`) },)
 }
 
 export const temperatureUpdate = ({ userId, threadID, temperature }) => dispatch => {
@@ -98,7 +94,7 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 			err => {
 				console.error('Could not update messages with AI response.')
 				console.error(err)
-				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: 'Could not update messages with AI response.\n' + err }))
+				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: `Could not update messages with AI response.\n${err}` }))
 			}
 		)
 		return result
