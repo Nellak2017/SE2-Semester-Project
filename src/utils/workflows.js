@@ -12,23 +12,23 @@ const fetchAIResponse = async ({ contents }) => {
 	return ok(parts[0].text)
 }
 
-// Input/Output: ({ userId, threadID, threadIndex }) => <Result> of { ok: { userId, threads, messages, temperature, typingSpeed } | '', error: string | '' }
-const fetchThreadData = async ({ userId, threadID, threadIndex = -1 }) => {
-	const threadsResult = await getThreads({ userID: userId })
+// Input/Output: ({ userId, threadId, threadIndex }) => <Result> of { ok: { userId, threads, messages, temperature, typingSpeed } | '', error: string | '' }
+const fetchThreadData = async ({ userId, threadId, threadIndex = -1 }) => {
+	const threadsResult = await getThreads({ userId })
 	if (!isOk(threadsResult)) return err(`Could not fetch threads when opening existing thread.\n${getError(threadsResult)}`)
 	const threads = highlightThread(getValue(threadsResult), threadIndex) // if threadIndex = -1 it doesn't highlight
 	const processedIndex = threadIndex > threads.length || threadIndex < 0 ? 0 : threadIndex
-	const processedThreadID = !threadID ? threads?.[processedIndex]?.ThreadID : threadID
+	const processedThreadID = !threadId ? threads?.[processedIndex]?.threadId : threadId
 
-	const messagesResult = await getMessages({ userID: userId, threadID: processedThreadID })
+	const messagesResult = await getMessages({ userId, threadId: processedThreadID })
 	if (!isOk(messagesResult)) return err(`Could not fetch messages.\n${getError(messagesResult)}`)
 	const messages = getValue(messagesResult)
 
-	const temperatureResult = await getTemperature({ userID: userId, threadID: processedThreadID })
+	const temperatureResult = await getTemperature({ userId, threadId: processedThreadID })
 	if (!isOk(temperatureResult)) return err(`Could not fetch temperature.\n${getError(temperatureResult)}`)
 	const temperature = getValue(temperatureResult)[0]?.Temperature
 
-	const typingSpeedResult = await getTypingSpeed({ userID: userId, threadID: processedThreadID })
+	const typingSpeedResult = await getTypingSpeed({ userId, threadId: processedThreadID })
 	if (!isOk(typingSpeedResult)) return err(`Could not fetch typing speed.\n${getError(typingSpeedResult)}`)
 	const typingSpeed = getValue(typingSpeedResult)[0]?.TypingSpeed
 
@@ -44,7 +44,7 @@ export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText
 	const AIText = getValue(LLMResult)
 
 	// 2. Update Database with user and AI messages
-	const messagesResult = await addMessageAndResponse({ userID: userId, threadID: threadId, userText, AIText })
+	const messagesResult = await addMessageAndResponse({ userId, threadId, userText, AIText })
 	if (!isOk(messagesResult)) return err(`Failed to update the database with the user and LLM messages.\n${getError(messagesResult)}`)
 
 	// 3. If all ok, then return ok({userMessage, LLMResponse})
@@ -61,10 +61,10 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 
 	// 2. Update Database with unique title
 	const AIBaseText = getValue(LLMResult).slice(0, 50).trim()
-	const threadExistsResult = await getThreadNameExists({ userID: userId, threadName: AIBaseText })
+	const threadExistsResult = await getThreadNameExists({ userId, threadName: AIBaseText })
 	if (!isOk(threadExistsResult)) return err(`Could not verify if the thread existed already or not. New thread was not added.\n${getError(threadExistsResult)}`)
 	const threadAlreadyExists = getValue(threadExistsResult)?.exists
-	const titleResult = await postThread({ userID: userId, threadName: threadAlreadyExists ? AIBaseText + (new Date().toISOString()) : AIBaseText }) // the date string is used to guaranteee uniqueness
+	const titleResult = await postThread({ userId, threadName: threadAlreadyExists ? AIBaseText + (new Date().toISOString()) : AIBaseText }) // the date string is used to guaranteee uniqueness
 	if (!isOk(titleResult)) return err(`Could not update thread title in the database.\n${getError(titleResult)}`)
 
 	const { newThreadID } = getValue(titleResult) // { message , newThreadID: int }
@@ -77,10 +77,10 @@ export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 	// get userId based on credentials, if no credentials return err('No credentials provided.')
 	const userId = 1 // TODO: get userId based on credentials
 	if (userId <= 0) return err('No userId found for the given credentials.')
-	const res = await fetchThreadData({ userId, threadID: undefined, threadIndex })
+	const res = await fetchThreadData({ userId, threadId: undefined, threadIndex })
 	return res
 }
 
 // Side-effects: fetch threads, fetch messages for thread with threadId 
 // Input/Output: ({ userId, threadId }) => <Result> of { ok: { threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
-export const openThreadWorkflow = async ({ userId, threadid }) => fetchThreadData({ userId, threadID: threadid })
+export const openThreadWorkflow = async ({ userId, threadId }) => fetchThreadData({ userId, threadId })
