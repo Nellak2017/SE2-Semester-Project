@@ -4,7 +4,6 @@ import { isOk, err, ok, getValue, getError } from './result'
 import { highlightThread } from './helpers'
 import { generatePalmMessage } from './palmApi'
 
-// --- Helpers
 const fetchAIResponse = async ({ contents }) => {
 	const LLMResult = await generatePalmMessage({ contents })
 	if (!isOk(LLMResult)) return err(`Unable to get a valid LLM response.\n${getError(LLMResult)}`)
@@ -36,9 +35,6 @@ const fetchThreadData = async ({ userId, threadID, threadIndex = -1 }) => {
 	return ok({ userId, threads, messages, temperature, typingSpeed })
 }
 
-// TODO: Increase abstraction level. Instead of if(err) return, do some kind of chain operation?
-
-// --- Sequential API convienience functions
 // Side-effects: Post user message, Get LLM response, Post LLM message
 // Input/Output: ({ userId, chatHistory, threadId, userText }) => <Result> of { ok: { userMessage, LLMResponse } | '', error: string | '' }
 export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText }) => {

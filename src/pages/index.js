@@ -6,8 +6,10 @@ import { initialize } from '../redux/thunks/LLMChatPageThunks.js'
 import { useLLMChatState } from '../components/stateHooks/LLMChatPage/useLLMChatState.js'
 import 'react-toastify/dist/ReactToastify.css'
 
-// TODO: make naming conventions consistent
+// TODO: Make naming conventions consistent
 // TODO: Add Error Boundaries
+// TODO: Add Error and Logging aspects to service object and state selectors
+// TODO: Add complete testing solutions
 export const Home = () => {
   useEffect(() => { store.dispatch(initialize({ credentials: {} })) }, [])
   return (<LLMChat state={useLLMChatState()} services={createLLMPageServices(store)} />)

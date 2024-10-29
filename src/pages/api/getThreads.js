@@ -3,10 +3,10 @@ import { tryCatchAsyncPlain } from '../../utils/result'
 
 // Serverless function handler
 export const handler = async (req, res) => {
-	const { userID } = req.query
-	if (!userID && userID !== 0) return res.status(400).json({ error: 'userID is the required parameter and it is missing.' })
-	if (userID <= 0) return res.status(400).json({ error: 'userID must be positive and greater than 0.' })
-	if (typeof parseInt(userID) !== 'number' || isNaN(userID)) return res.status(400).json({ error: 'userID must be a non-NaN number.' })
+	const { userId } = req.query
+	if (!userId && userId !== 0) return res.status(400).json({ error: 'userId is the required parameter and it is missing.' })
+	if (userId <= 0) return res.status(400).json({ error: 'userId must be positive and greater than 0.' })
+	if (typeof parseInt(userId) !== 'number' || isNaN(userId)) return res.status(400).json({ error: 'userId must be a non-NaN number.' })
 
 	const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
@@ -17,7 +17,7 @@ export const handler = async (req, res) => {
 			WHERE Threads.UserID = ?
 			LIMIT 10;
 			`
-		const dbResult = await db.query(query, [userID])
+		const dbResult = await db.query(query, [userId])
 		return res.status(200).json(dbResult[0])
 	}, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message
 

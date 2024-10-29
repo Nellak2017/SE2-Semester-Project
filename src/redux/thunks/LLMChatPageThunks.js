@@ -4,12 +4,17 @@ import { patchTemperature, patchTypingSpeed, deleteThread as deleteThreadAPI } f
 import { isOk, handle, getError, getValue } from '../../utils/result.js'
 import { convertMessagesToGemini } from '../../utils/helpers.js'
 
+const dispatchChatData = (dispatch, { threads, messages, temperature, typingSpeed }) => {
+	dispatch(setThreads(threads))
+	dispatch(setMessages(messages))
+	dispatch(setTemperature(temperature))
+	dispatch(setTypingSpeed(typingSpeed))
+}
+
 // initialize LLMChatPage (used in Login/Signup), returns boolean to indicate if successful updating userId, threads, and messages
 export const initialize = ({ credentials }) => async (dispatch) => {
-	// 1. initializeWorkflow({ credentials, threadIndex:0 }) => <Result> of { ok: { userId, threads, messages } | '' , error: string | ''}
-	const result = await initializeWorkflow({ credentials, threadIndex: 0 })
-	// 2. update threads and messages OR display an error when handling the result
-	if (!isOk(result)) {
+	const result = await initializeWorkflow({ credentials, threadIndex: 0 }) // 1. initializeWorkflow({ credentials, threadIndex:0 }) => <Result> of { ok: { userId, threads, messages } | '' , error: string | ''}
+	if (!isOk(result)) { // 2. update threads and messages OR display an error when handling the result
 		console.error(getError(result))
 		dispatch(addMessage({ MessageID: 1, ThreadID: 1, Text: '', TimeStamp: new Date().toISOString(), SentByUser: 'user', error: `An initialization error occurred.\n${getError(result)}` }))
 		return false
@@ -17,15 +22,11 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	// otherwise, update userId, threads, messages
 	const { userId, threads, messages, temperature, typingSpeed } = getValue(result)
 	dispatch(setUserId(userId))
-	dispatch(setThreads(threads))
-	dispatch(setMessages(messages))
-	dispatch(setTemperature(temperature))
-	dispatch(setTypingSpeed(typingSpeed))
+	dispatchChatData(dispatch, { threads, messages, temperature, typingSpeed })
 	dispatch(setIsNewChat(threads.length === 0 || messages.length === 0))
 	return true
 }
 
-// TODO: Extract all sequential dispatches to a single reducer wherever it is done for simplicity!
 export const newChat = () => dispatch => {
 	dispatch(highlightThread(-1))
 	dispatch(setThreadIndex(0))
@@ -46,11 +47,7 @@ export const openExistingThread = ({ userId, index, threadid, isNewChat = false 
 		return
 	}
 	const { threads, messages, temperature, typingSpeed } = getValue(result)
-	// Note: setThreads ... setTypingSpeed are repeated in initialize, extract to common reducer
-	dispatch(setThreads(threads))
-	dispatch(setMessages(messages))
-	dispatch(setTemperature(temperature))
-	dispatch(setTypingSpeed(typingSpeed))
+	dispatchChatData(dispatch, { threads, messages, temperature, typingSpeed })
 	dispatch(highlightThread(index))
 }
 
@@ -81,7 +78,6 @@ export const typingSpeedUpdate = ({ userId, threadID, typingSpeed }) => dispatch
 export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, updatedThreadId, messageId, nextThreadIndex, chatHistory }) => async (dispatch) => {
 	const userMessage = { MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user' }
 	const processedNewChatHistory = convertMessagesToGemini([userMessage, ...chatHistory]).toReversed()
-
 	const updateMessagesWithAIResponse = async (processedThreadId) => {
 		const result = await dialogueWorkflow({ userId, chatHistory: processedNewChatHistory, threadId: processedThreadId, userText: userMessage.Text })
 		if (chatHistory?.[0]?.error) dispatch(setMessages(chatHistory.slice(1, chatHistory.length))) // if we have an error displayed, remove it before proceeding
@@ -92,8 +88,7 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 				dispatch(setUserInput(''))
 			},
 			err => {
-				console.error('Could not update messages with AI response.')
-				console.error(err)
+				console.error(`Could not update messages with AI response.${err}`)
 				dispatch(addMessage({ MessageID: messageId, ThreadID: threadId, Text: userInput, TimeStamp: new Date().toISOString(), SentByUser: 'user', error: `Could not update messages with AI response.\n${err}` }))
 			}
 		)
@@ -123,7 +118,6 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 	const { newThreadID } = getValue(titleResult)
 	const messagesResult = await updateMessagesWithAIResponse(newThreadID)
 	if (!isOk(messagesResult)) return
-
 	dispatch(setIsNewChat(false))
 	dispatch(setThreadIndex(nextThreadIndex))
 }

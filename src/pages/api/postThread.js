@@ -2,8 +2,8 @@ import { connectToDatabase } from './utils/db'
 import { tryCatchAsyncPlain } from '../../utils/result'
 
 export const handler = async (req, res) => {
-	const { userID, threadName } = req.body
-	if ((!userID && userID !== 0) || !threadName) return res.status(400).json({ error: 'Both userID and threadName are required parameters and must not be missing.' })
+	const { userId, threadName } = req.body
+	if ((!userId && userId !== 0) || !threadName) return res.status(400).json({ error: 'Both userId and threadName are required parameters and must not be missing.' })
 
 const result = await tryCatchAsyncPlain(async () => {
 		const db = await connectToDatabase()
@@ -13,7 +13,7 @@ const result = await tryCatchAsyncPlain(async () => {
 			FROM Threads
 			WHERE UserID = ?;
 		`
-		const countResult = await db.query(countQuery, [userID])
+		const countResult = await db.query(countQuery, [userId])
 		const threadCount = countResult[0][0].threadCount
 		if (threadCount >= 10) return res.status(403).json({ error: 'User has reached the maximum limit of 10 threads.' })
 
@@ -22,7 +22,7 @@ const result = await tryCatchAsyncPlain(async () => {
 			INSERT INTO Threads (Name, UserID)
 			VALUES (?, ?);
     	`
-		const dbResult = await db.query(query, [threadName, userID])
+		const dbResult = await db.query(query, [threadName, userId])
 		const newThreadID = dbResult[0].insertId
 		res.status(200).json({ message: 'Thread created successfully.', newThreadID })
 		return null

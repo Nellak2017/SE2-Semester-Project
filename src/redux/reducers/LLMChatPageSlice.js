@@ -27,14 +27,8 @@ const LLMChatPageSlice = createSlice({
 		toggleSidebarOpen: (state, _) => { state.sideBar.isSideBarOpen = !state.sideBar.isSideBarOpen },
 		setTemperature: (state, action) => { state.sideBar.temperature = action.payload },
 		setTypingSpeed: (state, action) => { state.typingSpeed = action.payload },
-		setThreadIndex: (state, action) => {
-			const index = action.payload
-			state.threadIndex = index
-		},
-		setThreads: (state, action) => {
-			const threads = action.payload
-			state.sideBar.threads = threads
-		},
+		setThreadIndex: (state, action) => { state.threadIndex = action.payload },
+		setThreads: (state, action) => { state.sideBar.threads = action.payload },
 		deleteThread: (state, action) => {
 			const index = action.payload
 			state.sideBar.threads = [
@@ -42,32 +36,16 @@ const LLMChatPageSlice = createSlice({
 				...state.sideBar.threads.slice(index + 1),
 			] // delete it using array destructuring
 		},
-		addThread: (state, action) => {
-			const thread = action.payload
-			state.sideBar.threads = [...state.sideBar.threads, thread]
-		},
+		addThread: (state, action) => { state.sideBar.threads = [...state.sideBar.threads, action.payload] },
 		addMessage: (state, action) => {
 			if (state.chatHistory[0]?.error) return // prevents 2 errors displayed at once
-			const message = action.payload
-			state.chatHistory = [message, ...state.chatHistory]
+			state.chatHistory = [action.payload, ...state.chatHistory]
 		},
-		setMessages: (state, action) => {
-			const messages = action.payload
-			state.chatHistory = messages
-		},
+		setMessages: (state, action) => { state.chatHistory = action.payload },
 		deleteMessages: (state, _) => { state.chatHistory = [] },
-		setUserInput: (state, action) => {
-			const userInput = action.payload
-			state.chatList.userInput = userInput
-		},
-		setIsNewChat: (state, action) => {
-			const bool = Boolean(action.payload)
-			state.chatList.isNewChat = bool
-		},
-		highlightThread: (state, action) => {
-			const index = action.payload
-			state.sideBar.threads = state.sideBar.threads.map((e, i) => ({ ...e, highlighted: i === index }))
-		}
+		setUserInput: (state, action) => { state.chatList.userInput = action.payload },
+		setIsNewChat: (state, action) => { state.chatList.isNewChat = Boolean(action.payload) },
+		highlightThread: (state, action) => { state.sideBar.threads = state.sideBar.threads.map((e, i) => ({ ...e, highlighted: i === action.payload })) }
 	}
 })
 
