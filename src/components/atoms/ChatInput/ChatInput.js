@@ -6,20 +6,18 @@ import { VARIANTS } from '../../utils/constants'
 import { noop } from '../../../utils/helpers'
 
 export default function ChatInput({ state, services, ...rest }) {
-	const { variant = VARIANTS.dark, placeholder = 'Write a Message...', name = '', buttonType = 'submit', userID = 0, userInput = '', isNewChat = false, threads = [], threadIndex = 0, chatHistory = [], } = state || {}
+	const { variant = VARIANTS.dark, placeholder = 'Write a Message...', name = '', buttonType = 'submit', userId = 0, userInput = '', isNewChat = false, threads = [], threadIndex = 0, chatHistory = [], } = state || {}
 	const { userInputSubmit = noop, userInputChange = noop, onBlur = noop, } = services || {}
 	const ref = useRef(null)
 	const handleClick = useCallback(() => ref.current.focus(), [ref]), handleInputChange = useCallback(e => userInputChange(e.target.value), [userInputChange])
 	const handleSubmit = useCallback(() => userInputSubmit({
-		userId: userID,
-		userInput,
-		isNewChat,
-		threadId: threads?.[threadIndex]?.ThreadID || 0,
-		updatedThreadId: threads?.[threads.length - 1]?.ThreadID + 1 || 0,
-		messageId: chatHistory?.[0]?.MessageID + 1 || 0,
+		userId, userInput, isNewChat,
+		threadId: threads?.[threadIndex]?.threadId || 0,
+		updatedThreadId: threads?.[threads.length - 1]?.threadId + 1 || 0,
+		messageId: chatHistory?.[0]?.messageId + 1 || 0,
 		nextThreadIndex: threads.length || 0,
 		chatHistory
-	}), [chatHistory, isNewChat, threadIndex, threads, userID, userInput, userInputSubmit])
+	}), [chatHistory, isNewChat, threadIndex, threads, userId, userInput, userInputSubmit])
 
 	return (
 		<ChatInputParent variant={variant} onClick={handleClick}>

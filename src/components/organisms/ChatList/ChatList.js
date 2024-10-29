@@ -12,18 +12,9 @@ export default function ChatList({ state, services }) {
 		<ChatListContainer variant={variant}>
 			<MessageContainer onScroll={scrollHandler}>
 				{chatHistory?.map((el, i) => {
-					const { SentByUser: user, Text: text, MessageID: messageId, error } = el || {}
-					return (
-						<Chat
-							state={{
-								user,
-								text,
-								error,
-								userLogo: userLogos[user] || <PiPlaceholderDuotone />,
-								typingSpeed: i === 0 && typingSpeed, // typingSpeed or false
-							}}
-							key={`text-${messageId}`}
-						/>)
+					const { sentByUser: user, text, messageId, error } = el || {}
+					const userLogo = userLogos[user] || <PiPlaceholderDuotone />, newTypingSpeed = i === 0 && typingSpeed /* typingSpeed or false */
+					return (<Chat state={{ user, text, error, userLogo, typingSpeed: newTypingSpeed, }} key={`text-${messageId}`} />)
 				})}
 			</MessageContainer>
 			<ChatInput state={chatInputState} services={chatInputServices} />

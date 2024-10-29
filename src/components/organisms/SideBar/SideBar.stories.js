@@ -26,18 +26,7 @@ const exampleThreadInfo = [
 
 export const Light = Template.bind({})
 Light.args = {
-	state: {
-		variant: 'light',
-		threads: exampleThreadInfo,
-		// initialTemperature: 50,
-		// initialTypingSpeed: 50,
-		// threadListenerList: [() => { }],
-		// trashListenerList: [() => { }],
-		// maxwidth: 260,
-		// buttonText: "New Chat",
-		// logoutText: "Log Out",
-		// exportText: "Export to Text",
-	},
+	state: { variant: 'light', threads: exampleThreadInfo, },
 }
 
 export const Dark = Template.bind({})

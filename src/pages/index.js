@@ -7,6 +7,7 @@ import { useLLMChatState } from '../components/stateHooks/LLMChatPage/useLLMChat
 import 'react-toastify/dist/ReactToastify.css'
 
 // TODO: Make naming conventions consistent
+// TODO: Discover how the messageHistory is recieved, like the Pascal or CamelCasing and fix this potential issue
 // TODO: Add Error Boundaries
 // TODO: Add Error and Logging aspects to service object and state selectors
 // TODO: Add complete testing solutions

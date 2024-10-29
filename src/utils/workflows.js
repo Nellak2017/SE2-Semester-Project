@@ -71,7 +71,7 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 	return ok({ LLMResponse: AIBaseText, newThreadId })
 }
 
-// Side-effects: get userID, fetch threads, fetch messages for 0th thread 
+// Side-effects: get userId, fetch threads, fetch messages for 0th thread 
 // Input/Output: ({ credentials, threadIndex }) => <Result> of { ok: { userId, threads, messages, temperature, typingSpeed } | '' , error: string | ''} 
 export const initializeWorkflow = async ({ credentials, threadIndex = 0 }) => {
 	// get userId based on credentials, if no credentials return err('No credentials provided.')

@@ -52,65 +52,65 @@ Notice that the above text goes outside the box, but if styled right it instead 
 
 const exampleChatHistory = [
 	{
-		SentByUser: 'model',
-		Text: markdownContent, // 'first (oldest)',
-		MessageID: 0
+		sentByUser: 'model',
+		text: markdownContent, // 'first (oldest)',
+		messageId: 0
 	},
 	{
-		SentByUser: 'user',
-		Text: 'second',
-		MessageID: 1
+		sentByUser: 'user',
+		text: 'second',
+		messageId: 1
 	},
 	{
-		SentByUser: 'model',
-		Text: 'third',
+		sentByUser: 'model',
+		text: 'third',
 		error: 'An Error occurred, please refresh and try again', // optional parameter
-		MessageID: 2
+		messageId: 2
 	},
 	{
-		SentByUser: 'user',
-		Text: 'fourth',
-		MessageID: 3
+		sentByUser: 'user',
+		text: 'fourth',
+		messageId: 3
 	},
 	{
-		SentByUser: 'model',
-		Text: 'fifth',
-		MessageID: 4
+		sentByUser: 'model',
+		text: 'fifth',
+		messageId: 4
 	},
 	{
-		SentByUser: 'user',
-		Text: 'sixth',
-		MessageID: 5
+		sentByUser: 'user',
+		text: 'sixth',
+		messageId: 5
 	},
 	{
-		SentByUser: 'model',
-		Text: 'seventh',
-		MessageID: 6
+		sentByUser: 'model',
+		text: 'seventh',
+		messageId: 6
 	},
 	{
-		SentByUser: 'user',
-		Text: 'eigth',
-		MessageID: 7
+		sentByUser: 'user',
+		text: 'eigth',
+		messageId: 7
 	},
 	{
-		SentByUser: 'model',
-		Text: 'ninth',
-		MessageID: 8
+		sentByUser: 'model',
+		text: 'ninth',
+		messageId: 8
 	},
 	{
-		SentByUser: 'user',
-		Text: 'tenth',
-		MessageID: 9
+		sentByUser: 'user',
+		text: 'tenth',
+		messageId: 9
 	},
 	{
-		SentByUser: 'model',
-		Text: 'eleventh',
-		MessageID: 10
+		sentByUser: 'model',
+		text: 'eleventh',
+		messageId: 10
 	},
 	{
-		SentByUser: 'user',
-		Text: 'twelveth (newest)',
-		MessageID: 11
+		sentByUser: 'user',
+		text: 'twelveth (newest)',
+		messageId: 11
 	},
 ]
 
@@ -120,7 +120,8 @@ const exampleUserLogos = {
 }
 
 
-const sampleChatHistory = [{ "MessageID": 1, "ThreadID": 1, "Text": "Message1_Thread1_UserA", "Timestamp": "2024-08-27T06:33:45.000Z", "SentByUser": "model", "UserID": 1 }, { "MessageID": 2, "ThreadID": 1, "Text": "Message2_Thread1_UserA", "Timestamp": "2024-08-27T06:33:45.000Z", "SentByUser": "user", "UserID": 1 }, { "MessageID": 3, "ThreadID": 1, "Text": "Message3_Thread1_UserA", "Timestamp": "2024-08-27T06:33:49.000Z", "SentByUser": "model", "UserID": 1 }]
+//const sampleChatHistory = [{ "MessageID": 1, "ThreadID": 1, "Text": "Message1_Thread1_UserA", "Timestamp": "2024-08-27T06:33:45.000Z", "SentByUser": "model", "UserID": 1 }, { "MessageID": 2, "ThreadID": 1, "Text": "Message2_Thread1_UserA", "Timestamp": "2024-08-27T06:33:45.000Z", "SentByUser": "user", "UserID": 1 }, { "MessageID": 3, "ThreadID": 1, "Text": "Message3_Thread1_UserA", "Timestamp": "2024-08-27T06:33:49.000Z", "SentByUser": "model", "UserID": 1 }]
+const sampleChatHistory = [{ "messageId": 1, "ThreadID": 1, "text": "Message1_Thread1_UserA", "Timestamp": "2024-08-27T06:33:45.000Z", "sentByUser": "model", "UserID": 1 }, { "messageId": 2, "ThreadID": 1, "text": "Message2_Thread1_UserA", "Timestamp": "2024-08-27T06:33:45.000Z", "sentByUser": "user", "UserID": 1 }, { "messageId": 3, "ThreadID": 1, "text": "Message3_Thread1_UserA", "Timestamp": "2024-08-27T06:33:49.000Z", "sentByUser": "model", "UserID": 1 }]
 
 export const Light = Template.bind({})
 Light.args = {

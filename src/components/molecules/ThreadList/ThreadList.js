@@ -9,17 +9,10 @@ export default function ThreadList({ state, services, ...props }) {
 	return (
 		<ThreadListContainer variant={variant} $maxwidth={maxwidth} {...props}>
 			{threads?.map((info, index) => {
-				const { Name, ThreadID, highlighted } = info
-				const threadState = {
-					variant,
-					maxwidth,
-					maxheight: 44,
-					name: Name,
-					idno: ThreadID || index,
-					highlighted,
-				}
-				const threadServices = { threadListener: () => openExistingThread({ userId, index, threadid: ThreadID }), trashListener: () => deleteThread({ userId, index, threadid: ThreadID }), }
-				return (<Thread state={threadState} services={threadServices} key={`thread-trash-icon-${ThreadID}`} />)
+				const { name, threadId, highlighted } = info
+				const threadState = { variant, maxwidth, maxheight: 44, name, idno: threadId || index, highlighted, }
+				const threadServices = { threadListener: () => openExistingThread({ userId, index, threadId }), trashListener: () => deleteThread({ userId, index, threadId }), }
+				return (<Thread state={threadState} services={threadServices} key={`thread-trash-icon-${threadId}`} />)
 			})}
 		</ThreadListContainer>
 	)
