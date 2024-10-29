@@ -12,10 +12,7 @@ const initialState = {
 		temperature: 50, // number in range 0 to 100
 		isSideBarOpen: true, //bool
 	},
-	chatList: {
-		userInput: '', // string
-		isNewChat: true, // bool
-	},
+	chatList: { userInput: '', isNewChat: true, },
 }
 
 const LLMChatPageSlice = createSlice({
