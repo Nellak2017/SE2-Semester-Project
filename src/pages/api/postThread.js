@@ -23,8 +23,8 @@ const result = await tryCatchAsyncPlain(async () => {
 			VALUES (?, ?);
     	`
 		const dbResult = await db.query(query, [threadName, userId])
-		const newThreadID = dbResult[0].insertId
-		res.status(200).json({ message: 'Thread created successfully.', newThreadID })
+		const newThreadId = dbResult[0].insertId
+		res.status(200).json({ message: 'Thread created successfully.', newThreadId })
 		return null
 	}, _ => res.status(500).json({ error: 'Internal Server Error.' })) // e.message (security vulnerability)
 

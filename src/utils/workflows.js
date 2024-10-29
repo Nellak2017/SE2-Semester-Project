@@ -52,7 +52,7 @@ export const dialogueWorkflow = async ({ userId, chatHistory, threadId, userText
 }
 
 // Side-effects: Get LLM chat title based on user message, Post that chat title for thread name
-// Input/Output: ({ userInput }) => <Result> of { ok: { LLMResponse, newThreadID } | '', error: string | ''} 
+// Input/Output: ({ userInput }) => <Result> of { ok: { LLMResponse, newThreadId } | '', error: string | ''} 
 export const titleWorkflow = async ({ userId, userInput }) => {
 	// 1. Get AI Response for title
 	const text = `Using this supplied user input create a LLM Chat title that is between 2 and 5 words long. Your response must only be those words.\n---User Input\n"${userInput}"`
@@ -67,8 +67,8 @@ export const titleWorkflow = async ({ userId, userInput }) => {
 	const titleResult = await postThread({ userId, threadName: threadAlreadyExists ? AIBaseText + (new Date().toISOString()) : AIBaseText }) // the date string is used to guaranteee uniqueness
 	if (!isOk(titleResult)) return err(`Could not update thread title in the database.\n${getError(titleResult)}`)
 
-	const { newThreadID } = getValue(titleResult) // { message , newThreadID: int }
-	return ok({ LLMResponse: AIBaseText, newThreadID })
+	const { newThreadId } = getValue(titleResult) // { message , newThreadId: int }
+	return ok({ LLMResponse: AIBaseText, newThreadId })
 }
 
 // Side-effects: get userID, fetch threads, fetch messages for 0th thread 
