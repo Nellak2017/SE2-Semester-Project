@@ -2,8 +2,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import rangeParser from 'parse-numeric-range'
 import { CodeHeader } from '../Chat/Chat.elements.js'
-// React Syntax Highlighter - https://github.com/react-syntax-highlighter/react-syntax-highlighter (2) Blog that shows how to do it (Modern) - https://amirardalan.com/blog/syntax-highlight-code-in-markdown
-export const MarkdownComponents = {
+export const MarkdownComponents = { // React Syntax Highlighter - https://github.com/react-syntax-highlighter/react-syntax-highlighter (2) Blog that shows how to do it (Modern) - https://amirardalan.com/blog/syntax-highlight-code-in-markdown
 	code({ node, className, ...props }) {
 		const hasLang = /language-(\w+)/.exec(className || ''), hasMeta = node?.data?.meta
 		const applyHighlights = applyHighlight => {

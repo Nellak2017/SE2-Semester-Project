@@ -7,10 +7,5 @@ import store from '../../../redux/store.js'
 export default function LLMChat({ state, services = createLLMPageServices(store) }) {
 	const { sideBarState, chatListState } = state || {}
 	const { sideBarServices, chatListServices } = services || {}
-	return (
-		<ChatListContainer>
-			<SideBar state={sideBarState} services={sideBarServices} />
-			<ChatList state={chatListState} services={chatListServices} />
-		</ChatListContainer>
-	)
+	return (<ChatListContainer><SideBar state={sideBarState} services={sideBarServices} /><ChatList state={chatListState} services={chatListServices} /></ChatListContainer>)
 }

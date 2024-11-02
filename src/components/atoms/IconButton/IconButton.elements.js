@@ -55,18 +55,14 @@ const iconButtonPreSets = {
   },
   size: iconSizePreset,
 }
-
 export const IconButtonStyled = styled.button`
     outline-style: solid;
-    // Styles to make it a perfect circle, no matter what the child is
-    border-radius: 50%;
+    border-radius: 50%; // Styles to make it a perfect circle, no matter what the child is
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    
-    // Size defaults to xl if none is provided
-    height: ${props => props.theme.fontSizes.larger};
+    height: ${props => props.theme.fontSizes.larger}; // Size defaults to xl if none is provided
     width: ${props => props.theme.fontSizes.larger};
     padding: 8px;
     font-size: ${props => props.theme.fontSizes.large};

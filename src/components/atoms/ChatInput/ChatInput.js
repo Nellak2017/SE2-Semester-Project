@@ -18,7 +18,6 @@ export default function ChatInput({ state, services, ...rest }) {
 		nextThreadIndex: threads.length || 0,
 		chatHistory
 	}), [chatHistory, isNewChat, threadIndex, threads, userId, userInput, userInputSubmit])
-
 	return (
 		<ChatInputParent variant={variant} onClick={handleClick}>
 			<ChatInputChild placeholder={placeholder} name={name} onChange={handleInputChange} value={userInput} onBlur={onBlur} ref={ref} {...rest} />

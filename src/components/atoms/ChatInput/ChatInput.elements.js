@@ -16,8 +16,7 @@ const chatInputPresets = {
         default: css` padding: .5rem ${props => props.theme.fontSizes.smaller}; `
     },
 }
-// This should be a div with div children. The first child should have role='textbox'
-export const ChatInputParent = styled.div`
+export const ChatInputParent = styled.div`// This should be a div with div children. The first child should have role='textbox'
     padding: 0 ${props => props.theme.fontSizes.smaller}; 
     outline: none;
     display: inline-flex; 
@@ -35,8 +34,7 @@ export const ChatInputParent = styled.div`
     &:active { background-color: ${props => props.theme.colors.lightNeutralActive}; }
     ${getPresetCSS(chatInputPresets, 'variant')}
 `
-// This is the actual input element that is made from TextareaAutosize component downloaded from npm
-export const ChatInputChild = styled(TextareaAutosize)`
+export const ChatInputChild = styled(TextareaAutosize)`// This is the actual input element that is made from TextareaAutosize component downloaded from npm
     padding: .5rem 0; // This is here so that no matter where a user presses it will focus
     line-height: 1.375rem;
     min-height: 1.375rem;

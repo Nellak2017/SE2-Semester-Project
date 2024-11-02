@@ -14,8 +14,6 @@ export const ThreadContainerStyled = styled.section`
         box-shadow: ${props => props.theme.elevations.small};
 		background-color: ${props => props.theme.colors.lightNeutralHover};
     }
-	// This weird :active thing is so that Trashcan :active can be independent from parent
-	// See also: https://stackoverflow.com/questions/33114318/css-prevent-parent-element-getting-active-pseudoclass-when-child-element-is-cl
 	&:active:not(:has(:active)) {
 		cursor: pointer;
 		background-color: ${props => props.theme.colors.lightNeutralActive};
@@ -52,9 +50,7 @@ export const IconContainer = styled.div`
 		cursor: pointer;
 		color: ${props => props.theme.colors.primaryActive};
 	}
-	// This weird :active thing is so that Trashcan :active can be independent from parent
-	// See also: https://stackoverflow.com/questions/33114318/css-prevent-parent-element-getting-active-pseudoclass-when-child-element-is-cl
-	&:active:not(:has(:active)) {
+	&:active:not(:has(:active)) { // This weird :active thing is so that Trashcan :active can be independent from parent. See also: https://stackoverflow.com/questions/33114318/css-prevent-parent-element-getting-active-pseudoclass-when-child-element-is-cl
 		cursor: pointer;
 		background-color: ${props => props.theme.colors.lightNeutralActive};
 	}

@@ -8,11 +8,9 @@ import { PiPlaceholderDuotone } from 'react-icons/pi'
 import { MarkdownComponents } from '../TypingSimulator/markdownComponents.js'
 
 const NormalComponent = ({ error, typingSpeed, user, text = '' }) => !error && (user !== USERS.model || !typingSpeed)
-	? (<Message><ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown></Message>)
-	: undefined
+	? (<Message><ReactMarkdown components={MarkdownComponents} remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown></Message>) : undefined
 const TypingSimulationComponent = ({ error, typingSpeed, user, text = '' }) => !error && user === USERS.model && typingSpeed
-	? (<Message><TypingSimulator message={text} typingSpeed={typingSpeed} /></Message>)
-	: undefined
+	? (<Message><TypingSimulator message={text} typingSpeed={typingSpeed} /></Message>) : undefined
 const ErrorComponent = ({ error }) => error ? (<ErrorMessage message={error} />) : undefined
 
 export default function Chat({ state, ...props }) {

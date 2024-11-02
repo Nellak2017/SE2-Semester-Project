@@ -72,8 +72,9 @@ export const typingSpeedUpdate = ({ userId, threadId, typingSpeed }) => dispatch
 	patchTypingSpeed({ userId, threadId, newTypingSpeed: typingSpeed })
 }
 
-// TODO: Log in thunk
-// TODO: Log out thunk
+// TODO: Discover how the messageHistory is recieved, like the Pascal or CamelCasing and fix this potential issue
+// TODO: Log in thunk + Service aggregator
+// TODO: Log out thunk + Service aggregator
 
 export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, updatedThreadId, messageId, nextThreadIndex, chatHistory }) => async (dispatch) => {
 	const userMessage = {  messageId, threadId, text: userInput, timeStamp: new Date().toISOString(), sentByUser: 'user' }

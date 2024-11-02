@@ -2,7 +2,7 @@ import { toggleSidebarOpen, setTemperature, setTypingSpeed, setThreadIndex, setU
 import { newChat, temperatureUpdate, typingSpeedUpdate, deleteThreadThunk, userInputSubmit, openExistingThread } from '../../../redux/thunks/LLMChatPageThunks.js'
 import { handleExportButtonClick } from '../../../utils/helpers.js'
 
-export const createLLMPageServices = store => { // TODO: Add Logout
+export const createLLMPageServices = store => {
 	const dispatch = store.dispatch
 	const services = {
 		sideBarServices: {
