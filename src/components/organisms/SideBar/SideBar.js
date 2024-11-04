@@ -11,7 +11,7 @@ import CustomSlider from "../../molecules/CustomSlider/CustomSlider.js"
 export default function SideBar({ state, services, ...props }) {
 	const { variant = VARIANTS.dark, temperature = 50, typingSpeed = 50, userId = 0, isSideBarOpen = true, maxwidth = 260, buttonText = "New Chat", logoutText = "Log Out", exportText = "Export to Text", threadIndex = 0, threads = [], threadListState, chatHistory = [], } = state || {}
 	const { sideBarOpen = noop, newChat = noop, temperatureChange = noop, temperatureUpdate = noop, typingSpeedChange = noop, typingSpeedUpdate = noop, exportHandler = messages => handleExportButtonClick(messages), threadListServices, } = services || {}
-	const threadId = threads[threadIndex]?.threadId
+	const threadId = threads[threadIndex]?.threadId || 0 // if we have this guard clause it lets us always have temp or typing speed bar local updates. Otherwise it snaps to default if no threads
 	const topButtonConfigs = [{
 		state: { variant, text: buttonText, centered: false, maxheight: 44 },
 		services: { onClick: () => newChat() },
