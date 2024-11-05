@@ -7,17 +7,14 @@ export const useLLMChatState = () => {
 	const threadMeta = { variant, userId, threads, threadIndex, }, threadListState = { ...threadMeta, maxwidth: 260, }
 	return {
 		sideBarState: {
-			...threadListState,
-			temperature, typingSpeed, isSideBarOpen,
+			...threadListState, temperature, typingSpeed, isSideBarOpen, threadListState, chatHistory,
 			buttonText: "New Chat", logoutText: "Log Out", exportText: "Export to Text",
-			threadListState, chatHistory,
 		},
 		chatListState: {
-			variant, chatHistory, userLogos: USER_LOGOS, typingSpeed,
+			variant, chatHistory, typingSpeed, userLogos: USER_LOGOS,
 			chatInputState: {
-				...threadMeta,
+				...threadMeta, userInput, isNewChat, chatHistory,
 				placeholder: 'Write a Message...', name: '', buttonType: 'submit',
-				userInput, isNewChat, chatHistory,
 			},
 		},
 	}

@@ -28,10 +28,7 @@ const LLMChatPageSlice = createSlice({
 		setThreads: (state, action) => { state.sideBar.threads = action.payload },
 		deleteThread: (state, action) => {
 			const index = action.payload
-			state.sideBar.threads = [
-				...state.sideBar.threads.slice(0, index),
-				...state.sideBar.threads.slice(index + 1),
-			] // delete it using array destructuring
+			state.sideBar.threads = [...state.sideBar.threads.slice(0, index),...state.sideBar.threads.slice(index + 1),] // delete it using array destructuring
 		},
 		addThread: (state, action) => { state.sideBar.threads = [...state.sideBar.threads, action.payload] },
 		addMessage: (state, action) => {
@@ -42,11 +39,12 @@ const LLMChatPageSlice = createSlice({
 		deleteMessages: (state, _) => { state.chatHistory = [] },
 		setUserInput: (state, action) => { state.chatList.userInput = action.payload },
 		setIsNewChat: (state, action) => { state.chatList.isNewChat = Boolean(action.payload) },
-		highlightThread: (state, action) => { state.sideBar.threads = state.sideBar.threads.map((e, i) => ({ ...e, highlighted: i === action.payload })) }
+		highlightThread: (state, action) => { state.sideBar.threads = state.sideBar.threads.map((e, i) => ({ ...e, highlighted: i === action.payload })) },
+		reset: () => initialState,
 	}
 })
 
-export const { setVariant, setUserId, toggleSidebarOpen, setTemperature, setTypingSpeed, setThreadIndex, setThreads, deleteThread, addThread, addMessage, setMessages, deleteMessages, setUserInput, setIsNewChat,
-	highlightThread,
+export const { setVariant, setUserId, toggleSidebarOpen, setTemperature, setTypingSpeed, setThreadIndex, setThreads, deleteThread, addThread, addMessage, setMessages, deleteMessages, setUserInput, setIsNewChat, highlightThread,
+	reset
 } = LLMChatPageSlice.actions
 export default LLMChatPageSlice.reducer

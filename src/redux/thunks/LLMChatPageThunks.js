@@ -1,4 +1,4 @@
-import { deleteThread, setTemperature, setTypingSpeed, setUserId, setUserInput, setThreadIndex, setThreads, setIsNewChat, highlightThread, setMessages, addMessage, deleteMessages, addThread, } from '../reducers/LLMChatPageSlice.js'
+import { deleteThread, setTemperature, setTypingSpeed, setUserId, setUserInput, setThreadIndex, setThreads, setIsNewChat, highlightThread, setMessages, addMessage, deleteMessages, addThread, reset } from '../reducers/LLMChatPageSlice.js'
 import { dialogueWorkflow, titleWorkflow, initializeWorkflow, openThreadWorkflow, } from '../../utils/workflows.js'
 import { patchTemperature, patchTypingSpeed, deleteThread as deleteThreadAPI } from '../../utils/api.js'
 import { isOk, handle, getError, getValue } from '../../utils/result.js'
@@ -25,6 +25,11 @@ export const initialize = ({ credentials }) => async (dispatch) => {
 	dispatchChatData(dispatch, { threads, messages, temperature, typingSpeed })
 	dispatch(setIsNewChat(threads.length === 0 || messages.length === 0))
 	return true
+}
+
+export const resetPage = ({ credentials }) => async (dispatch) => { // Used to reset LLMChat page in case of an uncaught runtime error
+	dispatch(reset())
+	dispatch(initialize({ credentials }))
 }
 
 export const newChat = () => dispatch => {
@@ -73,11 +78,11 @@ export const typingSpeedUpdate = ({ userId, threadId, typingSpeed }) => dispatch
 }
 
 // TODO: Discover how the messageHistory is recieved, like the Pascal or CamelCasing and fix this potential issue
-// TODO: Log in thunk + Service aggregator
-// TODO: Log out thunk + Service aggregator
+// TODO: Log in thunk
+// TODO: Log out thunk
 
 export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, updatedThreadId, messageId, nextThreadIndex, chatHistory }) => async (dispatch) => {
-	const userMessage = {  messageId, threadId, text: userInput, timeStamp: new Date().toISOString(), sentByUser: 'user' }
+	const userMessage = { messageId, threadId, text: userInput, timeStamp: new Date().toISOString(), sentByUser: 'user' }
 	const processedNewChatHistory = convertMessagesToGemini([userMessage, ...chatHistory]).toReversed()
 	const updateMessagesWithAIResponse = async (processedThreadId) => {
 		const result = await dialogueWorkflow({ userId, chatHistory: processedNewChatHistory, threadId: processedThreadId, userText: userMessage.text })
@@ -99,7 +104,7 @@ export const userInputSubmit = ({ userId, userInput, isNewChat, threadId, update
 		const result = await titleWorkflow({ userId, userInput })
 		if (chatHistory?.[0]?.error) dispatch(setMessages(chatHistory.slice(1, chatHistory.length))) // if we have an error displayed, remove it before proceeding
 		handle(result,
-			val => { dispatch(addThread({ threadId: val.newThreadId, name: val.LLMResponse, temperature: 50, typingSpeed: 50, userId, highlighted: true }))},
+			val => { dispatch(addThread({ threadId: val.newThreadId, name: val.LLMResponse, temperature: 50, typingSpeed: 50, userId, highlighted: true })) },
 			err => {
 				console.error(err)
 				dispatch(addThread({ threadId: updatedThreadId, name: 'New Chat', temperature: 50, typingSpeed: 50, userId, highlighted: true }))
