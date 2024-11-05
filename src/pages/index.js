@@ -11,9 +11,8 @@ import LLMChatPageErrorBoundary from '../components/templates/ErrorBoundary/LLMC
 // TODO: Add complete testing solutions
 export const Home = () => {
   useEffect(() => { store.dispatch(initialize({ credentials: {} })) }, [])
-  return (
-    <ErrorBoundary FallbackComponent={LLMChatPageErrorBoundary} onReset={() => { store.dispatch(resetPage({ credentials: {} })) }}>
-      <LLMChat state={useLLMChatState()} services={createLLMPageServices(store)} />
-    </ErrorBoundary>)
+  return (<ErrorBoundary FallbackComponent={LLMChatPageErrorBoundary} onReset={() => { store.dispatch(resetPage({ credentials: {} })) }}>
+    <LLMChat state={useLLMChatState()} services={createLLMPageServices(store)} />
+  </ErrorBoundary>)
 }
 export default Home
