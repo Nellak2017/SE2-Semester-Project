@@ -1,9 +1,12 @@
 import { VARIANTS } from '../utils/constants.js'
 import { toggleSidebarOpen, setTemperature, setTypingSpeed, setThreadIndex, setUserInput, } from '../../redux/reducers/LLMChatPageSlice.js'
 import { newChat, temperatureUpdate, typingSpeedUpdate, deleteThreadThunk, userInputSubmit, openExistingThread } from '../../redux/thunks/LLMChatPageThunks.js'
-import { aggregateServices, aggregateState } from './businessRuleHelpers.js'
+import { aggregateServices, aggregateState, toValidators } from './businessRuleHelpers.js'
+import { any, number, mixedArray, bool, string, mixed, object } from '../../utils/schemaHelpers.js'
 
 export const LLMChatPageDefaults = { variant: VARIANTS['dark'], temperature: 50, typingSpeed: 50, userId: 1, isSideBarOpen: true, threadIndex: 0, threads: [], chatHistory: [], userInput: '', isNewChat: false, }
+const temperature = number.min(0).max(100), typingSpeed = number.min(0).max(100), threadIndex = number.integer().min(0), userId = number.integer().min(1), threadId = number, index = number, isNewChat = bool, updatedThreadId = number, messageId = number, nextThreadIndex = number, threads = mixedArray, chatHistory = mixedArray, userInput = string.max(1000), isSideBarOpen = bool, variant = mixed.oneOf(Object.values(VARIANTS))
+const temperatureDTO = { userId, threadId, temperature }, typingSpeedDTO = { userId, threadId, typingSpeed }, deleteThreadDTO = { userId, threadId, index }, userInputSubmitDTO = { userId, threadId, threads, chatHistory, userInput, isNewChat, updatedThreadId, messageId, nextThreadIndex, }
 // --- service stuff
 const LLMChatRawServices = {
 	sideBarOpen: toggleSidebarOpen,
@@ -19,21 +22,22 @@ const LLMChatRawServices = {
 	userInputChange: setUserInput,
 	userInputSubmit,
 }
-const LLMChatServiceValidators = {
-	sideBarOpen: () => true,
-	newChat: () => true,
-	temperatureChange: temp => Number.isFinite(temp) && temp >= 0 && temp <= 100,
-	temperatureUpdate: ({ userId, threadId, temperature }) => Number.isFinite(userId) && Number.isFinite(threadId) && Number.isFinite(temperature),
-	typingSpeedChange: spd => Number.isFinite(spd) && spd >= 0 && spd <= 100,
-	typingSpeedUpdate: ({ userId, threadId, typingSpeed }) => Number.isFinite(userId) && Number.isFinite(threadId) && Number.isFinite(typingSpeed),
-	setThreadIndex: idx => Number.isInteger(idx) && idx >= 1,
-	exportHandler: messages => Array.isArray(messages),
-	deleteThread: ({ userId, threadId, index }) => true,
-	openExistingThread: ({ userId, threadId, index }) => true,
-	scrollHandler: () => true,
-	userInputChange: userInput => true,
-	userInputSubmit: ({ userId, userInput, isNewChat, threadId, updatedThreadId, messageId, nextThreadIndex, threads, chatHistory }) => true,
+const LLMChatServiceSchema = {
+	sideBarOpen: any,  // Placeholder, since the validator is blank
+	newChat: any,
+	temperatureChange: temperature,
+	temperatureUpdate: object(temperatureDTO),
+	typingSpeedChange: typingSpeed,
+	typingSpeedUpdate: object(typingSpeedDTO),
+	setThreadIndex: threadIndex,
+	exportHandler: mixedArray,
+	deleteThread: object(deleteThreadDTO).required(),
+	openExistingThread: object(deleteThreadDTO).required(),
+	scrollHandler: any,
+	userInputChange: any,
+	userInputSubmit: object(userInputSubmitDTO).required(),
 }
+const LLMChatServiceValidators = toValidators(LLMChatServiceSchema)
 const LLMChatServiceDefaults = {
 	sideBarOpen: LLMChatPageDefaults.isSideBarOpen,
 	newChat: LLMChatPageDefaults.isNewChat,
@@ -45,20 +49,9 @@ const LLMChatServiceDefaults = {
 	exportHandler: LLMChatPageDefaults.chatHistory,
 }
 export const aggregateLLMChatServices = dispatch => aggregateServices(dispatch)(LLMChatRawServices, LLMChatServiceValidators, LLMChatServiceDefaults)
-
 // --- state stuff
-const LLMChatStateValidators = {
-	variant: variant => Object.values(VARIANTS).includes(variant),
-	userId: id => Number.isInteger(id) && id >= 1,
-	threads: threadLis => Array.isArray(threadLis),
-	threadIndex: index => Number.isInteger(index) && index >= 0,
-	temperature: temp => Number.isInteger(temp) && temp >= 0 && temp <= 100,
-	typingSpeed: speed => Number.isInteger(speed) && speed >= 0 && speed <= 100,
-	isSideBarOpen: bool => bool === true || bool === false,
-	chatHistory: chatLis => Array.isArray(chatLis),
-	userInput: input => typeof input === 'string' && input.length <= 1000,
-	isNewChat: bool => bool === true || bool === false,
-}
+const LLMChatStateSchema = { variant, userId, threads, threadIndex, temperature, typingSpeed, chatHistory, userInput, isSideBarOpen, isNewChat, }
+const LLMChatStateValidators = toValidators(LLMChatStateSchema)
 const LLMChatStateDataPaths = {
 	variant: 'LLMChatPage.variant',
 	userId: 'LLMChatPage.userId',

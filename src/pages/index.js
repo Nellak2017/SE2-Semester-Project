@@ -7,7 +7,6 @@ import { useLLMChatState } from '../components/stateHooks/LLMChatPage/useLLMChat
 import 'react-toastify/dist/ReactToastify.css'
 
 // TODO: Add Error Boundaries
-// TODO: Add Error and Logging aspects to service object and state selectors
 // TODO: Add complete testing solutions
 // TODO: Refactor page based thunks and reducers to DDD entity based approach
 export const Home = () => {

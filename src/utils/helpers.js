@@ -1,6 +1,4 @@
 import "core-js/features/array/to-reversed"; import "core-js/features/array/to-sorted"; import "core-js/features/array/to-spliced"
-export const dictMap = (dict, fx) => Object.fromEntries(Object.entries(dict).map(([key, value]) => [key, fx(value)]))
-export const getNestedState = (state, path) => path.split('.').reduce((acc, key) => acc && typeof acc === 'object' ? acc[key] : undefined, state)
 export const noop = () => { /* Intentionally left blank */ }
 export const highlightThread = (threadList, index = 0) => threadList.map((e, i) => ({ ...e, highlighted: i === index }))
 export const convertMessagesToGemini = old => old.map(message => ({ role: message.sentByUser, parts: [{ text: message.text }] }))
