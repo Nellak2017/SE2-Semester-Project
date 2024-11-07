@@ -77,7 +77,6 @@ export const typingSpeedUpdate = ({ userId, threadId, typingSpeed }) => dispatch
 	patchTypingSpeed({ userId, threadId, newTypingSpeed: typingSpeed })
 }
 
-// TODO: Discover how the messageHistory is recieved, like the Pascal or CamelCasing and fix this potential issue
 // TODO: Log in thunk
 // TODO: Log out thunk
 
