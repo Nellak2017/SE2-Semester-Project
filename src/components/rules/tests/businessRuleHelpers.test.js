@@ -1,4 +1,3 @@
-import "core-js/features/array/to-reversed"; import "core-js/features/array/to-sorted"; import "core-js/features/array/to-spliced"
 import { dictMap, getNestedState } from '../businessRuleHelpers.js'
 import * as fc from 'fast-check'
 
@@ -12,8 +11,6 @@ const buildPathAndValue = (obj, randomSeed, depth = 0) => {
 		return { path: `${randomKey}.${nestedPath}`, value: nestedValue }
 	} else { return { path: randomKey, value } }
 }
-const flattenObject = (obj, prefix = '') => Object.entries(obj).reduce((acc, [key, value]) => (typeof value === 'object' && value !== null)
-	? { ...acc, ...flattenObject(value, prefix ? `${prefix}.${key}` : key) } : { ...acc, [key]: value }, {})
 // --- property tests
 describe('dictMap', () => {
 	const objArb = fc.object(), funcArb = fc.func(fc.anything())

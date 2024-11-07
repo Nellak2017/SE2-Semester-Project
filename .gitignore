@@ -18,6 +18,7 @@
 # misc
 .DS_Store
 *.pem
+default
 
 # debug
 npm-debug.log*
@@ -39,3 +40,16 @@ yarn-error.log*
 *.x64.*
 llm-chatbot-app-*.json
 *.cmd
+
+# Golang
+/bin/
+/pkg/
+*.test
+*.out
+.vscode/
+*.log
+*.tmp
+
+# Docker
+docker-compose.yml
+Dockerfile
