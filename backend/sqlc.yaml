@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "db/queries.sql" # Path to queries file
+    schema: "db/schema.sql"   # Path to schema file
+    gen:
+      go:
+        package: "db"
+        out: "db"
+        #sql_package: "pgx/v5"
