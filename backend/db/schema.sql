@@ -1,26 +1,26 @@
--- Create Users Table
-CREATE TABLE IF NOT EXISTS Users (
-  UserID SERIAL PRIMARY KEY,
-  UserName VARCHAR(50) NOT NULL
+-- Create users Table
+CREATE TABLE IF NOT EXISTS users (
+  userid SERIAL PRIMARY KEY,
+  username VARCHAR(50) NOT NULL
 );
 
 -- Create Threads Table
-CREATE TABLE IF NOT EXISTS Threads (
-  ThreadID SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS threads (
+  threadid SERIAL PRIMARY KEY,
   Name VARCHAR(100) NOT NULL,
-  Temperature INT DEFAULT 50 CHECK (Temperature >= 0 AND Temperature <= 100),
-  TypingSpeed INT DEFAULT 50 CHECK (TypingSpeed >= 0 AND TypingSpeed <= 100),
-  UserID INT NOT NULL,
-  UNIQUE (Name, UserID),
-  CONSTRAINT fk_threads_user FOREIGN KEY (UserID) REFERENCES Users (UserID)
+  temperature INT DEFAULT 50 CHECK (temperature >= 0 AND temperature <= 100),
+  typingSpeed INT DEFAULT 50 CHECK (typingSpeed >= 0 AND typingSpeed <= 100),
+  userid INT NOT NULL,
+  UNIQUE (Name, userid),
+  CONSTRAINT fk_threads_user FOREIGN KEY (userid) REFERENCES users (userid)
 );
 
 -- Create Messages Table
-CREATE TABLE IF NOT EXISTS Messages (
-  MessageID SERIAL PRIMARY KEY,
-  ThreadID INT REFERENCES Threads (ThreadID),
+CREATE TABLE IF NOT EXISTS messages (
+  messageid SERIAL PRIMARY KEY,
+  threadid INT REFERENCES threads (threadid),
   Text TEXT,
   Timestamp TIMESTAMP DEFAULT NOW(),
-  SentByUser BOOLEAN DEFAULT NULL,
-  UserID INT REFERENCES Users (UserID)
+  sentbyuser BOOLEAN DEFAULT NULL,
+  userid INT REFERENCES users (userid)
 );
