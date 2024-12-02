@@ -14,9 +14,8 @@ import (
 // /deleteThread
 func DeleteThreadHandler(w http.ResponseWriter, r *http.Request, database *sql.DB) {
 	// Associate query with transaction preamble
-	ctx := r.Context()
+	ctx, queries := scripts.EndpointPreamble(r, database)
 	tx, err := database.Begin()
-	queries := db.New(database)
 	qtx := queries.WithTx(tx)
 	if err != nil {
 		http.Error(w, "Failed to start transaction", http.StatusInternalServerError)
@@ -60,10 +59,8 @@ func DeleteThreadHandler(w http.ResponseWriter, r *http.Request, database *sql.D
 }
 
 // GET endpoint for seeing if thread with userid and name exists
-func GetIsThreadNameExist(w http.ResponseWriter, r *http.Request, database *sql.DB) {
-	// Preamble
-	ctx := r.Context()
-	queries := db.New(database)
+func GetIsThreadNameExistHandler(w http.ResponseWriter, r *http.Request, database *sql.DB) {
+	ctx, queries := scripts.EndpointPreamble(r, database)
 
 	// Get query params
 	userID, err := scripts.ParseNumberURLQuery(w, r, "userid")

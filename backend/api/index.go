@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Nellak2017/SE2-Semester-Project/backend/api/messages"
 	"github.com/Nellak2017/SE2-Semester-Project/backend/api/threads"
 	"github.com/gorilla/mux"
 )
@@ -18,7 +19,8 @@ type Endpoint struct {
 func GetEndpointData() []Endpoint {
 	return []Endpoint{
 		{Route: "/deleteThread", Handler: threads.DeleteThreadHandler, Method: "DELETE"},
-		{Route: "/getIsThreadNameExist", Handler: threads.GetIsThreadNameExist, Method: "GET"},
+		{Route: "/getIsThreadNameExist", Handler: threads.GetIsThreadNameExistHandler, Method: "GET"},
+		{Route: "/getMessages", Handler: messages.GetMessagesHandler, Method: "GET"},
 		// Add more routes as needed
 	}
 }

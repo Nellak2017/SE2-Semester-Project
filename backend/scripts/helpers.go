@@ -1,6 +1,7 @@
 package scripts
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"strconv"
 
+	db "github.com/Nellak2017/SE2-Semester-Project/backend/db/SQLc"
 	"github.com/joho/godotenv"
 )
 
@@ -103,4 +105,20 @@ func ParseStringURLQuery(w http.ResponseWriter, r *http.Request, URL_Query strin
 		return "", errors.New(URL_Query + " is required")
 	}
 	return numStr, nil
+}
+
+func EndpointPreamble(r *http.Request, database *sql.DB) (ctx context.Context, queries *db.Queries) {
+	return r.Context(), db.New(database)
+}
+
+func ConvertMessagesToStrings(messages []db.Message) []string {
+	strings := make([]string, 0, len(messages)) // Preallocate for efficiency
+	for _, msg := range messages {
+		if msg.Text.Valid { // Check if the Text field is valid
+			strings = append(strings, msg.Text.String)
+		} else {
+			strings = append(strings, "") // Append an empty string if Text is null
+		}
+	}
+	return strings
 }
