@@ -2,8 +2,12 @@ package scripts
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -64,4 +68,39 @@ func CreateAndSeedTestDB() {
 	DropTestDB()
 	CreateTestDB()
 	TestSeed()
+}
+
+// --- Helpers for api stuff
+func SetResponseHeader(w http.ResponseWriter, content string, success_text string) error {
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(content); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		log.Println("Error encoding response:", err)
+		return err
+	}
+	log.Println(success_text)
+	return nil
+}
+
+func ParseNumberURLQuery(w http.ResponseWriter, r *http.Request, URL_Query string) (int, error) {
+	numStr := r.URL.Query().Get(URL_Query)
+	if numStr == "" {
+		http.Error(w, URL_Query+" is required", http.StatusBadRequest)
+		return 0, errors.New(URL_Query + " is required")
+	}
+	num, err := strconv.Atoi(numStr)
+	if err != nil {
+		http.Error(w, "Invalid "+URL_Query, http.StatusBadRequest)
+		return 0, errors.New("Invalid " + URL_Query)
+	}
+	return num, nil
+}
+
+func ParseStringURLQuery(w http.ResponseWriter, r *http.Request, URL_Query string) (string, error) {
+	numStr := r.URL.Query().Get(URL_Query)
+	if numStr == "" {
+		http.Error(w, URL_Query+" is required", http.StatusBadRequest)
+		return "", errors.New(URL_Query + " is required")
+	}
+	return numStr, nil
 }

@@ -11,7 +11,7 @@ func DropDB(env_path string, POSTGRES_ENV string, DB_NAME_ENV string, success_st
 	defer db.Close()
 	dbName := GetEnvVariable(DB_NAME_ENV)
 	ExecuteSQL(db, []byte("SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid();"), dbName)
-	ExecuteSQL(db, []byte("DROP DATABASE IF EXISTS $1"), dbName)
+	ExecuteSQL(db, []byte("DROP DATABASE IF EXISTS "+dbName))
 	log.Println(success_string)
 }
 

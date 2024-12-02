@@ -12,7 +12,7 @@ func CreateDB(env_path string, schema_path string, POSTGRES_ENV string, DB_NAME_
 	defer db.Close()
 
 	db_name := GetEnvVariable(DB_NAME_ENV)
-	ExecuteSQL(db, []byte("CREATE DATABASE $1"), db_name)
+	ExecuteSQL(db, []byte("CREATE DATABASE "+db_name))
 
 	db, _ = LoadDB(env_path, DB_ENV)
 	ExecuteSQL(db, schema)
