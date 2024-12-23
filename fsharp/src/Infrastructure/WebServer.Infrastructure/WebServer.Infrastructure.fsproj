@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Application\WebServer.Application\WebServer.Application.fsproj" />
+    <ProjectReference Include="..\..\Domain\WebServer.Domain\WebServer.Domain.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Persistence\SQLc\Models.fs" />
+    <Compile Include="Persistence\SQLc\Readers.fs" />
+    <Compile Include="Persistence\SQLc\Queries.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="9.0.2" />
+    <PackageReference Include="Npgsql.FSharp" Version="8.0.0" />
+  </ItemGroup>
+</Project>

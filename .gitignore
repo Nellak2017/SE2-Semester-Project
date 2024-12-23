@@ -55,3 +55,6 @@ llm-chatbot-app-*.json
 docker-compose.yml
 Dockerfile
 .fake
+
+# config
+.config/
