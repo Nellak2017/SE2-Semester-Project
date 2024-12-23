@@ -1,9 +1,9 @@
 ﻿open SE2.Infrastructure.Persistence.SQLc
+open System
+open dotenv.net
 
-let connectionString =
-    "use env variables!"
-
-let db = DB(connectionString)
+DotEnv.Load(DotEnvOptions(envFilePaths = [| "../../../.env.test" |]))
+let db = DB(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"))
 
 let getUsers () =
     try
