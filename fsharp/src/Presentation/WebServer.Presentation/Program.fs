@@ -3,6 +3,8 @@ open System
 open dotenv.net
 
 DotEnv.Load(DotEnvOptions(envFilePaths = [| "../../../.env.test" |]))
+let connStr = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+printfn "%s" connStr
 let db = DB(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"))
 
 let getUsers () =

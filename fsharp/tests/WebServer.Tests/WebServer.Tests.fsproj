@@ -1,28 +1,27 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <IsPackable>false</IsPackable>
-    <GenerateProgramFile>false</GenerateProgramFile>
+    <RunSettingsFilePath>$(MSBuildProjectDirectory)\test.runsettings</RunSettingsFilePath>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="Tests.fs" />
-    <Compile Include="Program.fs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="6.0.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="xunit" Version="2.9.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\Domain\WebServer.Domain\WebServer.Domain.fsproj" />
     <ProjectReference Include="..\..\src\Application\WebServer.Application\WebServer.Application.fsproj" />
     <ProjectReference Include="..\..\src\Infrastructure\WebServer.Infrastructure\WebServer.Infrastructure.fsproj" />
     <ProjectReference Include="..\..\src\Presentation\WebServer.Presentation\WebServer.Presentation.fsproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="dotenv.net" Version="3.2.1" />
+    <PackageReference Include="FsCheck" Version="2.16.6" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="Npgsql" Version="9.0.2" />
+    <PackageReference Include="Npgsql.FSharp" Version="8.0.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Utilities\TestDatabaseHelpers.fs" />
+    <Compile Include="InfrastructureTests.fs" />
+  </ItemGroup>
 </Project>
