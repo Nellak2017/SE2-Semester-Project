@@ -7,62 +7,96 @@ open System.Diagnostics
 open Npgsql
 open dotenv.net
 
-// DBOps - wrappers for basic DB operations like getting data, getting env, executing SQL, and more 
+// EnvOps - wrappers for environment variable functions like getting an env or a relative path
+module EnvOps =
+    let getEnv (environmentVariable: string) =
+        Environment.GetEnvironmentVariable(environmentVariable)
+
+    let pathFromRelative (relativePath: string) =
+        Path.GetFullPath(Path.Combine(Environment.CurrentDirectory, relativePath))
+
+    let schemaPath () = // convienience function for schema file location
+        pathFromRelative "../../../../../src/Infrastructure/WebServer.Infrastructure/Persistence/schema.sql"
+
+// DBOps - wrappers for basic DB operations like getting data, getting env, executing SQL, and more
 module DBOps =
-    // Loads the environment variables to be accessible within a given scope, When give an envPath
-    let loadEnvFile (envPath: string) =
+    let executeSQL (db: NpgsqlConnection) (sql: string) =
         try
-            DotEnv.Load(DotEnvOptions(envFilePaths = [| envPath |]))
-        with
-        | ex -> failwithf "Error loading .env file: %s" ex.Message
+            use command = new NpgsqlCommand(sql, db)
+            command.ExecuteNonQuery() |> ignore
+        with ex ->
+            printfn "Error executing SQL: %s" ex.Message
 
-    // Assumes that env are loaded, if not it will fail
-    let getEnvVariable (envName: string) =
-        Environment.GetEnvironmentVariable(envName)
+    let executeSQLWithLogging (db: NpgsqlConnection) (sql: string) (before: string) (after: string) (error: string) =
+        try
+            printfn "%s" before
+            executeSQL db sql
+            printfn "%s" after
+        with ex ->
+            printfn "%s %s" error ex.Message
 
-    let connectToDatabase (connStr: string) =
-        try 
-            let db = new NpgsqlConnection(connStr)
-            db
-        with
-        | ex -> failwithf "Error connecting to database: %s" ex.Message
-
-    // TODO: fix this one
-    let loadDB (envPath: string) (dbUrlEnv: string) =
-        loadEnvFile envPath // side-effect. May failwith 
-        connectToDatabase (getEnvVariable dbUrlEnv) // side-effect + return connection. May failwith
+    let connectToDB (connStr: string) = // side-effect
+        try
+            use conn = new NpgsqlConnection(connStr)
+            conn.Open()
+            conn
+        with ex ->
+            failwithf "Error connecting to database: %s" ex.Message
 
     let getFileData (filePath: string) =
         try
-            File.ReadAllBytes(filePath)
-        with
-        | ex -> failwithf "Error reading file: %s" ex.Message
-
-    let executeSQL (db: NpgsqlConnection) (sql: byte[]) =
-        try
-            use command = new NpgsqlCommand(System.Text.Encoding.UTF8.GetString(sql), db)
-            command.ExecuteNonQuery() |> ignore
-        with
-        | ex -> printfn "Error executing SQL: %s" ex.Message
+            File.ReadAllText(filePath)
+        with ex ->
+            failwithf "Error reading file: %s" ex.Message
 
 // Setup - creates a database and may seed it among other things
 module Setup =
-    let createDB (envPath: string) (schemaPath: string) (postgresEnv: string) (dbNameEnv: string) (dbEnv: string) (successString: string) =
+    let createDBIfNotExists (connStr: string) (dbName: string) =
+        use db = DBOps.connectToDB connStr // side-effect
+
+        use reader =
+            (new NpgsqlCommand(sprintf "SELECT 1 FROM pg_database WHERE datname = '%s'" dbName, db))
+                .ExecuteReader()
+
+        if not reader.HasRows then
+            DBOps.executeSQLWithLogging
+                db
+                (sprintf "CREATE DATABASE \"%s\"" dbName)
+                "Database does not exist. Creating..."
+                "Database created successfully."
+                "Eror could not create Database."
+        else
+            printfn "Database '%s' already exists." dbName
+
+        reader.Close()
+
+    let addDBSchema (connStr: string) (schemaPath: string) =
+        use db = DBOps.connectToDB connStr
         let schema = DBOps.getFileData schemaPath
-        let db = DBOps.loadDB envPath postgresEnv
+
         try
-            let dbName = DBOps.getEnvVariable dbNameEnv
-            DBOps.executeSQL db (System.Text.Encoding.UTF8.GetBytes("CREATE DATABASE " + dbName))
-            let db = DBOps.loadDB envPath dbEnv
-            DBOps.executeSQL db schema
-            printfn "%s" successString
+            DBOps.executeSQLWithLogging
+                db
+                schema
+                "Adding Schema to Database..."
+                "Added Schema to Database."
+                "Could not add schema to database."
         finally
             db.Close()
 
-    let createTestDB () =
-        createDB "../../../.env.test" "../../db/schema.sql" "POSTGRES_SERVER" "TEST_DATABASE_NAME" "TEST_DATABASE_URL" "Database schema created successfully!"
+    let setupDB (connStr: string) (schemaPath: string) (dbName: string) (successString: string) =
+        createDBIfNotExists connStr dbName
+        addDBSchema connStr schemaPath
+        printfn "%s" successString
 
-    let seedTestDB envPath dbEnv seedPath (successString: string) =
+    let createTestDB () =
+        setupDB
+            (EnvOps.getEnv "DB_CONNECTION_STRING")
+            (EnvOps.schemaPath ())
+            (EnvOps.getEnv "TEST_DATABASE_NAME")
+            "Database schema created successfully!"
+
+    let seedTestDB dbEnv seedPath (successString: string) =
         let dbConn = Environment.GetEnvironmentVariable(dbEnv)
 
         if String.IsNullOrWhiteSpace dbConn then
