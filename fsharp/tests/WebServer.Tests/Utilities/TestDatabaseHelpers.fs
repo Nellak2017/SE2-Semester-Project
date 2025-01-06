@@ -3,7 +3,6 @@ namespace Tests.TestDatabaseHelpers
 
 open System
 open System.IO
-open System.Diagnostics
 open Npgsql
 open FsToolkit.ErrorHandling
 
@@ -30,17 +29,15 @@ module DBOps =
     let querySQL (db: NpgsqlConnection) (sql: string) =
         async {
             try
-                use command = new NpgsqlCommand(sql, db)
-                use reader = command.ExecuteReader()
+                use reader = (new NpgsqlCommand(sql, db)).ExecuteReader()
 
-                let results =
+                return
                     seq {
                         while reader.Read() do
                             yield [ for i in 0 .. reader.FieldCount - 1 -> reader.GetValue(i) ]
                     }
                     |> Seq.toList
-
-                return Ok results
+                    |> Ok
             with ex ->
                 return Error $"Error querying SQL: \n{ex.Message}"
         }
@@ -48,8 +45,7 @@ module DBOps =
     let executeSQL (db: NpgsqlConnection) (sql: string) =
         async {
             try
-                use command = new NpgsqlCommand(sql, db)
-                command.ExecuteNonQuery() |> ignore
+                (new NpgsqlCommand(sql, db)).ExecuteNonQuery() |> ignore
                 return Ok $"Successfully executed SQL: \n{sql}"
             with ex ->
                 return Error $"Error executing SQL: \n{ex.Message}"
@@ -68,8 +64,7 @@ module DBOps =
     let getFileData (filePath: string) =
         async {
             try
-                let data = File.ReadAllText(filePath)
-                return Ok data
+                return File.ReadAllText(filePath) |> Ok
             with ex ->
                 return Error $"Error reading file: \n{ex.Message}"
         }
@@ -101,8 +96,11 @@ module Setup =
             | Error err -> return Error $"Error checking for database existence: \n{err}" // The query failed
         }
 
-    let addDBSchema connStr schemaPath = DBOps.executeSQLFromFile connStr schemaPath
-    let seedTestDB connStr seedPath = DBOps.executeSQLFromFile connStr seedPath
+    let addDBSchema connStr schemaPath =
+        DBOps.executeSQLFromFile connStr schemaPath
+
+    let seedTestDB connStr seedPath =
+        DBOps.executeSQLFromFile connStr seedPath
 
     let setupDB
         ({ DefaultConnStr = defaultConnStr
@@ -128,24 +126,22 @@ module Setup =
 
 // Teardown - will destroy the test database
 module Teardown =
-    let dropTestDatabase envPath postgresEnv dbNameEnv (successString: string) =
-        let postgresConn = Environment.GetEnvironmentVariable(postgresEnv)
-        let dbName = Environment.GetEnvironmentVariable(dbNameEnv)
-
-        if String.IsNullOrWhiteSpace postgresConn || String.IsNullOrWhiteSpace dbName then
-            failwith "Missing required environment variables for database deletion."
-
-        let result =
-            use p = new Process()
-            p.StartInfo.FileName <- "psql"
-            p.StartInfo.Arguments <- $"-c \"DROP DATABASE IF EXISTS {dbName}\" {postgresConn}"
-            p.StartInfo.RedirectStandardOutput <- true
-            p.StartInfo.RedirectStandardError <- true
-            p.Start() |> ignore
-            p.WaitForExit()
-            p.StandardOutput.ReadToEnd()
-
-        if not (result.Contains(successString)) then
-            failwith $"Failed to drop test database: {result}"
-
-        printfn "Test database dropped successfully."
+    let dropDatabase (defaultConnStr: string) (dbName: string) =
+        DBOps.connectToDB defaultConnStr (fun db -> 
+            async {
+                try 
+                    let! _ = DBOps.executeSQL db $"""
+                            SELECT pg_terminate_backend(pg_stat_activity.pid)
+                            FROM pg_stat_activity
+                            WHERE pg_stat_activity.datname = '{dbName}' AND pid <> pg_backend_pid()
+                            """
+                    return! DBOps.executeSQL db $"DROP DATABASE {dbName}"
+                with ex -> 
+                    return Error $"Error dropping database: \n{ex.Message}"
+            }
+        )
+    let dropTestDatabase () =
+        asyncResult {
+            let! _ = dropDatabase (EnvOps.getEnv "DEFAULT_DB_CONNECTION_STRING") (EnvOps.getEnv "TEST_DATABASE_NAME")
+            return ()
+        }

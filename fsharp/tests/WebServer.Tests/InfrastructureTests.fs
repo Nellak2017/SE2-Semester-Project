@@ -21,18 +21,16 @@ module GetAllUsers =
 
     [<Fact>]
     let ```Test getAllUsers should retrieve all users`` () =
-        let test =
-            createTestDB ()
+        let runTestWorkflow () =
+            asyncResult {
+                do! createTestDB ()
+                do! dropTestDatabase ()
+                return "Test Database setup and teardown completed successfully"
+            }
+        let testResult =
+            runTestWorkflow ()
             |> Async.RunSynchronously
-            |> (fun value ->
-                match value with
-                | Ok() -> "Database setup successfully"
-                | Error err -> err)
-
-        printfn "%s" test
-
-// seedTestDB "envPath" "DB_ENV" "seedPath" "SEED_SUCCESS"
-// try
-//     Assert.NotEmpty(db.getAllUsers())
-// finally
-//     dropTestDatabase "envPath" "POSTGRES_ENV" "DB_NAME_ENV" "DROP_SUCCESS"
+            |> function
+                | Ok message -> message
+                | Error err -> $"{err}"
+        printfn "%s" testResult
