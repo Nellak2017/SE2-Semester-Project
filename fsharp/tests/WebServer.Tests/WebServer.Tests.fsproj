@@ -14,6 +14,7 @@
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
     <PackageReference Include="dotenv.net" Version="3.2.1" />
     <PackageReference Include="FsCheck" Version="2.16.6" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="4.18.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="Npgsql" Version="9.0.2" />
     <PackageReference Include="Npgsql.FSharp" Version="8.0.0" />
